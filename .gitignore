@@ -1,0 +1,16 @@
+# Python/Django
+venv/
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+
+# Node/Angular
+node_modules/
+dist/
+.angular/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
