@@ -1,0 +1,54 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  margin: 1.5rem;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 1.90rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.logo-black {
+  color: #000000;
+  /* Le añadimos apenas una leve sombra blanca para asegurar que 
+     el color negro se lea perfectamente sobre nuestro modo Dark Mode */
+  text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.4);
+}
+
+.logo-brown {
+  color: #c48655; /* Marrón vibrante "Premium" adaptado a Dark Mode */
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.auth-btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+}
+
+.content-wrapper {
+  flex: 1; 
+  padding: 0 1.5rem 3rem 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}

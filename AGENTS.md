@@ -27,7 +27,7 @@ Eres un experto en Python (3.14+) y Angular enfocado en arquitectura escalable.
 ## 🛠️ Stack Tecnológico
 
 - **Core**: Backend en Python (Django + Django REST Framework) y Frontend en Angular.
-- **BD**: SQLite (suficiente y ligero para la escala prevista de usuarios).
+- **BD**: PostgreSQL (Sistema de base de datos relacional robusto para producción).
 
 ## ⚠️ Error Handling y Validación
 

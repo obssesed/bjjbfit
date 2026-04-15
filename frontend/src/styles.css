@@ -1,0 +1,94 @@
+/* styles.css */
+
+/* 1. Variables Globales: Modificadores de la estética Vibrante, Dark y Premium */
+:root {
+  /* Paleta de Colores Base */
+  --bg-dark: #0f172a;       /* Fondo muy oscuro y profundo, ideal para el gym */
+  --bg-card: rgba(30, 41, 59, 0.7); /* Fondo traslúcido para las tarjetas (Glassmorphism) */
+  --primary: #3b82f6;       /* Azul vibrante principal */
+  --primary-hover: #2563eb; /* Azul efecto hover */
+  --accent: #f59e0b;        /* Color secundario ámbar para avisos/highlights */
+  
+  /* Tonos de Texto */
+  --text-main: #f8fafc;     /* Blanco suave, menos cansado que blanco puro */
+  --text-muted: #94a3b8;    /* Gris para texto secundario y descriptivo */
+  
+  /* Distancias, Bordes y Efectos (UI moderna) */
+  --border-color: rgba(255, 255, 255, 0.08); /* Borde de cristal muy sútil */
+  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.5); /* Sombra difuminada amplia */
+  --blur-glass: blur(16px);  /* Desenfoque de fondo dinámico */
+  --radius-md: 12px;         /* Esquinas suavemente redondeadas */
+  --radius-lg: 20px;         /* Esquinas muy redondeadas para componentes mayores */
+  --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Curva de animación suavizada */
+}
+
+/* 2. Reset Básico (Para que los navegadores no rompan el grid) */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. Comportamiento del Cuerpo entero de la app */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  /* Fondo dinámico: un ligero gradiente radial hace que no sea un color plano y aburrido */
+  background: radial-gradient(circle at top right, #1e293b, #0f172a);
+}
+
+/* 4. Títulos Globales */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+}
+
+/* 5. Enlaces Globales */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* ==============================================================
+   CLASES DE UTILIDAD GOBALES (Para usar en cualquier HTML)
+   ============================================================== */
+
+/* Glass Card: El estándar actual para diseño "Premium". Parecen placas de cristal. */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-glass);
+  -webkit-backdrop-filter: var(--blur-glass); /* Soporte iOS */
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-glass);
+  padding: 2rem;
+}
+
+/* Botón interactivo animado */
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3); /* Sombra que "brilla" */
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px); /* Pequeña elevación 3D al pasar ratón */
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); /* Crece la sombra */
+}

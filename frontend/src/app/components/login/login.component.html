@@ -1,0 +1,23 @@
+<div class="login-container">
+  <div class="glass-card login-card">
+    <h2 class="form-title">Zona Privada</h2>
+    <p class="subtitle">Accede para gestionar tus reservas.</p>
+
+    <!-- Caja de error -->
+    <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
+
+    <form (ngSubmit)="login()">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" [(ngModel)]="username" name="username" class="form-control" autocomplete="off" required>
+      </div>
+
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" [(ngModel)]="password" name="password" class="form-control" required>
+      </div>
+
+      <button type="submit" class="btn-primary w-100">Entrar al Tatami</button>
+    </form>
+  </div>
+</div>
