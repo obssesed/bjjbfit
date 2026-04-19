@@ -17,9 +17,12 @@ class ReservaViewSet(viewsets.ModelViewSet):
     Vista CRUD completa para gestionar reservas (Crear, Leer, Actualizar, Borrar).
     Usamos 'select_related' para optimizar la carga del deportista y la clase asociada.
     """
-    queryset = Reserva.objects.select_related('clase', 'deportista').all()
     serializer_class = ReservaSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # SEGURIDAD CRÍTICA: Cada usuario solo puede ver y borrar SUS propias reservas.
+        return Reserva.objects.select_related('clase', 'deportista').filter(deportista=self.request.user)
 
     def perform_create(self, serializer):
         # Asigna la reserva, automáticamente, al usuario que hace la petición (Sacado del Token JWT)

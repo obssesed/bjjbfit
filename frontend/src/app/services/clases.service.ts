@@ -37,4 +37,19 @@ export class ClasesService {
   hacerReserva(claseId: number): Observable<any> {
     return this.http.post(this.reservasUrl, { clase: claseId });
   }
+
+  /**
+   * Pide a Django las reservas. Como modificamos el Backend, Django ya sabe
+   * por el Token JWT quién es el usuario y le devolverá solo las suyas.
+   */
+  getMisReservas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.reservasUrl}?t=${new Date().getTime()}`);
+  }
+
+  /**
+   * Ejecuta DELETE sobre la reserva indicada.
+   */
+  cancelarReserva(reservaId: number): Observable<any> {
+    return this.http.delete(`${this.reservasUrl}${reservaId}/`);
+  }
 }

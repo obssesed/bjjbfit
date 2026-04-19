@@ -1,18 +1,26 @@
 <main class="app-container">
   
-  <!-- BARRA DE NAVEGACIÓN SUPERIOR -->
-  <nav class="navbar glass-card">
+  <nav class="navbar">
     <div class="nav-brand">
-      <span class="logo-text"><span class="logo-black">BJJ</span><span class="logo-brown">BFIT</span></span>
+      <span class="logo-text">
+        <span class="logo-white">BJJB</span><span class="logo-gold">FIT</span>
+      </span>
     </div>
-    
+
     <div class="nav-links">
-      <a routerLink="/">Clases</a>
-      <a routerLink="/mis-reservas" class="btn-primary auth-btn">Mi Perfil</a>
+      <a routerLink="/" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Clases</a>
+      <a *ngIf="authService.isLoggedIn()" routerLink="/mis-reservas" class="nav-item" routerLinkActive="active">Mis Reservas</a>
+      
+      <button *ngIf="!authService.isLoggedIn()" routerLink="/login" class="auth-btn">
+        Entrar
+      </button>
+      
+      <button *ngIf="authService.isLoggedIn()" (click)="logout()" class="auth-btn" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary);">
+        Salir
+      </button>
     </div>
   </nav>
 
-  <!-- CONTENEDOR PRINCIPAL -->
   <div class="content-wrapper">
     <router-outlet></router-outlet>
   </div>

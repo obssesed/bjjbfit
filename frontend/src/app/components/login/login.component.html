@@ -1,23 +1,43 @@
-<div class="login-container">
-  <div class="glass-card login-card">
-    <h2 class="form-title">Zona Privada</h2>
-    <p class="subtitle">Accede para gestionar tus reservas.</p>
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2 class="auth-title">Bienvenido de nuevo</h2>
+      <p class="auth-subtitle">Ingresa tus credenciales para acceder al tatami.</p>
+    </div>
 
-    <!-- Caja de error -->
-    <div *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</div>
+    <!-- Mensajes de Error -->
+    <div *ngIf="errorMsg" class="alert-error">
+      {{ errorMsg }}
+    </div>
 
-    <form (ngSubmit)="login()">
-      <div class="form-group">
-        <label>Usuario</label>
-        <input type="text" [(ngModel)]="username" name="username" class="form-control" autocomplete="off" required>
+    <form (ngSubmit)="login()" class="auth-form">
+      <div class="input-group">
+        <label for="username">Nombre de usuario</label>
+        <input 
+          id="username"
+          type="text" 
+          [(ngModel)]="username" 
+          name="username" 
+          placeholder="Tu nombre de usuario"
+          required>
       </div>
 
-      <div class="form-group">
-        <label>Contraseña</label>
-        <input type="password" [(ngModel)]="password" name="password" class="form-control" required>
+      <div class="input-group">
+        <label for="password">Contraseña</label>
+        <input 
+          id="password"
+          type="password" 
+          [(ngModel)]="password" 
+          name="password" 
+          placeholder="••••••••"
+          required>
       </div>
 
-      <button type="submit" class="btn-primary w-100">Entrar al Tatami</button>
+      <button type="submit" class="submit-btn">Entrar al Tatami</button>
     </form>
+
+    <div class="auth-footer">
+      <p>¿No tienes cuenta? <a routerLink="/registro" class="link-gold">Regístrate aquí</a></p>
+    </div>
   </div>
 </div>

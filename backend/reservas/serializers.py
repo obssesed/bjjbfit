@@ -31,3 +31,28 @@ class ReservaSerializer(serializers.ModelSerializer):
         model = Reserva
         fields = ['id', 'clase', 'deportista', 'fecha_reserva']
         read_only_fields = ['deportista']
+
+    def validate(self, data):
+        """
+        Validación a nivel de objeto para asegurar que la clase tiene cupo.
+        """
+        clase = data.get('clase')
+        if clase and clase.plazas_disponibles() <= 0:
+            raise serializers.ValidationError(
+                "Lo sentimos, esta clase ya ha alcanzado su capacidad máxima."
+            )
+        return data
+
+    def to_representation(self, instance):
+        """
+        Sobrescribimos este método para que, aunque el cliente nos mande sólo el ID de la clase en el POST (Ej: clase: 2),
+        cuando Django devuelva los datos de la reserva, incluya detalles útiles de la clase (como el título y fecha)
+        para que la pantalla de 'Mi Perfil' de Angular pueda pintarlos.
+        """
+        response = super().to_representation(instance)
+        response['clase_detalle'] = {
+            'id': instance.clase.id,
+            'titulo': instance.clase.titulo,
+            'fecha_hora_inicio': instance.clase.fecha_hora_inicio
+        }
+        return response

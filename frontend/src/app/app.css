@@ -1,3 +1,28 @@
+:root {
+  /* Color Palette - Premium Dark Theme */
+  --bg-dark: #0a0a0b;
+  --bg-card: #141417;
+  --accent-gold: #c48655;
+  --accent-gold-hover: #e0a370;
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  
+  /* Shadows & Effects */
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
 .app-container {
   display: flex;
   flex-direction: column;
@@ -8,30 +33,27 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
-  margin: 1.5rem;
-}
-
-.nav-brand {
-  display: flex;
-  align-items: center;
+  padding: 1.5rem 2rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo-text {
-  font-size: 1.90rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -1px;
 }
 
-.logo-black {
-  color: #000000;
-  /* Le añadimos apenas una leve sombra blanca para asegurar que 
-     el color negro se lea perfectamente sobre nuestro modo Dark Mode */
-  text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.4);
+.logo-white {
+  color: var(--text-primary);
 }
 
-.logo-brown {
-  color: #c48655; /* Marrón vibrante "Premium" adaptado a Dark Mode */
+.logo-gold {
+  color: var(--accent-gold);
 }
 
 .nav-links {
@@ -40,15 +62,78 @@
   align-items: center;
 }
 
+.nav-item {
+  text-decoration: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: var(--transition-smooth);
+}
+
+.nav-item:hover, .nav-item.active {
+  color: var(--text-primary);
+}
+
 .auth-btn {
-  padding: 0.5rem 1.25rem;
-  font-size: 0.9rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--accent-gold);
+  color: #000;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.auth-btn:hover {
+  background: var(--accent-gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(196, 134, 85, 0.3);
 }
 
 .content-wrapper {
-  flex: 1; 
-  padding: 0 1.5rem 3rem 1.5rem;
+  flex: 1;
+  padding: 3rem 1.5rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  /* Navbar */
+  .navbar {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  
+  .nav-brand {
+    text-align: center;
+    width: 100%;
+  }
+  
+  .logo-text {
+    font-size: 1.5rem;
+  }
+  
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .nav-item {
+    font-size: 0.9rem;
+  }
+  
+  .auth-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  /* Contenedor Principal */
+  .content-wrapper {
+    padding: 1.5rem 1rem;
+  }
 }

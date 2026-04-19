@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
@@ -7,19 +7,24 @@ import { Observable, tap } from 'rxjs';
 })
 export class AuthService {
   private tokenUrl = 'http://localhost:8000/api/token/';
+  private registerUrl = 'http://localhost:8000/api/deportistas/';
+  
+  // Usamos una señal para que el frontend reaccione instantáneamente
+  public loggedIn = signal<boolean>(!!localStorage.getItem('access_token'));
   
   constructor(private http: HttpClient) {}
 
-  /**
-   * Envía credenciales al servidor Django y si es exitoso,
-   * guarda el token JWT en el LocalStorage del navegador.
-   */
+  registro(datos: any): Observable<any> {
+    return this.http.post<any>(this.registerUrl, datos);
+  }
+
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(this.tokenUrl, { username, password })
       .pipe(
         tap(response => {
           if (response && response.access) {
             localStorage.setItem('access_token', response.access);
+            this.loggedIn.set(true);
           }
         })
       );
@@ -27,6 +32,7 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('access_token');
+    this.loggedIn.set(false);
   }
 
   getToken() {
@@ -34,6 +40,6 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return this.loggedIn();
   }
 }

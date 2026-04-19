@@ -1,41 +1,54 @@
-<div class="clases-header">
-  <h1>Próximas Sesiones de BJJ</h1>
-  <p class="subtitle">Reserva tu plaza antes de que se agoten.</p>
+<div class="header-section">
+  <h1 class="title">Sesiones Disponibles</h1>
+  <p class="subtitle">Asegura tu lugar en el tatami.</p>
 </div>
 
-<div *ngIf="mensajeExito" class="success-banner">
-  {{ mensajeExito }}
+<div *ngIf="mensajeExito" class="alert-success">
+  <span class="icon">✓</span> {{ mensajeExito }}
 </div>
 
 <div *ngIf="cargando" class="loading-state">
-  <div class="spinner"></div>
+  <div class="loader"></div>
 </div>
 
-<div *ngIf="error" class="error-state glass-card">
-  <h3>Ups...</h3>
+<div *ngIf="error" class="alert-error">
   <p>{{ error }}</p>
 </div>
 
-<div class="clases-grid" *ngIf="!cargando && !error">
+<div class="week-calendar" *ngIf="!cargando && !error">
   
-  <div *ngIf="clases.length === 0" class="empty-state glass-card">
-    <p>Aún no hay clases programadas en el sistema.</p>
-  </div>
-
-  <!-- Bucle sobre las clases obtenidas de la API de Django -->
-  <div *ngFor="let clase of clases" class="clase-card glass-card">
-    <div class="clase-info">
-      <h3>{{ clase.titulo }}</h3>
-      <p class="fecha-txt">🗓️ {{ clase.fecha_hora_inicio | date:'EEEE, dd MMM - HH:mm' }}</p>
+  <div *ngFor="let dia of semana" class="day-column" [class.is-today]="dia.esHoy">
+    <div class="day-header">
+      <span class="day-name">{{ dia.nombre }}</span>
+      <span class="day-number" [class.highlight-gold]="dia.esHoy">{{ dia.numero }}</span>
     </div>
-    
-    <div class="clase-action">
-      <div class="plazas-badge">
-        <span class="plazas-num">{{ clase.plazas_disponibles }}</span> libres
+
+    <div class="classes-list">
+      <div *ngIf="dia.clases.length === 0" class="empty-day">
+        <span>No programado</span>
       </div>
-      <button class="btn-primary" [disabled]="clase.plazas_disponibles <= 0" (click)="reservar(clase)">
-        {{ clase.plazas_disponibles > 0 ? 'Reservar' : 'Lleno' }}
-      </button>
+
+      <div *ngFor="let clase of dia.clases" class="mini-card" 
+           [class.full-card]="clase.plazas_disponibles <= 0 && !esClasePasada(clase.fecha_hora_inicio)"
+           [class.past-card]="esClasePasada(clase.fecha_hora_inicio)">
+        <div class="mini-card-content">
+          <div class="time-badge">
+            {{ obtenerFormatoHorario(clase.fecha_hora_inicio) }}
+          </div>
+          <h4 class="mini-title">{{ clase.titulo }}</h4>
+        </div>
+        
+        <div class="mini-card-actions">
+          <button class="reserve-btn-sm" 
+                  [disabled]="clase.plazas_disponibles <= 0 || esClasePasada(clase.fecha_hora_inicio)" 
+                  (click)="reservar(clase)">
+            {{ esClasePasada(clase.fecha_hora_inicio) ? 'Caducada' : (clase.plazas_disponibles > 0 ? 'Reservar' : 'Lleno') }}
+          </button>
+          <span class="spots-left" *ngIf="clase.plazas_disponibles > 0 && clase.plazas_disponibles <= 5 && !esClasePasada(clase.fecha_hora_inicio)">
+            ¡Solo {{ clase.plazas_disponibles }}!
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 
