@@ -1,0 +1,63 @@
+<div class="content-wrapper">
+  
+  <div class="header-section text-center">
+    <h1 class="title">Rumbo al Cinturón Negro 🥋</h1>
+    <p class="subtitle">Gestiona tus reservas y revisa tu historial en el tatami.</p>
+  </div>
+
+  <div *ngIf="cargando" class="loading-state">
+    <div class="loader"></div>
+  </div>
+
+  <div *ngIf="!cargando">
+    
+    <!-- Estadisticas de Progreso -->
+    <div class="card stats-card">
+      <div class="stat-number">{{ reservasFinalizadas.length }}</div>
+      <div class="stat-label">Clases Completadas</div>
+    </div>
+
+    <!-- Reservas Futuras -->
+    <div class="section-container">
+      <h2 class="section-title">Tus Próximas Clases</h2>
+      
+      <div *ngIf="reservasFuturas.length === 0" class="empty-state">
+        <p>No tienes clases programadas. ¡Reserva una en el panel principal!</p>
+      </div>
+
+      <div class="grid-container">
+        <div *ngFor="let reserva of reservasFuturas" class="card futura">
+          <div class="card-content">
+            <h3 class="card-title">{{ reserva.clase_detalle.titulo }}</h3>
+            <div class="card-details">
+              <span class="detail-item">
+                <span class="icon">📅</span> {{ reserva.clase_detalle.fecha_hora_inicio | date:'dd MMM, HH:mm' }}
+              </span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button class="reserve-btn btn-danger" (click)="cancelar(reserva)">Cancelar Clase</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial Finalizadas -->
+    <div class="section-container mt-5">
+      <h2 class="section-title text-muted">Historial del Tatami</h2>
+      
+      <div *ngIf="reservasFinalizadas.length === 0" class="empty-state">
+        <p>Aún no has sudado el kimono. ¡Empieza a entrenar!</p>
+      </div>
+
+      <div class="history-list">
+        <div *ngFor="let reserva of reservasFinalizadas" class="history-item">
+          <span class="check-icon">✔️</span>
+          <span class="history-title">{{ reserva.clase_detalle.titulo }}</span>
+          <span class="history-date">{{ reserva.clase_detalle.fecha_hora_inicio | date:'dd MMM yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

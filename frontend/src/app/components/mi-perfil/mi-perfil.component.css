@@ -1,0 +1,122 @@
+.text-center {
+  text-align: center;
+}
+
+.section-container {
+  margin-top: 3rem;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-primary);
+}
+
+.text-muted {
+  color: var(--text-secondary);
+}
+
+.mt-5 {
+  margin-top: 4rem;
+}
+
+/* Rediseño Estadísticas */
+.stats-card {
+  text-align: center;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, rgba(196, 134, 85, 0.15) 0%, rgba(10, 10, 11, 0.8) 100%);
+  border: 1px solid var(--accent-gold);
+  border-radius: 20px;
+}
+
+.stat-number {
+  font-size: 4.5rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(196, 134, 85, 0.3);
+}
+
+.stat-label {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+/* Modificadores para Clases Futuras */
+.card.futura {
+  border-left: 4px solid var(--accent-gold);
+}
+
+/* Botón de Cancelación */
+.btn-danger {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Historial List */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  background: var(--glass-bg);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  transition: var(--transition-smooth);
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.check-icon {
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.history-title {
+  flex-grow: 1;
+  font-weight: 600;
+  color: #d1d5db;
+}
+
+.history-date {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .stat-number {
+    font-size: 3.5rem;
+  }
+  
+  .history-item {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .history-title {
+    width: 100%;
+  }
+}
