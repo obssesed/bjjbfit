@@ -3,23 +3,26 @@
 /* 1. Variables Globales: Modificadores de la estética Vibrante, Dark y Premium */
 :root {
   /* Paleta de Colores Base */
-  --bg-dark: #0f172a;       /* Fondo muy oscuro y profundo, ideal para el gym */
-  --bg-card: rgba(30, 41, 59, 0.7); /* Fondo traslúcido para las tarjetas (Glassmorphism) */
+  --bg-dark: #0a0a0b;       /* Fondo muy oscuro y profundo */
+  --bg-card: rgba(20, 20, 23, 0.7); /* Fondo traslúcido para las tarjetas */
   --primary: #3b82f6;       /* Azul vibrante principal */
-  --primary-hover: #2563eb; /* Azul efecto hover */
-  --accent: #f59e0b;        /* Color secundario ámbar para avisos/highlights */
+  --primary-hover: #2563eb; 
+  --accent-gold: #c48655;   /* Dorado premium */
+  --accent-gold-hover: #e0a370;
   
   /* Tonos de Texto */
-  --text-main: #f8fafc;     /* Blanco suave, menos cansado que blanco puro */
-  --text-muted: #94a3b8;    /* Gris para texto secundario y descriptivo */
+  --text-main: #f8fafc;     
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
   
-  /* Distancias, Bordes y Efectos (UI moderna) */
-  --border-color: rgba(255, 255, 255, 0.08); /* Borde de cristal muy sútil */
-  --shadow-glass: 0 4px 30px rgba(0, 0, 0, 0.5); /* Sombra difuminada amplia */
-  --blur-glass: blur(16px);  /* Desenfoque de fondo dinámico */
-  --radius-md: 12px;         /* Esquinas suavemente redondeadas */
-  --radius-lg: 20px;         /* Esquinas muy redondeadas para componentes mayores */
-  --transition-fast: 0.25s cubic-bezier(0.4, 0, 0.2, 1); /* Curva de animación suavizada */
+  /* Distancias, Bordes y Efectos */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --blur-glass: blur(16px);
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 2. Reset Básico (Para que los navegadores no rompan el grid) */

@@ -1,18 +1,4 @@
-:root {
-  /* Color Palette - Premium Dark Theme */
-  --bg-dark: #0a0a0b;
-  --bg-card: #141417;
-  --accent-gold: #c48655;
-  --accent-gold-hover: #e0a370;
-  --text-primary: #ffffff;
-  --text-secondary: #94a3b8;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  
-  /* Shadows & Effects */
-  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
-  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Styles moved to styles.css */
 
 body {
   margin: 0;
@@ -75,17 +61,18 @@ body {
 
 .auth-btn {
   padding: 0.6rem 1.5rem;
-  background: var(--accent-gold);
-  color: #000;
+  background: transparent;
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
   border-radius: 8px;
   font-weight: 600;
-  border: none;
   cursor: pointer;
   transition: var(--transition-smooth);
 }
 
 .auth-btn:hover {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gold);
+  color: #0c111d; /* Fondo oscuro para el texto cuando el botón se rellena */
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(196, 134, 85, 0.3);
 }

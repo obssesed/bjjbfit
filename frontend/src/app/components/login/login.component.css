@@ -67,9 +67,9 @@
 }
 
 .submit-btn {
-  background: var(--accent-gold);
-  color: #000;
-  border: none;
+  background: transparent;
+  color: var(--accent-gold);
+  border: 1px solid var(--accent-gold);
   padding: 1rem;
   border-radius: 10px;
   font-weight: 700;
@@ -80,7 +80,8 @@
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: var(--accent-gold-hover);
+  background: var(--accent-gold);
+  color: #0c111d;
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(196, 134, 85, 0.4);
 }
