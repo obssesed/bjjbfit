@@ -9,8 +9,18 @@ class ClaseBJJ(models.Model):
         max_length=100, 
         help_text="Nombre corto de la clase (ej. BJJ Fundamentos, No-Gi)."
     )
+    descripcion = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Descripción o detalles adicionales sobre la sesión."
+    )
     fecha_hora_inicio = models.DateTimeField(
         help_text="Fecha y hora de inicio de la clase."
+    )
+    fecha_hora_fin = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Fecha y hora de finalización de la clase."
     )
     capacidad_maxima = models.PositiveIntegerField(
         default=30,
@@ -26,8 +36,8 @@ class ClaseBJJ(models.Model):
             int: Entero que representa la diferencia entre la capacidad máxima 
                  y el total de reservas activas.
         """
-        reservas_actuales = self.reservas.count()
-        return self.capacidad_maxima - reservas_actuales
+        reservas_confirmadas = self.reservas.filter(estado='CONFIRMADA').count()
+        return self.capacidad_maxima - reservas_confirmadas
 
     def __str__(self) -> str:
         """
@@ -40,6 +50,12 @@ class Reserva(models.Model):
     """
     Modelo que representa la asistencia de un Deportista a una ClaseBJJ.
     """
+    ESTADOS_RESERVA = [
+        ('CONFIRMADA', 'Confirmada'),
+        ('CANCELADA', 'Cancelada'),
+        ('ESPERA', 'Lista de Espera'),
+    ]
+
     clase = models.ForeignKey(
         ClaseBJJ, 
         on_delete=models.CASCADE, 
@@ -51,6 +67,12 @@ class Reserva(models.Model):
         on_delete=models.CASCADE, 
         related_name="mis_reservas",
         help_text="El deportista que realiza la reserva."
+    )
+    estado = models.CharField(
+        max_length=20,
+        choices=ESTADOS_RESERVA,
+        default='CONFIRMADA',
+        help_text="Estado actual de la reserva gestionando aforo y lista de espera."
     )
     fecha_reserva = models.DateTimeField(
         auto_now_add=True,
@@ -67,4 +89,4 @@ class Reserva(models.Model):
         """
         Representación en texto de la reserva.
         """
-        return f"Reserva: {self.deportista} -> {self.clase.titulo}"
+        return f"Reserva [{self.get_estado_display()}]: {self.deportista} -> {self.clase.titulo}"
