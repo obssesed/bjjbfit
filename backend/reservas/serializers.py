@@ -62,7 +62,14 @@ class ReservaSerializer(serializers.ModelSerializer):
                 "El deportista ya tiene una reserva activa para esta clase."
             )
 
-        # 3. Gestión de Aforo y Lista de Espera Automática
+        # 3. Restricciones Cronológicas
+        from django.utils import timezone
+        if clase and clase.fecha_hora_inicio < timezone.now():
+            raise serializers.ValidationError(
+                "No puedes reservar una clase que ya ha comenzado o finalizado."
+            )
+
+        # 4. Gestión de Aforo y Lista de Espera Automática
         if clase:
             if clase.plazas_disponibles() <= 0:
                 # Si no hay hueco, sobreescribimos el estado mandado por el usuario (si lo hubo) a ESPERA.

@@ -49,3 +49,30 @@ def clase_con_hueco(db):
         fecha_hora_fin=fin,
         capacidad_maxima=2
     )
+
+@pytest.fixture
+def deportista_adulto_soltero(db):
+    return Deportista.objects.create_user(
+        username="adultosolo",
+        email="solo@test.com",
+        password="password_secreta",
+        plan_activo=True
+    )
+
+@pytest.fixture
+def clase_pasada(db):
+    inicio = timezone.now() - timezone.timedelta(days=1)
+    return ClaseBJJ.objects.create(
+        titulo="Clase Pasada",
+        fecha_hora_inicio=inicio,
+        capacidad_maxima=2
+    )
+
+@pytest.fixture
+def clase_inminente(db):
+    inicio = timezone.now() + timezone.timedelta(minutes=10)
+    return ClaseBJJ.objects.create(
+        titulo="Clase Inminente",
+        fecha_hora_inicio=inicio,
+        capacidad_maxima=2
+    )

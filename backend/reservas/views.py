@@ -1,6 +1,9 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
+from rest_framework.exceptions import ValidationError
 from .models import ClaseBJJ, Reserva
 from .serializers import ClaseBJJSerializer, ReservaSerializer
 
@@ -44,6 +47,11 @@ class ReservaViewSet(viewsets.ModelViewSet):
             serializer.save()
 
     def perform_destroy(self, instance):
+        # Regla de Negocio: Cancelaciones solo hasta 30 mins antes.
+        tiempo_limite = instance.clase.fecha_hora_inicio - timedelta(minutes=30)
+        if timezone.now() > tiempo_limite:
+            raise ValidationError("Demasiado tarde para cancelar. La ventana de cancelación expira 30 minutos antes del inicio.")
+
         # Lógica de Lista de Espera: Al cancelar una reserva, asciende la primera en espera.
         clase = instance.clase
         

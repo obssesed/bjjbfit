@@ -78,3 +78,29 @@ class TestReservasViews:
         r2.refresh_from_db()
         assert r1.estado == 'CANCELADA'
         assert r2.estado == 'CONFIRMADA'
+
+    def test_si_usuario_reserva_clase_pasada_resultado_400(self, api_client, clase_pasada, deportista_adulto_soltero):
+        api_client.force_authenticate(user=deportista_adulto_soltero)
+        res = api_client.post('/api/reservas/', {'clase': clase_pasada.id})
+        assert res.status_code == 400
+        assert "ya ha comenzado o finalizado" in str(res.data)
+
+    def test_si_usuario_cancela_fuera_de_tiempo_resultado_400(self, api_client, clase_inminente, deportista_adulto_soltero):
+        # A 10 minutos de empezar
+        r1 = Reserva.objects.create(clase=clase_inminente, deportista=deportista_adulto_soltero, estado='CONFIRMADA')
+        api_client.force_authenticate(user=deportista_adulto_soltero)
+        res = api_client.delete(f'/api/reservas/{r1.id}/')
+        assert res.status_code == 400
+        assert "expira 30 minutos antes" in str(res.data)
+        
+    def test_si_usuario_soltero_funcionamiento_normal_resultado_confirmada(self, api_client, clase_con_hueco, deportista_adulto_soltero):
+        api_client.force_authenticate(user=deportista_adulto_soltero)
+        res = api_client.post('/api/reservas/', {'clase': clase_con_hueco.id})
+        assert res.status_code == 201
+
+    def test_si_usuario_reserva_misma_clase_dos_veces_resultado_400(self, api_client, clase_con_hueco, deportista_adulto_soltero):
+        Reserva.objects.create(clase=clase_con_hueco, deportista=deportista_adulto_soltero, estado='CONFIRMADA')
+        api_client.force_authenticate(user=deportista_adulto_soltero)
+        res = api_client.post('/api/reservas/', {'clase': clase_con_hueco.id})
+        assert res.status_code == 400
+        assert "ya tiene una reserva activa" in str(res.data)
