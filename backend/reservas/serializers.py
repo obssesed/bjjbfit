@@ -10,7 +10,7 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClaseBJJ
-        fields = ['id', 'titulo', 'fecha_hora_inicio', 'capacidad_maxima', 'plazas_disponibles']
+        fields = ['id', 'titulo', 'descripcion', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles']
 
     def get_plazas_disponibles(self, obj: ClaseBJJ) -> int:
         """
@@ -29,18 +29,34 @@ class ReservaSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Reserva
-        fields = ['id', 'clase', 'deportista', 'fecha_reserva']
-        read_only_fields = ['deportista']
+        fields = ['id', 'clase', 'deportista', 'estado', 'fecha_reserva']
+        # Quitamos deportista de read_only_fields para que pueda mandarse desde frontend (reserva para hijos)
 
     def validate(self, data):
         """
-        Validación a nivel de objeto para asegurar que la clase tiene cupo.
+        Validación a nivel de objeto para reglas de negocio MVP.
         """
-        clase = data.get('clase')
-        if clase and clase.plazas_disponibles() <= 0:
+        request = self.context.get('request')
+        user = request.user if request else None
+
+        # 1. El usuario solicitante (Admin o normal) debe tener el plan activo? 
+        # La regla dice "Plan debe estar activado por admin". 
+        # Si envían un 'deportista' específico (ej. un hijo), miramos el plan_activo del deportista que recibe la clase.
+        deportista_target = data.get('deportista', user)
+        if not deportista_target.plan_activo:
             raise serializers.ValidationError(
-                "Lo sentimos, esta clase ya ha alcanzado su capacidad máxima."
+                f"El deportista {deportista_target.username} no tiene un plan activo. Contacte con administración."
             )
+
+        # 2. Gestión de Aforo y Lista de Espera Automática
+        clase = data.get('clase')
+        if clase:
+            if clase.plazas_disponibles() <= 0:
+                # Si no hay hueco, sobreescribimos el estado mandado por el usuario (si lo hubo) a ESPERA.
+                data['estado'] = 'ESPERA'
+            else:
+                data['estado'] = 'CONFIRMADA'
+                
         return data
 
     def to_representation(self, instance):
@@ -54,5 +70,9 @@ class ReservaSerializer(serializers.ModelSerializer):
             'id': instance.clase.id,
             'titulo': instance.clase.titulo,
             'fecha_hora_inicio': instance.clase.fecha_hora_inicio
+        }
+        response['deportista_detalle'] = {
+            'id': instance.deportista.id,
+            'username': instance.deportista.username
         }
         return response
