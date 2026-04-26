@@ -40,9 +40,9 @@
         
         <div class="mini-card-actions">
           <button class="reserve-btn-sm" 
-                  [disabled]="clase.plazas_disponibles <= 0 || esClasePasada(clase.fecha_hora_inicio)" 
+                  [disabled]="esClasePasada(clase.fecha_hora_inicio)" 
                   (click)="reservar(clase)">
-            {{ esClasePasada(clase.fecha_hora_inicio) ? 'Caducada' : (clase.plazas_disponibles > 0 ? 'Reservar' : 'Lleno') }}
+            {{ esClasePasada(clase.fecha_hora_inicio) ? 'Caducada' : (clase.plazas_disponibles > 0 ? 'Reservar' : 'Lista de espera') }}
           </button>
           <span class="spots-left" *ngIf="clase.plazas_disponibles > 0 && clase.plazas_disponibles <= 5 && !esClasePasada(clase.fecha_hora_inicio)">
             ¡Solo {{ clase.plazas_disponibles }}!

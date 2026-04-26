@@ -33,6 +33,11 @@
               <span class="detail-item">
                 <span class="icon">📅</span> {{ reserva.clase_detalle.fecha_hora_inicio | date:'dd MMM, HH:mm' }}
               </span>
+              <div style="margin-top: 1rem;">
+                <span class="badge-status" [ngClass]="{'badge-oro': reserva.estado === 'CONFIRMADA', 'badge-gris': reserva.estado === 'ESPERA'}">
+                  {{ reserva.estado === 'ESPERA' ? 'Lista de espera' : 'Confirmada' }}
+                </span>
+              </div>
             </div>
           </div>
           <div class="card-actions">

@@ -30,6 +30,8 @@ export class MiPerfilComponent implements OnInit {
         this.reservasFinalizadas = [];
 
         data.forEach(reserva => {
+          if (reserva.estado === 'CANCELADA') return;
+          
           const fechaClase = new Date(reserva.clase_detalle.fecha_hora_inicio);
           if (fechaClase.getTime() < ahora.getTime()) {
             this.reservasFinalizadas.push(reserva);
@@ -63,7 +65,7 @@ export class MiPerfilComponent implements OnInit {
         error: (err) => {
           console.error(err);
           alert("Error al cancelar la clase.");
-          this.cargarReservas(); // Rollback recargando los datos
+          this.cargarReservas(); // Rollback recargando los datos reales
         }
       });
     }

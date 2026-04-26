@@ -5,7 +5,9 @@ import { Observable } from 'rxjs';
 export interface ClaseBJJ {
   id: number;
   titulo: string;
+  descripcion?: string;
   fecha_hora_inicio: string;
+  fecha_hora_fin?: string;
   capacidad_maxima: number;
   plazas_disponibles: number;
 }

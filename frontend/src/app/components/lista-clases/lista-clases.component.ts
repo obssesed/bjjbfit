@@ -131,19 +131,39 @@ export class ListaClasesComponent implements OnInit {
       return;
     }
 
-    // Optimistic Update: Restamos visualmente antes de que conteste el servidor
-    // Esto asegura que la interfaz reacciona instantáneamente (0ms de lag)
-    clase.plazas_disponibles -= 1;
+    // Optimistic Update: Solo restamos visualmente si había plaza libre
+    let restado = false;
+    if (clase.plazas_disponibles > 0) {
+      clase.plazas_disponibles -= 1;
+      restado = true;
+    }
 
     this.clasesService.hacerReserva(clase.id).subscribe({
-      next: () => {
-        this.mensajeExito = "¡Plaza reservada con éxito! Te esperamos en el tatami.";
-        setTimeout(() => this.mensajeExito = null, 3000);
+      next: (response) => {
+        if (response.estado === 'ESPERA') {
+          this.mensajeExito = "¡Estás en la lista de espera! Te avisaremos si queda algún hueco libre.";
+        } else {
+          this.mensajeExito = "¡Plaza reservada con éxito! Te esperamos en el tatami.";
+        }
+        setTimeout(() => this.mensajeExito = null, 4000);
+        
+        // Refrescamos en background para tener datos reales exactos
+        setTimeout(() => this.cargarClases(), 2000);
       },
       error: (err) => {
-        // Rollback visual si el servidor nos dice que hubo un error (ej. ya lo tenía reservado)
-        clase.plazas_disponibles += 1;
-        alert("Ya tienes esta clase reservada o ha ocurrido un error.");
+        // Rollback visual si restamos plaza
+        if (restado) {
+          clase.plazas_disponibles += 1;
+        }
+
+        let msg = "Ha ocurrido un error al intentar reservar.";
+        if (err.status === 400 && err.error && err.error.non_field_errors) {
+           msg = err.error.non_field_errors[0];
+        } else if (err.status === 403) {
+           msg = "No tienes permiso para realizar esta acción.";
+        }
+        
+        alert(msg);
         console.error(err);
       }
     });

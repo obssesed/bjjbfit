@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from usuarios.models import Deportista
 from .models import ClaseBJJ, Reserva
 
 class ClaseBJJSerializer(serializers.ModelSerializer):
@@ -27,10 +28,16 @@ class ReservaSerializer(serializers.ModelSerializer):
     """
     Serializador para las Reservas generadas.
     """
+    deportista = serializers.PrimaryKeyRelatedField(
+        queryset=Deportista.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
     class Meta:
         model = Reserva
         fields = ['id', 'clase', 'deportista', 'estado', 'fecha_reserva']
-        # Quitamos deportista de read_only_fields para que pueda mandarse desde frontend (reserva para hijos)
+        validators = [] # Evita que DRF nos fuerce a mandar `deportista` por culpa del unique_together
 
     def validate(self, data):
         """
@@ -48,8 +55,14 @@ class ReservaSerializer(serializers.ModelSerializer):
                 f"El deportista {deportista_target.username} no tiene un plan activo. Contacte con administración."
             )
 
-        # 2. Gestión de Aforo y Lista de Espera Automática
+        # 2. Aseguramos uniqueness manual (no pueden reservar la misma clase dos veces)
         clase = data.get('clase')
+        if clase and Reserva.objects.filter(clase=clase, deportista=deportista_target, estado__in=['CONFIRMADA', 'ESPERA']).exists():
+            raise serializers.ValidationError(
+                "El deportista ya tiene una reserva activa para esta clase."
+            )
+
+        # 3. Gestión de Aforo y Lista de Espera Automática
         if clase:
             if clase.plazas_disponibles() <= 0:
                 # Si no hay hueco, sobreescribimos el estado mandado por el usuario (si lo hubo) a ESPERA.
