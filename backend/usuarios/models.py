@@ -10,11 +10,25 @@ class Deportista(AbstractUser):
         unique=True,
         help_text="Correo electrónico de contacto y recepción de notificaciones."
     )
+    OPCIONES_CINTURON = [
+        # Adultos
+        ('Blanco', 'Blanco'),
+        ('Azul', 'Azul'),
+        ('Morado', 'Morado'),
+        ('Marrón', 'Marrón'),
+        ('Negro', 'Negro'),
+        # Infantiles
+        ('Gris', 'Gris'),
+        ('Amarillo', 'Amarillo'),
+        ('Naranja', 'Naranja'),
+        ('Verde', 'Verde'),
+    ]
+
     cinturon = models.CharField(
         max_length=50, 
-        blank=True, 
-        null=True,
-        help_text="Grado o cinturón actual del deportista (ej. Blanco, Azul, Morado)."
+        choices=OPCIONES_CINTURON,
+        default='Blanco',
+        help_text="Grado o cinturón actual del deportista."
     )
     telefono = models.CharField(
         max_length=20, 
@@ -49,7 +63,12 @@ class Deportista(AbstractUser):
     )
     grados = models.PositiveSmallIntegerField(
         default=0,
-        help_text="Grados en el cinturón del atleta (solo lo ve el admin)."
+        help_text="Grados en el cinturón del atleta (0 a 4)."
+    )
+    fecha_ultima_graduacion = models.DateField(
+        null=True,
+        blank=True,
+        help_text="Auto-fecha. Se actualiza sola si el profesor cambia el cinturón o los grados."
     )
     cuenta_bancaria = models.CharField(
         max_length=50,
@@ -79,6 +98,27 @@ class Deportista(AbstractUser):
         related_name='hijos_a_cargo',
         help_text="Relación Adulto -> Niños. Determina quién administra el perfil de un menor."
     )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._original_cinturon = self.cinturon
+        self._original_grados = getattr(self, 'grados', 0)
+
+    def save(self, *args, **kwargs):
+        from django.utils import timezone
+        # Detectamos si es una actualización (pk exists) y si los grados o el color han cambiado
+        if self.pk:
+            if self.cinturon != self._original_cinturon or self.grados != self._original_grados:
+                self.fecha_ultima_graduacion = timezone.now().date()
+        else:
+            # Si es nuevo, la fecha de graduacion inicial es hoy
+            if not self.fecha_ultima_graduacion:
+                self.fecha_ultima_graduacion = timezone.now().date()
+
+        super().save(*args, **kwargs)
+        # Actualizamos el estado interno en memoria por si se llama a save multiples veces
+        self._original_cinturon = self.cinturon
+        self._original_grados = self.grados
 
     def __str__(self) -> str:
         """

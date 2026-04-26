@@ -11,8 +11,29 @@
 
   <div *ngIf="!cargando">
     
-    <!-- Estadisticas de Progreso -->
-    <div class="card stats-card">
+    <!-- BJJ Belt Card (Stats & Belt representation) -->
+    <div *ngIf="perfilDeportista" class="card stats-card belt-card belt-{{ perfilDeportista.cinturon | lowercase }}">
+      
+      <!-- Center Content -->
+      <div class="belt-center-content">
+        <div class="stat-number">{{ reservasFinalizadas.length }}</div>
+        <div class="stat-label">Clases Completadas</div>
+      </div>
+
+      <!-- Right Tip (Stripes) -->
+      <div class="belt-tip" [ngClass]="{'tip-roja': perfilDeportista.cinturon === 'Negro', 'tip-negra': perfilDeportista.cinturon !== 'Negro'}">
+        <div class="stripes-container">
+          <!-- Create N stripes using Angular ngFor hack for arrays of N length -->
+          <div *ngFor="let _ of [].constructor(perfilDeportista.grados)" class="stripe">
+             <span class="stripe-date" *ngIf="perfilDeportista.fecha_ultima_graduacion">{{ perfilDeportista.fecha_ultima_graduacion | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Fallback while user loads -->
+    <div *ngIf="!perfilDeportista" class="card stats-card">
       <div class="stat-number">{{ reservasFinalizadas.length }}</div>
       <div class="stat-label">Clases Completadas</div>
     </div>

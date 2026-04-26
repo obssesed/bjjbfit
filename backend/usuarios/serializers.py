@@ -8,9 +8,11 @@ class DeportistaSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'email', 'password', 'cinturon', 'telefono']
+        fields = ['id', 'username', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'telefono']
         extra_kwargs = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            'plan_activo': {'read_only': True},
+            'fecha_ultima_graduacion': {'read_only': True}
         }
 
     def create(self, validated_data):

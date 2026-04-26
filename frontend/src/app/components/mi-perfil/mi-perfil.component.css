@@ -51,6 +51,105 @@
   font-weight: 600;
 }
 
+/* --- GUI: Cinturón BJJ Dinámico --- */
+
+.belt-card {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* Efecto tela/cinturón pesado */
+  box-shadow: inset 0 0 40px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4);
+  border: none;
+  min-height: 200px;
+}
+
+/* Colores de Cinturón Adultos & Niños */
+.belt-blanco { 
+  background-color: #f8fafc; 
+  box-shadow: inset 0 0 25px rgba(0,0,0,0.08), 0 10px 20px rgba(0,0,0,0.2); 
+}
+.belt-gris { background-color: #64748b; }
+.belt-amarillo { 
+  background-color: #eab308; 
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.2), 0 10px 20px rgba(0,0,0,0.3);
+}
+.belt-naranja { background-color: #f97316; }
+.belt-verde { background-color: #22c55e; }
+.belt-azul { background-color: #2563eb; }
+.belt-morado { background-color: #9333ea; }
+.belt-marrón, .belt-marron { background-color: #78350f; }
+.belt-negro { background-color: #0f172a; border: 1px solid #334155; }
+
+/* Letras doradas/oscuras según contraste del cinturon */
+.belt-blanco .stat-number, .belt-amarillo .stat-number { color: #0f172a; text-shadow: none; }
+.belt-blanco .stat-label, .belt-amarillo .stat-label { color: #334155; }
+.belt-blanco .belt-date, .belt-amarillo .belt-date { color: #475569; }
+
+.belt-morado .stat-number, .belt-azul .stat-number, .belt-marrón .stat-number, .belt-verde .stat-number, .belt-naranja .stat-number, .belt-gris .stat-number, .belt-negro .stat-number { 
+  color: #ffffff; text-shadow: 0 4px 10px rgba(0,0,0,0.6); 
+}
+.belt-morado .stat-label, .belt-azul .stat-label, .belt-marrón .stat-label, .belt-verde .stat-label, .belt-naranja .stat-label, .belt-gris .stat-label, .belt-negro .stat-label {
+  color: #f8fafc;
+}
+.belt-morado .belt-date, .belt-azul .belt-date, .belt-marrón .belt-date, .belt-verde .belt-date, .belt-naranja .belt-date, .belt-gris .belt-date, .belt-negro .belt-date {
+  color: #e2e8f0;
+}
+
+/* Centro y Grados */
+.belt-center-content {
+  z-index: 2;
+  position: relative;
+  text-align: center;
+}
+
+.belt-tip {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 140px; /* Ancho estático para asegurar que siempre quepan 4 grados perfectamente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.4);
+}
+
+.tip-negra { background-color: #020617; }
+.tip-roja { background-color: #dc2626; }
+
+.stripes-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start; /* Empiezan desde el lado izquierdo de la franja negra */
+  align-items: center;
+  height: 100%; /* Sin margen superior e inferior, toca los bordes del cinturon */
+  width: 100%;
+  padding-left: 15px; /* Pequeño margen reservado al inicio de la banda negra */
+  box-sizing: border-box;
+  gap: 10px; /* Separación entre cada grado */
+}
+
+.stripe {
+  height: 100%; /* Todo el alto disponible */
+  width: 20px; /* Grados más gruesos */
+  background-color: #ffffff;
+  box-shadow: inset 1px 0 3px rgba(0,0,0,0.2), 2px 0 6px rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stripe-date {
+  font-size: 0.55rem; /* Texto muy chiquitito para encajar en 20px ancho */
+  color: #1e293b;
+  font-weight: 800;
+  transform: rotate(-90deg); /* Girado 90 grados para leer de abajo a arriba */
+  white-space: nowrap;
+  letter-spacing: 1px;
+}
+
 /* Modificadores para Clases Futuras */
 .card.futura {
   border-left: 4px solid var(--accent-gold);

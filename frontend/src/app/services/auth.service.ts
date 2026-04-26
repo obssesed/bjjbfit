@@ -8,6 +8,7 @@ import { Observable, tap } from 'rxjs';
 export class AuthService {
   private tokenUrl = 'http://localhost:8000/api/token/';
   private registerUrl = 'http://localhost:8000/api/deportistas/';
+  private meUrl = 'http://localhost:8000/api/deportistas/me/';
   
   // Usamos una señal para que el frontend reaccione instantáneamente
   public loggedIn = signal<boolean>(!!localStorage.getItem('access_token'));
@@ -28,6 +29,10 @@ export class AuthService {
           }
         })
       );
+  }
+
+  me(): Observable<any> {
+    return this.http.get<any>(this.meUrl);
   }
 
   logout() {

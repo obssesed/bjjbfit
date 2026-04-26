@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ClasesService } from '../../services/clases.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-mi-perfil',
@@ -13,11 +14,23 @@ export class MiPerfilComponent implements OnInit {
   reservasFuturas: any[] = [];
   reservasFinalizadas: any[] = [];
   cargando: boolean = true;
+  perfilDeportista: any = null;
 
-  constructor(private clasesService: ClasesService, private cdr: ChangeDetectorRef) {}
+  constructor(private clasesService: ClasesService, private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.cargarReservas();
+    this.cargarPerfil();
+  }
+
+  cargarPerfil() {
+    this.authService.me().subscribe({
+      next: (data) => {
+        this.perfilDeportista = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error('Error cargando perfil', err)
+    });
   }
 
   cargarReservas() {
