@@ -9,13 +9,14 @@
 
     <div class="nav-links">
       <a routerLink="/" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Clases</a>
-      <a *ngIf="authService.isLoggedIn()" routerLink="/mis-reservas" class="nav-item" routerLinkActive="active">Mis Reservas</a>
+      <a *ngIf="authService.loggedIn$ | async" routerLink="/mis-reservas" class="nav-item" routerLinkActive="active">Mis Reservas</a>
+      <a *ngIf="authService.isStaff$ | async" routerLink="/backoffice/usuarios" class="nav-item backoffice-tab" routerLinkActive="active">🗄️ Backoffice</a>
       
-      <button *ngIf="!authService.isLoggedIn()" routerLink="/login" class="auth-btn">
+      <button *ngIf="!(authService.loggedIn$ | async)" routerLink="/login" class="auth-btn">
         Entrar
       </button>
       
-      <button *ngIf="authService.isLoggedIn()" (click)="logout()" class="auth-btn" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary);">
+      <button *ngIf="authService.loggedIn$ | async" (click)="logout()" class="auth-btn" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary);">
         Salir
       </button>
     </div>

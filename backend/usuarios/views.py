@@ -16,10 +16,13 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         """
         Asigna permisos dinámicos según la acción:
         - 'create': Público (Registro).
+        - 'activos_backoffice': Solo administradores.
         - Otros: Solo usuarios autenticados.
         """
         if self.action == 'create':
             return [permissions.AllowAny()]
+        if self.action == 'activos_backoffice':
+            return [permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
 
     @action(detail=False, methods=['get'])
@@ -28,4 +31,14 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         Devuelve el perfil del usuario actualmente logueado.
         """
         serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def activos_backoffice(self, request):
+        """
+        Endpoint exclusivo para el Backoffice. Devuelve todos los usuarios 
+        con plan_activo=True, ordenados alfabéticamente por nombre.
+        """
+        activos = Deportista.objects.filter(plan_activo=True).order_by('first_name', 'last_name')
+        serializer = self.get_serializer(activos, many=True)
         return Response(serializer.data)

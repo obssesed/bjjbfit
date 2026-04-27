@@ -16,9 +16,11 @@ class DeportistaSerializer(serializers.ModelSerializer):
     """
     hijos_a_cargo = HijoSerializer(many=True, read_only=True)
 
+    is_staff = serializers.BooleanField(read_only=True)
+
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'telefono', 'hijos_a_cargo']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'telefono', 'hijos_a_cargo', 'is_staff']
         extra_kwargs = {
             'password': {'write_only': True},
             'plan_activo': {'read_only': True},

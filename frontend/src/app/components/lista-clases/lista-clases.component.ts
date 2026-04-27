@@ -248,6 +248,7 @@ export class ListaClasesComponent implements OnInit {
         } else {
           this.mensajeExito = "¡Plaza reservada con éxito! Te esperamos en el tatami.";
         }
+        this.cdr.detectChanges();
         setTimeout(() => this.mensajeExito = null, 4000);
         
         // Refrescamos en background para tener datos reales exactos
@@ -274,6 +275,7 @@ export class ListaClasesComponent implements OnInit {
         this.mensajeErrorModal = msg;
         this.showErrorModal = true;
         console.error(err);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -298,6 +300,7 @@ export class ListaClasesComponent implements OnInit {
     } else {
       this.reservaACancelarID = 0; // Obligamos a clicar si hay varias
     }
+    this.cdr.detectChanges();
   }
 
   cerrarErrorModal() {
@@ -324,6 +327,7 @@ export class ListaClasesComponent implements OnInit {
     this.clasesService.cancelarReserva(reservaId).subscribe({
       next: () => {
         this.mensajeExito = "Reserva cancelada correctamente.";
+        this.cdr.detectChanges();
         setTimeout(() => this.mensajeExito = null, 4000);
         setTimeout(() => {
           this.cargarClases();
@@ -340,6 +344,7 @@ export class ListaClasesComponent implements OnInit {
         }
         this.mensajeErrorModal = errorMsg;
         this.showErrorModal = true;
+        this.cdr.detectChanges();
       }
     });
   }
