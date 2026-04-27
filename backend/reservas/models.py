@@ -27,17 +27,19 @@ class ClaseBJJ(models.Model):
         help_text="Número máximo de personas que pueden asistir a la clase."
     )
 
+    def plazas_ocupadas(self) -> int:
+        """Devuelve el total de reservas activas"""
+        return self.reservas.filter(estado='CONFIRMADA').count()
+
+    def en_espera(self) -> int:
+        """Devuelve el total de personas en lista de espera"""
+        return self.reservas.filter(estado='ESPERA').count()
+
     def plazas_disponibles(self) -> int:
         """
         Calcula el número de plazas disponibles para la clase actual.
-        (Ejemplo de lógica en el 'Fat Model')
-
-        Returns:
-            int: Entero que representa la diferencia entre la capacidad máxima 
-                 y el total de reservas activas.
         """
-        reservas_confirmadas = self.reservas.filter(estado='CONFIRMADA').count()
-        return self.capacidad_maxima - reservas_confirmadas
+        return self.capacidad_maxima - self.plazas_ocupadas()
 
     def __str__(self) -> str:
         """

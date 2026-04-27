@@ -47,20 +47,30 @@
         </div>
         
         <div class="mini-card-actions">
+          <!-- Indicadores Discretos de Plazas -->
+          <div class="class-metrics">
+            <span class="metric" title="Ocupación de la clase"><span class="icon" style="font-size:0.75rem">👤</span> {{ clase.plazas_ocupadas }} / {{ clase.capacidad_maxima }}</span>
+            <span class="metric waiting" *ngIf="clase.en_espera > 0" title="Personas en lista de espera"><span class="icon" style="font-size:0.75rem">⏳</span> {{ clase.en_espera }}</span>
+          </div>
+
+          <!-- Botones Lógicos -->
           <div class="dual-actions" *ngIf="!esClasePasada(clase.fecha_hora_inicio)">
-            <!-- Botón Reservar ✅ -->
+            
+            <!-- Botón Reservar ✅ (Deshabilitado si lleno o si > 24h) -->
             <button class="reserve-btn-sm" 
-                    [disabled]="!puedeReservar(clase.id)"
-                    [class.disabled-btn]="!puedeReservar(clase.id)"
+                    [disabled]="!puedeReservar(clase.id) || !estaAbiertaParaReserva(clase.fecha_hora_inicio)"
+                    [class.disabled-btn]="!puedeReservar(clase.id) || !estaAbiertaParaReserva(clase.fecha_hora_inicio)"
                     (click)="reservar(clase)" title="Reservar Plazas">
               <span class="icon" style="font-size:1.1rem">✅</span> 
             </button>
-            <!-- Botón Cancelar ❌ -->
+
+            <!-- Botón Cancelar ❌ (Siempre puede cancelar si tiene plaza asegurada) -->
             <button class="reserve-btn-sm cancel-btn-sm" 
                     *ngIf="puedeCancelar(clase.id)"
                     (click)="cancelarFrente(clase)" title="Cancelar Reserva">
               <span class="icon" style="font-size:1.1rem">❌</span> 
             </button>
+
           </div>
 
           <!-- Si clase pasada -->
@@ -68,8 +78,9 @@
                   *ngIf="esClasePasada(clase.fecha_hora_inicio)" disabled>
             Caducada
           </button>
-          <span class="spots-left" *ngIf="clase.plazas_disponibles > 0 && clase.plazas_disponibles <= 5 && !esClasePasada(clase.fecha_hora_inicio)">
-            ¡Solo {{ clase.plazas_disponibles }}!
+          
+          <span class="spots-left" *ngIf="clase.plazas_disponibles > 0 && clase.plazas_disponibles <= 5 && !esClasePasada(clase.fecha_hora_inicio) && estaAbiertaParaReserva(clase.fecha_hora_inicio)">
+            ¡Solo {{ clase.plazas_disponibles }} libres!
           </span>
         </div>
       </div>

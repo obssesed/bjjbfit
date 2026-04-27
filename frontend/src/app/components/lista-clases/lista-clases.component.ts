@@ -162,6 +162,18 @@ export class ListaClasesComponent implements OnInit {
     return claseDate.getTime() < ahora.getTime();
   }
 
+  estaAbiertaParaReserva(fechaInicioIso: string): boolean {
+    const ahora = new Date();
+    const claseDate = new Date(fechaInicioIso);
+    const msIn24Hours = 24 * 60 * 60 * 1000;
+    
+    // Si quedan más de 24 horas para que empiece, aún no está abierta
+    if (claseDate.getTime() - ahora.getTime() > msIn24Hours) {
+      return false;
+    }
+    return true;
+  }
+
   // --- LÓGICA DUAL DE BOTONES ---
   getReservasEnClase(claseId: number): any[] {
     return this.misReservasActivas.filter(r => r.clase === claseId);

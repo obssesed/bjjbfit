@@ -8,21 +8,21 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
     Incluye el campo calculado "plazas_disponibles" llamando a la lógica de negocio del modelo.
     """
     plazas_disponibles = serializers.SerializerMethodField()
+    plazas_ocupadas = serializers.SerializerMethodField()
+    en_espera = serializers.SerializerMethodField()
 
     class Meta:
         model = ClaseBJJ
-        fields = ['id', 'titulo', 'descripcion', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles']
+        fields = ['id', 'titulo', 'descripcion', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
 
     def get_plazas_disponibles(self, obj: ClaseBJJ) -> int:
-        """
-        Obtiene el número de plazas disponibles usando el método del "Fat Model".
-        
-        Args:
-            obj (ClaseBJJ): La instancia de la clase actual.
-        Returns:
-            int: Cantidad de plazas libres.
-        """
         return obj.plazas_disponibles()
+
+    def get_plazas_ocupadas(self, obj: ClaseBJJ) -> int:
+        return obj.plazas_ocupadas()
+        
+    def get_en_espera(self, obj: ClaseBJJ) -> int:
+        return obj.en_espera()
 
 class ReservaSerializer(serializers.ModelSerializer):
     """
@@ -64,9 +64,17 @@ class ReservaSerializer(serializers.ModelSerializer):
 
         # 3. Restricciones Cronológicas
         from django.utils import timezone
-        if clase and clase.fecha_hora_inicio < timezone.now():
+        import datetime
+        now = timezone.now()
+        
+        if clase and clase.fecha_hora_inicio < now:
             raise serializers.ValidationError(
                 "No puedes reservar una clase que ya ha comenzado o finalizado."
+            )
+            
+        if clase and (clase.fecha_hora_inicio - now > datetime.timedelta(hours=24)):
+            raise serializers.ValidationError(
+                "Las reservas solo se abren con 24 horas de antelación al inicio de la clase."
             )
 
         # 4. Gestión de Aforo y Lista de Espera Automática

@@ -10,6 +10,8 @@ export interface ClaseBJJ {
   fecha_hora_fin?: string;
   capacidad_maxima: number;
   plazas_disponibles: number;
+  plazas_ocupadas: number;
+  en_espera: number;
 }
 
 @Injectable({
