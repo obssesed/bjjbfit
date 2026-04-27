@@ -36,8 +36,12 @@ export class ClasesService {
    * Intenta crear una reserva en Django. 
    * Se enviará automáticamente el JWT del usuario gracias al interceptor.
    */
-  hacerReserva(claseId: number): Observable<any> {
-    return this.http.post(this.reservasUrl, { clase: claseId });
+  hacerReserva(claseId: number, deportistaId?: number): Observable<any> {
+    const payload: any = { clase: claseId };
+    if (deportistaId) {
+      payload.deportista = deportistaId;
+    }
+    return this.http.post(this.reservasUrl, payload);
   }
 
   /**

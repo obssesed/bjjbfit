@@ -1,8 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ClasesService, ClaseBJJ } from '../../services/clases.service';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, PerfilDeportista } from '../../services/auth.service';
 
 interface DiaCalendario {
   nombre: string;
@@ -15,7 +16,7 @@ interface DiaCalendario {
 @Component({
   selector: 'app-lista-clases',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './lista-clases.component.html',
   styleUrls: ['./lista-clases.component.css']
 })
@@ -24,6 +25,18 @@ export class ListaClasesComponent implements OnInit {
   cargando: boolean = true;
   error: string | null = null;
   mensajeExito: string | null = null;
+
+  perfilDeportista: PerfilDeportista | null = null;
+  showModal: boolean = false;
+  claseSeleccionada: ClaseBJJ | null = null;
+  asistenteSeleccionado: number = 0;
+
+  misReservasActivas: any[] = [];
+  showCancelModal: boolean = false;
+  reservaACancelarID: number = 0;
+  
+  showErrorModal: boolean = false;
+  mensajeErrorModal: string = '';
 
   constructor(
     private clasesService: ClasesService, 
@@ -34,6 +47,22 @@ export class ListaClasesComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarClases();
+    if (this.authService.isLoggedIn()) {
+      this.authService.me().subscribe({
+        next: (data) => this.perfilDeportista = data,
+        error: (err) => console.error('Error cargando perfil', err)
+      });
+      this.cargarMisReservas();
+    }
+  }
+
+  cargarMisReservas() {
+    this.clasesService.getMisReservas().subscribe({
+      next: (data) => {
+        this.misReservasActivas = data.filter(r => r.estado !== 'CANCELADA');
+      },
+      error: (err) => console.error('Error cargando mis reservas activas', err)
+    });
   }
 
   cargarClases() {
@@ -112,11 +141,35 @@ export class ListaClasesComponent implements OnInit {
     return `${fInicio} - ${fFin}`;
   }
 
-  // Verifica si una clase ya ha comenzado / pasado
   esClasePasada(fechaInicioIso: string): boolean {
     const ahora = new Date();
     const claseDate = new Date(fechaInicioIso);
     return claseDate.getTime() < ahora.getTime();
+  }
+
+  // --- LÓGICA DUAL DE BOTONES ---
+  getReservasEnClase(claseId: number): any[] {
+    return this.misReservasActivas.filter(r => r.clase === claseId);
+  }
+
+  puedeReservar(claseId: number): boolean {
+    if (!this.perfilDeportista) return true; // Ciego
+    const reservasEnClase = this.getReservasEnClase(claseId);
+    let totalCapacidadFamiliar = 1; // Padre
+    if (this.perfilDeportista.hijos_a_cargo) {
+      totalCapacidadFamiliar += this.perfilDeportista.hijos_a_cargo.length;
+    }
+    return reservasEnClase.length < totalCapacidadFamiliar;
+  }
+
+  puedeCancelar(claseId: number): boolean {
+    return this.getReservasEnClase(claseId).length > 0;
+  }
+
+  // Comprueba si un deportista ID específico ya está inscrito
+  estaInscrito(deportistaId: number, claseId: number): boolean {
+    const reservas = this.getReservasEnClase(claseId);
+    return reservas.some(r => r.deportista === deportistaId);
   }
 
   reservar(clase: ClaseBJJ) {
@@ -131,6 +184,29 @@ export class ListaClasesComponent implements OnInit {
       return;
     }
 
+    if (this.perfilDeportista && this.perfilDeportista.hijos_a_cargo && this.perfilDeportista.hijos_a_cargo.length > 0) {
+      this.claseSeleccionada = clase;
+      this.asistenteSeleccionado = this.perfilDeportista.id; // Opción default: Yo
+      this.showModal = true;
+    } else {
+      this.ejecutarReservaReal(clase);
+    }
+  }
+
+  cancelarReservaModal() {
+    this.showModal = false;
+    this.claseSeleccionada = null;
+  }
+
+  confirmarReservaModal() {
+    this.showModal = false;
+    if (this.claseSeleccionada) {
+      const targetId = this.asistenteSeleccionado === Number(this.perfilDeportista!.id) ? undefined : this.asistenteSeleccionado;
+      this.ejecutarReservaReal(this.claseSeleccionada, targetId);
+    }
+  }
+
+  ejecutarReservaReal(clase: ClaseBJJ, deportistaId?: number) {
     // Optimistic Update: Solo restamos visualmente si había plaza libre
     let restado = false;
     if (clase.plazas_disponibles > 0) {
@@ -138,17 +214,20 @@ export class ListaClasesComponent implements OnInit {
       restado = true;
     }
 
-    this.clasesService.hacerReserva(clase.id).subscribe({
+    this.clasesService.hacerReserva(clase.id, deportistaId).subscribe({
       next: (response) => {
         if (response.estado === 'ESPERA') {
-          this.mensajeExito = "¡Estás en la lista de espera! Te avisaremos si queda algún hueco libre.";
+          this.mensajeExito = "¡En lista de espera! Te avisaremos si queda algún hueco libre.";
         } else {
           this.mensajeExito = "¡Plaza reservada con éxito! Te esperamos en el tatami.";
         }
         setTimeout(() => this.mensajeExito = null, 4000);
         
         // Refrescamos en background para tener datos reales exactos
-        setTimeout(() => this.cargarClases(), 2000);
+        setTimeout(() => {
+          this.cargarClases();
+          this.cargarMisReservas();
+        }, 2000);
       },
       error: (err) => {
         // Rollback visual si restamos plaza
@@ -161,10 +240,79 @@ export class ListaClasesComponent implements OnInit {
            msg = err.error.non_field_errors[0];
         } else if (err.status === 403) {
            msg = "No tienes permiso para realizar esta acción.";
+        } else if (err.error && typeof err.error === 'object' && err.error[0] && typeof err.error[0] === 'string') {
+           msg = err.error[0];
         }
         
-        alert(msg);
+        this.mensajeErrorModal = msg;
+        this.showErrorModal = true;
         console.error(err);
+      }
+    });
+  }
+
+  // --- LÓGICA DE CANCELACIÓN EXPRESS ---
+  cancelarFrente(clase: ClaseBJJ) {
+    if (this.esClasePasada(clase.fecha_hora_inicio)) {
+      alert("No puedes cancelar una clase pasada.");
+      return;
+    }
+    if (!this.authService.isLoggedIn()) return;
+
+    const reservasOcupadas = this.getReservasEnClase(clase.id);
+
+    // Activamos siempre el modal rojo bonito, independientemente del número de reservas
+    this.claseSeleccionada = clase;
+    this.showCancelModal = true;
+    
+    // Si solo hay una reserva, la pre-seleccionamos automáticamente
+    if (reservasOcupadas.length === 1) {
+      this.reservaACancelarID = reservasOcupadas[0].id;
+    } else {
+      this.reservaACancelarID = 0; // Obligamos a clicar si hay varias
+    }
+  }
+
+  cerrarErrorModal() {
+    this.showErrorModal = false;
+    this.mensajeErrorModal = '';
+  }
+
+  cerrarCancelModal() {
+    this.showCancelModal = false;
+    this.claseSeleccionada = null;
+  }
+
+  confirmarCancelModal(reservaId: number) {
+    this.showCancelModal = false;
+    if (this.claseSeleccionada) {
+      this.ejecutarCancelacionReal(reservaId, this.claseSeleccionada);
+    }
+  }
+
+  ejecutarCancelacionReal(reservaId: number, claseTarget: ClaseBJJ) {
+    // Optimistic Update inverso
+    claseTarget.plazas_disponibles += 1;
+
+    this.clasesService.cancelarReserva(reservaId).subscribe({
+      next: () => {
+        this.mensajeExito = "Reserva cancelada correctamente.";
+        setTimeout(() => this.mensajeExito = null, 4000);
+        setTimeout(() => {
+          this.cargarClases();
+          this.cargarMisReservas();
+        }, 1500);
+      },
+      error: (err) => {
+        claseTarget.plazas_disponibles -= 1; // rollback
+        let errorMsg = "Ocurrió un error al cancelar.";
+        if (err.error && err.error[0] && typeof err.error[0] === 'string') {
+           errorMsg = err.error[0];
+        } else if (err.error && err.error.detail) {
+           errorMsg = err.error.detail;
+        }
+        this.mensajeErrorModal = errorMsg;
+        this.showErrorModal = true;
       }
     });
   }

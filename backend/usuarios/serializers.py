@@ -1,14 +1,24 @@
 from rest_framework import serializers
 from .models import Deportista
 
+class HijoSerializer(serializers.ModelSerializer):
+    """
+    Serializador muy leve para anidar en el Perfil del Padre
+    """
+    class Meta:
+        model = Deportista
+        fields = ['id', 'username', 'first_name', 'last_name', 'plan_activo', 'cinturon']
+
 class DeportistaSerializer(serializers.ModelSerializer):
     """
     Serializador para el modelo Deportista.
     Maneja la representación de datos y la creación segura de nuevos usuarios.
     """
+    hijos_a_cargo = HijoSerializer(many=True, read_only=True)
+
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'telefono']
+        fields = ['id', 'username', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'telefono', 'hijos_a_cargo']
         extra_kwargs = {
             'password': {'write_only': True},
             'plan_activo': {'read_only': True},

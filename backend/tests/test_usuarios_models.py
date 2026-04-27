@@ -15,7 +15,7 @@ def test_si_obtener_string_resultado_formato_correcto(deportista_padre):
 @pytest.mark.django_db
 def test_si_string_vacio_resultado_cinturon_blanco():
     d = Deportista.objects.create(username="novato")
-    assert str(d) == "novato - Cinturón blanco sin grados"
+    assert str(d) == "novato - Blanco"
 
 @pytest.mark.django_db
 def test_si_deportista_sube_de_grado_resultado_fecha_actualiza(deportista_padre):
@@ -31,3 +31,15 @@ def test_si_deportista_sube_de_grado_resultado_fecha_actualiza(deportista_padre)
     deportista_padre.save()
     
     assert deportista_padre.fecha_ultima_graduacion == timezone.now().date()
+
+@pytest.mark.django_db
+def test_si_padre_serializa_resultado_hijos_a_cargo_incluidos(deportista_padre, deportista_hijo):
+    from usuarios.serializers import DeportistaSerializer
+    serializer = DeportistaSerializer(deportista_padre)
+    data = serializer.data
+    # Afirmar que se crea el vector de hijos
+    assert 'hijos_a_cargo' in data
+    # Comprobar que el hijo tutelado viaja en estrucutra dict dentro
+    assert len(data['hijos_a_cargo']) == 1
+    assert data['hijos_a_cargo'][0]['id'] == deportista_hijo.id
+    assert data['hijos_a_cargo'][0]['username'] == deportista_hijo.username

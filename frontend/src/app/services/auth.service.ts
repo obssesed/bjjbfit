@@ -2,6 +2,27 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 
+export interface HijoDelegado {
+  id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  plan_activo: boolean;
+  cinturon: string;
+}
+
+export interface PerfilDeportista {
+  id: number;
+  username: string;
+  email: string;
+  cinturon: string;
+  grados: number;
+  fecha_ultima_graduacion?: string;
+  plan_activo: boolean;
+  telefono?: string;
+  hijos_a_cargo: HijoDelegado[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -31,8 +52,8 @@ export class AuthService {
       );
   }
 
-  me(): Observable<any> {
-    return this.http.get<any>(this.meUrl);
+  me(): Observable<PerfilDeportista> {
+    return this.http.get<PerfilDeportista>(this.meUrl);
   }
 
   logout() {

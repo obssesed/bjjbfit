@@ -79,6 +79,22 @@ class ReservaSerializer(serializers.ModelSerializer):
                 
         return data
 
+    def create(self, validated_data):
+        from django.utils import timezone
+        
+        # Si el usuario había cancelado antes en esta misma clase, reaprovechamos
+        # su registro para no violar el Meta.unique_together de Django en PostgreSQL.
+        clase = validated_data.get('clase')
+        deportista = validated_data.get('deportista')
+        estado = validated_data.get('estado', 'CONFIRMADA')
+        
+        reserva, created = Reserva.objects.update_or_create(
+            clase=clase, 
+            deportista=deportista,
+            defaults={'estado': estado, 'fecha_reserva': timezone.now()}
+        )
+        return reserva
+
     def to_representation(self, instance):
         """
         Sobrescribimos este método para que, aunque el cliente nos mande sólo el ID de la clase en el POST (Ej: clase: 2),
@@ -93,6 +109,8 @@ class ReservaSerializer(serializers.ModelSerializer):
         }
         response['deportista_detalle'] = {
             'id': instance.deportista.id,
-            'username': instance.deportista.username
+            'username': instance.deportista.username,
+            'first_name': instance.deportista.first_name,
+            'last_name': instance.deportista.last_name
         }
         return response

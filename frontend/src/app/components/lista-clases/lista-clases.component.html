@@ -39,10 +39,26 @@
         </div>
         
         <div class="mini-card-actions">
-          <button class="reserve-btn-sm" 
-                  [disabled]="esClasePasada(clase.fecha_hora_inicio)" 
-                  (click)="reservar(clase)">
-            {{ esClasePasada(clase.fecha_hora_inicio) ? 'Caducada' : (clase.plazas_disponibles > 0 ? 'Reservar' : 'Lista de espera') }}
+          <div class="dual-actions" *ngIf="!esClasePasada(clase.fecha_hora_inicio)">
+            <!-- Botón Reservar ✅ -->
+            <button class="reserve-btn-sm" 
+                    [disabled]="!puedeReservar(clase.id)"
+                    [class.disabled-btn]="!puedeReservar(clase.id)"
+                    (click)="reservar(clase)" title="Reservar Plazas">
+              <span class="icon" style="font-size:1.1rem">✅</span> 
+            </button>
+            <!-- Botón Cancelar ❌ -->
+            <button class="reserve-btn-sm cancel-btn-sm" 
+                    *ngIf="puedeCancelar(clase.id)"
+                    (click)="cancelarFrente(clase)" title="Cancelar Reserva">
+              <span class="icon" style="font-size:1.1rem">❌</span> 
+            </button>
+          </div>
+
+          <!-- Si clase pasada -->
+          <button class="reserve-btn-sm disabled-btn" 
+                  *ngIf="esClasePasada(clase.fecha_hora_inicio)" disabled>
+            Caducada
           </button>
           <span class="spots-left" *ngIf="clase.plazas_disponibles > 0 && clase.plazas_disponibles <= 5 && !esClasePasada(clase.fecha_hora_inicio)">
             ¡Solo {{ clase.plazas_disponibles }}!
@@ -52,4 +68,85 @@
     </div>
   </div>
 
+</div>
+
+<!-- Modal de Selección de Asistente (Hijos a Cargo) -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="modal-card">
+    <h3 class="modal-title">¿Quién asiste a la clase?</h3>
+    <p class="modal-subtitle">Selecciona el perfil para ocupar la plaza de: <br><strong style="color:var(--accent-gold)">{{ claseSeleccionada?.titulo }}</strong></p>
+    
+    <div class="radio-group" *ngIf="perfilDeportista">
+      <!-- Opción Padre -->
+      <label class="radio-label" *ngIf="claseSeleccionada && !estaInscrito(perfilDeportista.id, claseSeleccionada.id)" [class.selected]="asistenteSeleccionado == perfilDeportista.id">
+        <input type="radio" name="asistente" [value]="perfilDeportista.id" [(ngModel)]="asistenteSeleccionado">
+        <span class="custom-radio"></span>
+        <div class="radio-text">
+          <span class="name">Reservar para mí</span>
+          <span class="belt-badge belt-{{perfilDeportista.cinturon.toLowerCase()}}">(ADULTO)</span>
+        </div>
+      </label>
+
+      <!-- Opciones Hijos -->
+      <ng-container *ngIf="claseSeleccionada">
+        <ng-container *ngFor="let hijo of perfilDeportista.hijos_a_cargo">
+           <label class="radio-label" *ngIf="!estaInscrito(hijo.id, claseSeleccionada.id)" [class.selected]="asistenteSeleccionado == hijo.id">
+             <input type="radio" name="asistente" [value]="hijo.id" [(ngModel)]="asistenteSeleccionado">
+             <span class="custom-radio"></span>
+             <div class="radio-text">
+               <span class="name">{{ hijo.first_name || hijo.username }} {{ hijo.last_name }}</span>
+               <span class="belt-badge belt-{{hijo.cinturon.toLowerCase()}}">(MENOR)</span>
+             </div>
+           </label>
+        </ng-container>
+      </ng-container>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelarReservaModal()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirmarReservaModal()">Confirmar Plaza</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Error / Warning (Ámbar) -->
+<div class="modal-overlay warning-mode" *ngIf="showErrorModal">
+  <div class="modal-card" style="border-color: #f59e0b; max-width: 400px; text-align: center;">
+    <h3 class="modal-title" style="color: #f59e0b; justify-content: center; font-size: 1.5rem; margin-bottom: 1rem;">
+      <span style="font-size: 2rem;">⚠️</span><br>Aviso
+    </h3>
+    <p class="modal-subtitle" style="color: #fcd34d; font-size: 1.1rem; line-height: 1.6;">
+      {{ mensajeErrorModal }}
+    </p>
+    
+    <div class="modal-actions" style="margin-top: 1.5rem; justify-content: center;">
+      <button class="btn-confirm warning-btn" (click)="cerrarErrorModal()">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Cancelación de Asistente (Rojo Peligro) -->
+<div class="modal-overlay danger-mode" *ngIf="showCancelModal && claseSeleccionada">
+  <div class="modal-card" style="border-color: #ef4444;">
+    <h3 class="modal-title" style="color: #ef4444;">Cancelar Reserva</h3>
+    <p class="modal-subtitle">¿De quién deseas liberar la plaza en <strong style="color:#fca5a5;">{{ claseSeleccionada.titulo }}</strong>?</p>
+    
+    <div class="radio-group">
+      <ng-container *ngFor="let res of getReservasEnClase(claseSeleccionada.id)">
+        <label class="radio-label danger-label" [class.selected]="reservaACancelarID == res.id">
+          <input type="radio" name="cancelReserva" [value]="res.id" [(ngModel)]="reservaACancelarID">
+          <span class="custom-radio"></span>
+          <div class="radio-text">
+            <span class="name" style="color: #fca5a5; text-transform:none;">Reserva a nombre de: {{ res.deportista_detalle?.first_name || res.deportista_detalle?.username }} {{ res.deportista_detalle?.last_name }}</span>
+            <span class="belt-badge" style="background:#7f1d1d; color:white; border:none;">RESERVADO</span>
+          </div>
+        </label>
+      </ng-container>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarCancelModal()">Atrás</button>
+      <button class="btn-confirm danger-btn" [disabled]="!reservaACancelarID" (click)="confirmarCancelModal(reservaACancelarID)">Sí, Liberar Plaza</button>
+    </div>
+  </div>
 </div>
