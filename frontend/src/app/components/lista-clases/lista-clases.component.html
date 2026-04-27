@@ -15,6 +15,14 @@
   <p>{{ error }}</p>
 </div>
 
+<div class="actions-toolbar" *ngIf="!cargando && !error">
+  <div class="week-selector">
+    <select [(ngModel)]="offsetSemanas" (change)="cambiarSemana()" class="select-premium">
+      <option *ngFor="let op of opcionesSemanas" [value]="op.valor">{{ op.etiqueta }}</option>
+    </select>
+  </div>
+</div>
+
 <div class="week-calendar" *ngIf="!cargando && !error">
   
   <div *ngFor="let dia of semana" class="day-column" [class.is-today]="dia.esHoy">

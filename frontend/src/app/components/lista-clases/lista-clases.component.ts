@@ -22,6 +22,15 @@ interface DiaCalendario {
 })
 export class ListaClasesComponent implements OnInit {
   semana: DiaCalendario[] = [];
+  todasLasClases: ClaseBJJ[] = [];
+  offsetSemanas: number = 0;
+  opcionesSemanas = [
+    { valor: 0, etiqueta: 'Semana Actual' },
+    { valor: 1, etiqueta: 'Próxima Semana' },
+    { valor: 2, etiqueta: 'En 2 Semanas' },
+    { valor: 3, etiqueta: 'En 3 Semanas' }
+  ];
+
   cargando: boolean = true;
   error: string | null = null;
   mensajeExito: string | null = null;
@@ -68,7 +77,8 @@ export class ListaClasesComponent implements OnInit {
   cargarClases() {
     this.clasesService.getClases().subscribe({
       next: (data) => {
-        this.construirSemana(data);
+        this.todasLasClases = data;
+        this.construirSemana();
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -81,15 +91,20 @@ export class ListaClasesComponent implements OnInit {
     });
   }
 
-  construirSemana(todasLasClases: ClaseBJJ[]) {
+  cambiarSemana() {
+    this.offsetSemanas = Number(this.offsetSemanas);
+    this.construirSemana();
+  }
+
+  construirSemana() {
     this.semana = [];
     const hoy = new Date();
     // 1 es Lunes, 7 es Domingo
     const diaActual = hoy.getDay() === 0 ? 7 : hoy.getDay(); 
     
-    // Obtener el Lunes de la semana en curso
+    // Obtener el Lunes de la semana seleccionada
     const lunes = new Date(hoy);
-    lunes.setDate(hoy.getDate() - diaActual + 1);
+    lunes.setDate(hoy.getDate() - diaActual + 1 + (this.offsetSemanas * 7));
     
     const nombresDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
@@ -98,7 +113,7 @@ export class ListaClasesComponent implements OnInit {
         iterDia.setDate(lunes.getDate() + i);
         
         // Comprobar si es el día de hoy exacto
-        const esHoy = iterDia.getDate() === hoy.getDate() && iterDia.getMonth() === hoy.getMonth();
+        const esHoy = iterDia.getDate() === hoy.getDate() && iterDia.getMonth() === hoy.getMonth() && iterDia.getFullYear() === hoy.getFullYear();
 
         this.semana.push({
             nombre: nombresDias[i],
@@ -110,7 +125,7 @@ export class ListaClasesComponent implements OnInit {
     }
 
     // Filtrar y ordenar clases en su día correspondiente
-    todasLasClases.forEach(clase => {
+    this.todasLasClases.forEach(clase => {
         const claseDate = new Date(clase.fecha_hora_inicio);
         const dayIndex = this.semana.findIndex(d => 
             d.fechaObj.getFullYear() === claseDate.getFullYear() &&
