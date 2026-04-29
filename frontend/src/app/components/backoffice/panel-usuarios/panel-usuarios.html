@@ -10,6 +10,76 @@
   {{ mensajeExito }}
 </div>
 
+<!-- ====== BARRA DE FILTROS AVANZADA ====== -->
+<div class="filter-toolbar" *ngIf="!cargando && !error">
+  <div class="filter-main-row">
+    <div class="filter-group main-search">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" [(ngModel)]="filtros.texto" placeholder="Buscar por nombre, DNI o Nº Socio...">
+      </div>
+    </div>
+    <button class="btn-toggle-filters" [class.active]="filtrosExpandidos" (click)="filtrosExpandidos = !filtrosExpandidos">
+      <span>{{ filtrosExpandidos ? 'Ocultar Filtros' : 'Filtros Avanzados' }}</span>
+      <span class="toggle-icon">⚙️</span>
+    </button>
+    <button class="btn-export" (click)="exportarReporte()" title="Exportar datos filtrados a CSV">
+      📊 Exportar
+    </button>
+  </div>
+
+  <div class="filter-grid" [class.expanded]="filtrosExpandidos">
+    <div class="filter-item">
+      <label>Cinturón</label>
+      <select [(ngModel)]="filtros.cinturon">
+        <option value="">Todos</option>
+        <option *ngFor="let c of opcionesCinturon" [value]="c">{{ c }}</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <label>Sexo</label>
+      <select [(ngModel)]="filtros.sexo">
+        <option value="">Ambos</option>
+        <option value="M">Masculino</option>
+        <option value="F">Femenino</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <label>Categoría</label>
+      <select [(ngModel)]="filtros.categoria">
+        <option value="">Todas</option>
+        <option value="ADULTO">Adulto</option>
+        <option value="JUVENIL">Juvenil</option>
+        <option value="INFANTIL">Infantil</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <label>Plan</label>
+      <select [(ngModel)]="filtros.plan">
+        <option value="">Todos</option>
+        <option value="ADULTO">Bono Adulto</option>
+        <option value="JUVENIL">Bono Juvenil</option>
+        <option value="INFANTIL">Bono Infantil</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
+      <label>Fecha Alta</label>
+      <input type="date" [(ngModel)]="filtros.fechaAlta">
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn-clear" (click)="limpiarFiltros()" title="Limpiar filtros">
+        ✕ Limpiar
+      </button>
+    </div>
+  </div>
+</div>
+
+
 <div class="table-container" *ngIf="!cargando && !error">
   <table class="premium-table">
     <thead>
@@ -26,7 +96,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of usuariosActivos">
+      <tr *ngFor="let u of usuariosActivosFiltrados">
         <td>
           <div class="user-meta">
             <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
@@ -122,7 +192,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of usuariosPendientes">
+      <tr *ngFor="let u of usuariosPendientesFiltrados">
         <td>
           <div class="user-meta">
             <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
@@ -180,7 +250,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of usuariosInactivos">
+      <tr *ngFor="let u of usuariosInactivosFiltrados">
         <td>
           <div class="user-meta">
             <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>

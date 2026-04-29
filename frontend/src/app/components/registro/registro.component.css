@@ -85,6 +85,11 @@
   transition: var(--transition-smooth);
 }
 
+.select-control option {
+  background-color: #1a1c23;
+  color: #ffffff;
+}
+
 .select-control {
   cursor: pointer;
   appearance: none; /* Elimina estilo nativo en algunos browsers */
