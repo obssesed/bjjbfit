@@ -28,6 +28,7 @@ export class RegistroComponent {
   
   errorMsg: string | null = null;
   cargando: boolean = false;
+  showExitoModal: boolean = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -45,22 +46,36 @@ export class RegistroComponent {
 
     this.authService.registro(this.registroData).subscribe({
       next: () => {
-        // Redirige al login tras registro exitoso
         this.cargando = false;
-        alert('Registro exitoso. Ya puedes iniciar sesión.');
-        this.router.navigate(['/login']);
+        this.showExitoModal = true;
       },
       error: (err) => {
         this.cargando = false;
-        console.error('Error al registrar usuario', err);
-        // Intentar parsear el error de Django si existe
+        console.error('Error detallado de registro:', err);
+        
         if (err.error && typeof err.error === 'object') {
-          const firstErrorKey = Object.keys(err.error)[0];
-          this.errorMsg = `Error (${firstErrorKey}): ${err.error[firstErrorKey][0]}`;
+          // Extraer mensajes de error de Django REST Framework
+          const errors = [];
+          for (const key in err.error) {
+            if (err.error.hasOwnProperty(key)) {
+              const msg = Array.isArray(err.error[key]) ? err.error[key][0] : err.error[key];
+              errors.push(`${key.toUpperCase()}: ${msg}`);
+            }
+          }
+          this.errorMsg = errors.join(' | ');
+        } else if (err.status === 0) {
+          this.errorMsg = 'No se pudo conectar con el servidor. Revisa tu conexión.';
         } else {
-          this.errorMsg = 'Ha ocurrido un error durante el registro. Inténtalo de nuevo.';
+          this.errorMsg = 'Error inesperado. Por favor, revisa los datos e inténtalo de nuevo.';
         }
       }
     });
   }
+
+
+  irALogin() {
+    this.showExitoModal = false;
+    this.router.navigate(['/login']);
+  }
+
 }

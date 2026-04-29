@@ -140,6 +140,7 @@ AUTH_USER_MODEL = 'usuarios.Deportista'
 # Orígenes permitidos desde Angular
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4200",
+    "http://127.0.0.1:4200",
 ]
 
 # Configuración REST Framework

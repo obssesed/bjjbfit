@@ -39,10 +39,10 @@ export interface PerfilDeportista {
   providedIn: 'root'
 })
 export class AuthService {
-  private tokenUrl = 'http://localhost:8000/api/token/';
-  private registerUrl = 'http://localhost:8000/api/deportistas/';
-  private meUrl = 'http://localhost:8000/api/deportistas/me/';
-  private apiUrl = 'http://localhost:8000/api';
+  private tokenUrl = 'http://127.0.0.1:8000/api/token/';
+  private registerUrl = 'http://127.0.0.1:8000/api/deportistas/';
+  private meUrl = 'http://127.0.0.1:8000/api/deportistas/me/';
+  private apiUrl = 'http://127.0.0.1:8000/api';
   
   // Usamos BehaviorSubject para asegurar que Angular detecte cambios desde el Nav
   public loggedIn$ = new BehaviorSubject<boolean>(this.checkToken());

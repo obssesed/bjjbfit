@@ -89,3 +89,17 @@
     </div>
   </div>
 </div>
+
+<!-- ====== MODAL: Registro Exitoso ====== -->
+<div class="modal-overlay" *ngIf="showExitoModal">
+  <div class="modal-card success-card">
+    <div class="success-icon">✓</div>
+    <h3 class="success-title">¡Bienvenido al Equipo!</h3>
+    <p class="success-text">
+      Tu registro se ha completado correctamente.<br>
+      Ahora solo necesitas iniciar sesión para reservar tu primera clase.
+    </p>
+    <button class="btn-login-go" (click)="irALogin()">Ir al Inicio de Sesión</button>
+  </div>
+</div>
+
