@@ -105,9 +105,8 @@
       <tr *ngFor="let u of usuariosPendientes">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta'
-              }}</span>
-            <span class="user-alias">@{{ u.username }}</span>
+            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+            <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
           </div>
         </td>
         <td>
@@ -166,9 +165,8 @@
       <tr *ngFor="let u of usuariosInactivos">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta'
-              }}</span>
-            <span class="user-alias">@{{ u.username }}</span>
+            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+            <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
           </div>
         </td>
         <td>
