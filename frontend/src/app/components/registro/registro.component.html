@@ -49,6 +49,7 @@
         <div class="input-group">
           <label for="nif">NIF/DNI *</label>
           <input id="nif" type="text" [(ngModel)]="registroData.nif" name="nif" placeholder="12345678X" required>
+          <span class="field-hint">En menores, usar el DNI del tutor.</span>
         </div>
         <div class="input-group">
           <label for="sexo">Sexo *</label>
@@ -68,7 +69,8 @@
         </div>
         <div class="input-group">
           <label for="telefono">Teléfono *</label>
-          <input id="telefono" type="tel" [(ngModel)]="registroData.telefono" name="telefono" placeholder="600 000 000" required>
+          <input id="telefono" type="tel" [(ngModel)]="registroData.telefono" name="telefono" placeholder="600 000 000" maxlength="9" required>
+          <span class="field-hint">9 dígitos, sin prefijo.</span>
         </div>
       </div>
 
@@ -76,7 +78,8 @@
 
       <div class="input-group">
         <label for="cuenta_bancaria">Cuenta Bancaria (Opcional)</label>
-        <input id="cuenta_bancaria" type="text" [(ngModel)]="registroData.cuenta_bancaria" name="cuenta_bancaria" placeholder="ES00 0000 0000 ...">
+        <input id="cuenta_bancaria" type="text" [(ngModel)]="registroData.cuenta_bancaria" name="cuenta_bancaria" placeholder="ES00 0000 0000 0000 0000 0000">
+        <span class="field-hint">Formato IBAN español: ES + 22 dígitos.</span>
       </div>
 
       <button type="submit" class="submit-btn" [disabled]="!registroForm.form.valid || cargando">

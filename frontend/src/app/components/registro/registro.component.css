@@ -68,6 +68,13 @@
   color: var(--text-secondary);
 }
 
+.field-hint {
+  font-size: 0.75rem;
+  color: var(--accent-gold);
+  opacity: 0.8;
+  margin-top: 2px;
+}
+
 .input-group input, .select-control {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
