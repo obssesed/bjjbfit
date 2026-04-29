@@ -86,4 +86,31 @@
     </div>
 
   </div>
+
+</div>
+
+<!-- Toast de resultado -->
+<div class="toast-resultado" *ngIf="mensajeResultado" [class.toast-error]="mensajeError">
+  {{ mensajeResultado }}
+</div>
+
+<!-- Modal Premium de Cancelación -->
+<div class="modal-overlay danger-mode" *ngIf="showCancelModal && reservaSeleccionada">
+  <div class="modal-card" style="border-color: #ef4444;">
+    <h3 class="modal-title" style="color: #ef4444;">Cancelar Reserva</h3>
+    <p class="modal-subtitle">
+      ¿Seguro que deseas liberar tu plaza en
+      <strong style="color:#fca5a5;">{{ reservaSeleccionada.clase_detalle.titulo }}</strong>?
+    </p>
+    <p class="modal-detail">
+      📅 {{ reservaSeleccionada.clase_detalle.fecha_hora_inicio | date:'dd MMM, HH:mm' }}
+    </p>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarCancelModal()">Atrás</button>
+      <button class="btn-confirm danger-btn" [disabled]="cancelando" (click)="confirmarCancelacion()">
+        {{ cancelando ? 'Cancelando...' : 'Sí, Liberar Plaza' }}
+      </button>
+    </div>
+  </div>
 </div>

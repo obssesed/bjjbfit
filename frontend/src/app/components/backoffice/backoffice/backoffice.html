@@ -1,0 +1,15 @@
+<div class="backoffice-layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Panel Admin</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a routerLink="usuarios" routerLinkActive="active-tab" class="tab-item">👥 Usuarios Activos</a>
+      <a routerLink="reportes" routerLinkActive="active-tab" class="tab-item disabled">📊 Metricas (Pronto)</a>
+    </nav>
+  </aside>
+
+  <main class="backoffice-content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

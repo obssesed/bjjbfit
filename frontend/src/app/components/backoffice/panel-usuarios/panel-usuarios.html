@@ -1,0 +1,162 @@
+<div class="panel-header">
+  <h3>Deportistas Activos</h3>
+  <p>Gestión de altas y seguimiento del alumnado matriculado.</p>
+</div>
+
+<div *ngIf="cargando" class="state-msg">Cargando base de datos...</div>
+<div *ngIf="error" class="state-msg error">{{ error }}</div>
+<div *ngIf="mensajeExito" class="state-msg" style="background-color: var(--success-bg); border-color: var(--success); color: #fff;">
+  {{ mensajeExito }}
+</div>
+
+<div class="table-container" *ngIf="!cargando && !error">
+  <table class="premium-table">
+    <thead>
+      <tr>
+        <th>Deportista</th>
+        <th>Cinturón</th>
+        <th>Contacto</th>
+        <th>Hijos Asociados</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuariosActivos">
+        <td>
+          <div class="user-meta">
+            <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
+            <span class="user-alias">@{{ u.username }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="belt-badge belt-{{ u.cinturon | lowercase }}">{{ u.cinturon }}</span>
+        </td>
+        <td class="contact-col">
+          <span class="contact-item"><span class="contact-icon">@</span>{{ u.email }}</span>
+          <span class="contact-item" *ngIf="u.telefono"><span class="contact-icon">☎</span>{{ u.telefono }}</span>
+        </td>
+        <td>
+          <span class="pill primary" *ngIf="u.hijos_a_cargo && u.hijos_a_cargo.length > 0">
+            {{ u.hijos_a_cargo.length }}
+          </span>
+          <span class="pill gray" *ngIf="!u.hijos_a_cargo || u.hijos_a_cargo.length === 0">0</span>
+        </td>
+        <td>
+          <span class="pill success">✔️ Alta</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="empty-state" *ngIf="usuariosActivos.length === 0">
+    No hay usuarios con plan activo.
+  </div>
+</div>
+
+<div class="panel-header" style="margin-top: 4rem;">
+  <h3>Nuevas Altas Pendientes</h3>
+  <p>Alumnos recién registrados en la app pendientes de que administres su Bono y Cinturón.</p>
+</div>
+
+<div class="table-container" *ngIf="!cargando && !error">
+  <table class="premium-table">
+    <thead>
+      <tr>
+        <th>Deportista</th>
+        <th>Fecha de Registro</th>
+        <th>Contacto</th>
+        <th>Activar Plan</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuariosPendientes">
+        <td>
+          <div class="user-meta">
+            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+            <span class="user-alias">@{{ u.username }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="registration-date">{{ u.date_joined | date:'dd/MM/yyyy' }}</span>
+        </td>
+        <td class="contact-col">
+          <span class="contact-item"><span class="contact-icon">@</span>{{ u.email }}</span>
+          <span class="contact-item" *ngIf="u.telefono"><span class="contact-icon">☎</span>{{ u.telefono }}</span>
+        </td>
+        <td>
+          <div class="activar-plan-col">
+             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
+                <option value="MENSUAL">Mensual</option>
+                <option value="FAMILIAR">Familiar</option>
+             </select>
+             <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
+                {{ activandoId === u.id ? '...' : 'Activar' }}
+             </button>
+          </div>
+        </td>
+        <td>
+          <span class="pill pending-pill">⏳ Pendiente Activar</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="empty-state" *ngIf="usuariosPendientes.length === 0">
+    No hay usuarios pendientes de alta.
+  </div>
+</div>
+
+<div class="panel-header" style="margin-top: 4rem;">
+  <h3>Deportistas Inactivos / Bajas</h3>
+  <p>Alumnos históricos de la academia que no tienen ningún Bono en curso.</p>
+</div>
+
+<div class="table-container" *ngIf="!cargando && !error">
+  <table class="premium-table">
+    <thead>
+      <tr>
+        <th>Deportista</th>
+        <th>Cinturón</th>
+        <th>Contacto</th>
+        <th>Activar Plan</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let u of usuariosInactivos">
+        <td>
+          <div class="user-meta">
+            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+            <span class="user-alias">@{{ u.username }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="belt-badge belt-{{ u.cinturon | lowercase }}">{{ u.cinturon }}</span>
+        </td>
+        <td class="contact-col">
+          <span class="contact-item"><span class="contact-icon">@</span>{{ u.email }}</span>
+          <span class="contact-item" *ngIf="u.telefono"><span class="contact-icon">☎</span>{{ u.telefono }}</span>
+        </td>
+        <td>
+          <div class="activar-plan-col">
+             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
+                <option value="MENSUAL">Mensual</option>
+                <option value="FAMILIAR">Familiar</option>
+             </select>
+             <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
+                {{ activandoId === u.id ? '...' : 'Reactivar' }}
+             </button>
+          </div>
+        </td>
+        <td>
+          <span class="pill error-pill">❌ Inactivo</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <div class="empty-state" *ngIf="usuariosInactivos.length === 0">
+    No hay usuarios inactivos registrados.
+  </div>
+</div>

@@ -21,7 +21,9 @@ export interface PerfilDeportista {
   grados: number;
   fecha_ultima_graduacion?: string;
   plan_activo: boolean;
+  tipo_plan_seleccionado?: string; // UI Temporary state
   telefono?: string;
+  date_joined?: string;
   hijos_a_cargo: HijoDelegado[];
   is_staff: boolean;
 }
@@ -86,6 +88,18 @@ export class AuthService {
 
   getUsuariosActivos(): Observable<PerfilDeportista[]> {
     return this.http.get<PerfilDeportista[]>(`${this.apiUrl}/deportistas/activos_backoffice/`);
+  }
+
+  getUsuariosInactivos(): Observable<PerfilDeportista[]> {
+    return this.http.get<PerfilDeportista[]>(`${this.apiUrl}/deportistas/inactivos_backoffice/`);
+  }
+
+  getUsuariosPendientes(): Observable<PerfilDeportista[]> {
+    return this.http.get<PerfilDeportista[]>(`${this.apiUrl}/deportistas/pendientes_backoffice/`);
+  }
+
+  activarPlan(deportistaId: number, tipoPlan: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/activar_plan/`, { tipo_plan: tipoPlan });
   }
 
   getToken() {
