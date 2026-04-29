@@ -190,7 +190,12 @@
           </div>
         </td>
         <td>
-          <span class="belt-badge belt-{{ u.cinturon | lowercase }}">{{ u.cinturon }}</span>
+          <div class="mini-belt belt-color-{{ u.cinturon | lowercase }}">
+            <div class="mini-belt-body"></div>
+            <div class="mini-belt-tip" [ngClass]="{'tip-roja': u.cinturon === 'Negro', 'tip-negra': u.cinturon !== 'Negro'}">
+              <div class="mini-stripe" *ngFor="let _ of [].constructor(u.grados)"></div>
+            </div>
+          </div>
         </td>
         <td class="contact-col">
           <span class="contact-item"><span class="contact-icon">@</span>{{ u.email }}</span>
