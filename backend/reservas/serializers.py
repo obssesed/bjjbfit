@@ -13,7 +13,7 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClaseBJJ
-        fields = ['id', 'titulo', 'descripcion', 'icono', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
+        fields = ['id', 'titulo', 'descripcion', 'icono', 'categoria_acceso', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
 
     def get_plazas_disponibles(self, obj: ClaseBJJ) -> int:
         return obj.plazas_disponibles()
@@ -25,9 +25,10 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
         return obj.en_espera()
 
 class PlantillaClaseSerializer(serializers.ModelSerializer):
+    categoria_acceso_display = serializers.CharField(source='get_categoria_acceso_display', read_only=True)
     class Meta:
         model = PlantillaClase
-        fields = '__all__'
+        fields = ['id', 'titulo', 'descripcion', 'icono', 'hora_inicio', 'duracion_minutos', 'capacidad_maxima', 'categoria_acceso', 'categoria_acceso_display']
 
 class ReservaSerializer(serializers.ModelSerializer):
     """
@@ -60,8 +61,16 @@ class ReservaSerializer(serializers.ModelSerializer):
                 f"El deportista {deportista_target.username} no tiene un plan activo. Contacte con administración."
             )
 
-        # 2. Aseguramos uniqueness manual (no pueden reservar la misma clase dos veces)
+        # 2. Aseguramos que el plan coincida con la categoría de la clase
         clase = data.get('clase')
+        if clase and deportista_target.tipo_plan:
+            if deportista_target.tipo_plan.categoria_edad != clase.categoria_acceso:
+                raise serializers.ValidationError(
+                    f"Esta clase es para la categoría {clase.get_categoria_acceso_display()}. "
+                    f"Tu plan es de categoría {deportista_target.tipo_plan.get_categoria_edad_display()}."
+                )
+
+        # 3. Aseguramos uniqueness manual (no pueden reservar la misma clase dos veces)
         if clase and Reserva.objects.filter(clase=clase, deportista=deportista_target, estado__in=['CONFIRMADA', 'ESPERA']).exists():
             raise serializers.ValidationError(
                 "El deportista ya tiene una reserva activa para esta clase."

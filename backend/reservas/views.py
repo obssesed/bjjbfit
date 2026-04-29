@@ -54,6 +54,7 @@ class PlantillaClaseViewSet(viewsets.ModelViewSet):
                         titulo=plantilla.titulo,
                         descripcion=plantilla.descripcion,
                         icono=plantilla.icono,
+                        categoria_acceso=plantilla.categoria_acceso,
                         fecha_hora_inicio=dt_inicio,
                         fecha_hora_fin=dt_fin,
                         capacidad_maxima=plantilla.capacidad_maxima

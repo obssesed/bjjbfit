@@ -5,6 +5,11 @@ class ClaseBJJ(models.Model):
     """
     Modelo que representa una sesión o clase de BJJ disponible en el gimnasio.
     """
+    CHOICES_CATEGORIA = [
+        ('ADULTO', 'Solo Adultos'),
+        ('JUVENIL', 'Solo Juveniles'),
+        ('INFANTIL', 'Solo Infantiles'),
+    ]
     titulo = models.CharField(
         max_length=100, 
         help_text="Nombre corto de la clase (ej. BJJ Fundamentos, No-Gi)."
@@ -30,6 +35,12 @@ class ClaseBJJ(models.Model):
         max_length=50,
         default="🥋",
         help_text="Icono visual para la clase (emoji o nombre de icono)."
+    )
+    categoria_acceso = models.CharField(
+        max_length=20,
+        choices=CHOICES_CATEGORIA,
+        default='ADULTO',
+        help_text="Qué tipo de plan se requiere para esta clase."
     )
 
     def plazas_ocupadas(self) -> int:
@@ -59,6 +70,11 @@ class PlantillaClase(models.Model):
     hora_inicio = models.TimeField(help_text="Hora de comienzo por defecto.")
     duracion_minutos = models.PositiveIntegerField(default=90)
     capacidad_maxima = models.PositiveIntegerField(default=30)
+    categoria_acceso = models.CharField(
+        max_length=20,
+        choices=ClaseBJJ.CHOICES_CATEGORIA,
+        default='ADULTO'
+    )
 
     def __str__(self):
         return f"Plantilla: {self.icono} {self.titulo} ({self.hora_inicio})"

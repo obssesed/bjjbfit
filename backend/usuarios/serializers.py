@@ -10,9 +10,10 @@ class HijoSerializer(serializers.ModelSerializer):
     """
     Serializador muy leve para anidar en el Perfil del Padre
     """
+    categoria_plan = serializers.CharField(source='tipo_plan.categoria_edad', read_only=True)
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'first_name', 'last_name', 'plan_activo', 'cinturon']
+        fields = ['id', 'username', 'first_name', 'last_name', 'plan_activo', 'cinturon', 'categoria_plan']
 
 class DeportistaSerializer(serializers.ModelSerializer):
     """
@@ -20,12 +21,13 @@ class DeportistaSerializer(serializers.ModelSerializer):
     Maneja la representación de datos y la creación segura de nuevos usuarios.
     """
     hijos_a_cargo = HijoSerializer(many=True, read_only=True)
+    categoria_plan = serializers.CharField(source='tipo_plan.categoria_edad', read_only=True)
 
     is_staff = serializers.BooleanField(read_only=True)
 
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'tipo_plan', 'es_familiar', 'telefono', 'nif', 'sexo', 'fecha_nacimiento', 'cuenta_bancaria', 'id_interno', 'hijos_a_cargo', 'is_staff', 'date_joined']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'tipo_plan', 'categoria_plan', 'es_familiar', 'telefono', 'nif', 'sexo', 'fecha_nacimiento', 'cuenta_bancaria', 'id_interno', 'hijos_a_cargo', 'is_staff', 'date_joined']
         extra_kwargs = {
             'password': {'write_only': True},
             'first_name': {'required': True, 'allow_blank': False},

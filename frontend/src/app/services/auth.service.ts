@@ -19,6 +19,7 @@ export interface PlantillaClase {
   hora_inicio: string; // "HH:mm:ss"
   duracion_minutos: number;
   capacidad_maxima: number;
+  categoria_acceso: 'ADULTO' | 'JUVENIL' | 'INFANTIL';
 }
 
 export interface HijoDelegado {
@@ -28,6 +29,7 @@ export interface HijoDelegado {
   last_name: string;
   plan_activo: boolean;
   cinturon: string;
+  categoria_plan?: string;
 }
 
 export interface PerfilDeportista {
@@ -41,6 +43,7 @@ export interface PerfilDeportista {
   fecha_ultima_graduacion?: string;
   plan_activo: boolean;
   tipo_plan?: number; // Ahora es el ID del objeto Plan
+  categoria_plan?: string;
   es_familiar?: boolean;
   tipo_plan_seleccionado?: number; // UI Temporary state
   es_familiar_seleccionado?: boolean; // UI Temporary state

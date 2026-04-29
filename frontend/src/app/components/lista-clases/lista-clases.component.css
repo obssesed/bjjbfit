@@ -172,19 +172,20 @@
   margin-bottom: 0.4rem;
 }
 
-.mini-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-  line-height: 1.2;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.cat-tag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-top: 0.2rem;
 }
 
-.class-emoji {
-  font-size: 1.2rem;
-}
+.cat-tag.ADULTO { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+.cat-tag.JUVENIL { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
+.cat-tag.INFANTIL { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
 
 .mini-card-actions {
   display: flex;

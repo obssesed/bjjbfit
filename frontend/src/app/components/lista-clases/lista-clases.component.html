@@ -44,8 +44,10 @@
             {{ obtenerFormatoHorario(clase.fecha_hora_inicio) }}
           </div>
           <h4 class="mini-title">
-            <span class="class-emoji">{{ clase.icono }}</span> {{ clase.titulo }}
+            <span class="class-emoji" *ngIf="clase.icono">{{ clase.icono }}</span>
+            <span>{{ clase.titulo }}</span>
           </h4>
+          <span class="cat-tag" [ngClass]="clase.categoria_acceso">{{ clase.categoria_acceso }}</span>
         </div>
         
         <div class="mini-card-actions">
@@ -99,24 +101,24 @@
     
     <div class="radio-group" *ngIf="perfilDeportista">
       <!-- Opción Padre -->
-      <label class="radio-label" *ngIf="claseSeleccionada && !estaInscrito(perfilDeportista.id, claseSeleccionada.id)" [class.selected]="asistenteSeleccionado == perfilDeportista.id">
+      <label class="radio-label" *ngIf="claseSeleccionada && cumpleCategoria(perfilDeportista, claseSeleccionada) && !estaInscrito(perfilDeportista.id, claseSeleccionada.id)" [class.selected]="asistenteSeleccionado == perfilDeportista.id">
         <input type="radio" name="asistente" [value]="perfilDeportista.id" [(ngModel)]="asistenteSeleccionado">
         <span class="custom-radio"></span>
         <div class="radio-text">
           <span class="name">Reservar para mí</span>
-          <span class="belt-badge belt-{{perfilDeportista.cinturon.toLowerCase()}}">(ADULTO)</span>
+          <span class="belt-badge belt-{{perfilDeportista.cinturon.toLowerCase()}}">({{ perfilDeportista.categoria_plan }})</span>
         </div>
       </label>
 
       <!-- Opciones Hijos -->
       <ng-container *ngIf="claseSeleccionada">
         <ng-container *ngFor="let hijo of perfilDeportista.hijos_a_cargo">
-           <label class="radio-label" *ngIf="!estaInscrito(hijo.id, claseSeleccionada.id)" [class.selected]="asistenteSeleccionado == hijo.id">
+           <label class="radio-label" *ngIf="claseSeleccionada && cumpleCategoria(hijo, claseSeleccionada) && !estaInscrito(hijo.id, claseSeleccionada.id)" [class.selected]="asistenteSeleccionado == hijo.id">
              <input type="radio" name="asistente" [value]="hijo.id" [(ngModel)]="asistenteSeleccionado">
              <span class="custom-radio"></span>
              <div class="radio-text">
                <span class="name">{{ hijo.first_name || hijo.username }} {{ hijo.last_name }}</span>
-               <span class="belt-badge belt-{{hijo.cinturon.toLowerCase()}}">(MENOR)</span>
+               <span class="belt-badge belt-{{hijo.cinturon.toLowerCase()}}">({{ hijo.categoria_plan }})</span>
              </div>
            </label>
         </ng-container>

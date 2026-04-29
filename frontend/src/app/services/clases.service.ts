@@ -13,6 +13,7 @@ export interface ClaseBJJ {
   plazas_disponibles: number;
   plazas_ocupadas: number;
   en_espera: number;
+  categoria_acceso: 'ADULTO' | 'JUVENIL' | 'INFANTIL';
 }
 
 @Injectable({

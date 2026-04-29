@@ -77,6 +77,7 @@ export class ListaClasesComponent implements OnInit {
   cargarClases() {
     this.clasesService.getClases().subscribe({
       next: (data) => {
+        console.log('DEBUG - Clases cargadas:', data);
         this.todasLasClases = data;
         this.construirSemana();
         this.cargando = false;
@@ -179,21 +180,30 @@ export class ListaClasesComponent implements OnInit {
     return this.misReservasActivas.filter(r => r.clase === claseId);
   }
 
-  puedeReservar(claseId: number): boolean {
-    if (!this.perfilDeportista) return true; // Ciego
-    const reservasEnClase = this.getReservasEnClase(claseId);
-    let totalCapacidadFamiliar = 1; // Padre
-    if (this.perfilDeportista.hijos_a_cargo) {
-      totalCapacidadFamiliar += this.perfilDeportista.hijos_a_cargo.length;
-    }
-    return reservasEnClase.length < totalCapacidadFamiliar;
-  }
-
   puedeCancelar(claseId: number): boolean {
     return this.getReservasEnClase(claseId).length > 0;
   }
 
-  // Comprueba si un deportista ID específico ya está inscrito
+  cumpleCategoria(deportista: any, clase: ClaseBJJ): boolean {
+    if (!deportista || !deportista.categoria_plan) return true;
+    return deportista.categoria_plan === clase.categoria_acceso;
+  }
+
+  puedeReservar(claseId: number): boolean {
+    if (!this.perfilDeportista) return true;
+    
+    const claseObj = this.todasLasClases.find(c => c.id === claseId);
+    if (!claseObj) return true;
+
+    const perfilesDisponibles: any[] = [this.perfilDeportista];
+    if (this.perfilDeportista.hijos_a_cargo) {
+      perfilesDisponibles.push(...this.perfilDeportista.hijos_a_cargo);
+    }
+
+    return perfilesDisponibles.some(p => 
+      this.cumpleCategoria(p, claseObj) && !this.estaInscrito(p.id, claseId)
+    );
+  }
   estaInscrito(deportistaId: number, claseId: number): boolean {
     const reservas = this.getReservasEnClase(claseId);
     return reservas.some(r => r.deportista === deportistaId);
@@ -213,7 +223,18 @@ export class ListaClasesComponent implements OnInit {
 
     if (this.perfilDeportista && this.perfilDeportista.hijos_a_cargo && this.perfilDeportista.hijos_a_cargo.length > 0) {
       this.claseSeleccionada = clase;
-      this.asistenteSeleccionado = this.perfilDeportista.id; // Opción default: Yo
+      
+      // Preseleccionar Yo si cumplo categoria y no estoy inscrito
+      if (this.cumpleCategoria(this.perfilDeportista, clase) && !this.estaInscrito(this.perfilDeportista.id, clase.id)) {
+        this.asistenteSeleccionado = this.perfilDeportista.id;
+      } else {
+        // Si no, buscar el primer hijo que cumpla y no este inscrito
+        const primerHijoValido = this.perfilDeportista.hijos_a_cargo.find(h => 
+          this.cumpleCategoria(h, clase) && !this.estaInscrito(h.id, clase.id)
+        );
+        this.asistenteSeleccionado = primerHijoValido ? primerHijoValido.id : 0;
+      }
+
       this.showModal = true;
     } else {
       this.ejecutarReservaReal(clase);
