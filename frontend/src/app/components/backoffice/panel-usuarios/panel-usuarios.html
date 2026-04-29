@@ -15,6 +15,7 @@
     <thead>
       <tr>
         <th>Deportista</th>
+        <th>Nº Socio</th>
         <th>Cinturón</th>
         <th>Sexo</th>
         <th>Nacimiento</th>
@@ -30,6 +31,21 @@
           <div class="user-meta">
             <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
             <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+          </div>
+        </td>
+        <td>
+          <div class="id-interno-cell">
+            <div *ngIf="editandoIdSocio !== u.id" class="id-display" (click)="editandoIdSocio = u.id">
+              <span class="id-value">{{ u.id_interno || 'S/N' }}</span>
+              <span class="edit-hint">✏️</span>
+            </div>
+            <div *ngIf="editandoIdSocio === u.id" class="id-edit">
+              <input type="text" [(ngModel)]="u.id_interno" 
+                     (keyup.enter)="guardarIdInterno(u)"
+                     class="control-input small-input" 
+                     placeholder="Nº..." autofocus>
+              <button class="btn-save-inline" (click)="guardarIdInterno(u)">✔️</button>
+            </div>
           </div>
         </td>
         <td>

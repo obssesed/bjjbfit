@@ -29,6 +29,7 @@ export interface PerfilDeportista {
   nif?: string;
   sexo?: string;
   fecha_nacimiento?: string;
+  id_interno?: string;
   date_joined?: string;
   hijos_a_cargo: HijoDelegado[];
   is_staff: boolean;
@@ -119,6 +120,11 @@ export class AuthService {
   actualizarGraduacion(deportistaId: number, cinturon: string, grados: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_graduacion/`, { cinturon, grados });
   }
+
+  actualizarIdInterno(deportistaId: number, idInterno: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_id_interno/`, { id_interno: idInterno });
+  }
+
 
 
   getToken() {

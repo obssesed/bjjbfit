@@ -154,3 +154,16 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         return Response({'error': 'Faltan datos para la graduación.'}, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def actualizar_id_interno(self, request, pk=None):
+        """
+        Permite al profesor cambiar el Nº de Socio (id_interno) de un atleta.
+        """
+        deportista = self.get_object()
+        nuevo_id = request.data.get('id_interno')
+        
+        deportista.id_interno = nuevo_id
+        deportista.save()
+        return Response({'success': f'Nº Socio de {deportista.first_name} actualizado a {nuevo_id}.'})
+
+

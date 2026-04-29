@@ -20,11 +20,12 @@ export class PanelUsuarios implements OnInit {
   activandoId: number | null = null;
   mensajeExito: string | null = null;
 
-  // Estado de modales
+  // Estado de modales y edición
   showBajaModal: boolean = false;
   showCambioPlanModal: boolean = false;
   showGraduacionModal: boolean = false;
   deportistaSeleccionado: PerfilDeportista | null = null;
+  editandoIdSocio: number | null = null; // Para edición inline del Nº Socio
 
   opcionesCinturon: string[] = ['Blanco', 'Azul', 'Morado', 'Marrón', 'Negro', 'Gris', 'Amarillo', 'Naranja', 'Verde'];
 
@@ -261,6 +262,31 @@ export class PanelUsuarios implements OnInit {
       }
     });
   }
+
+  guardarIdInterno(deportista: PerfilDeportista) {
+    if (deportista.id_interno === undefined) return;
+    
+    this.activandoId = deportista.id;
+    this.cdr.detectChanges();
+
+    this.authService.actualizarIdInterno(deportista.id, deportista.id_interno || '').subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.editandoIdSocio = null;
+        this.mensajeExito = res.success || 'Nº Socio actualizado.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        this.editandoIdSocio = null;
+        this.mensajeExito = '❌ Error al actualizar Nº Socio.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
+
 
   // === Helpers ===
   getPlanLabel(u: PerfilDeportista): string {

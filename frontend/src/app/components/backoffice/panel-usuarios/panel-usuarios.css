@@ -673,3 +673,77 @@
   opacity: 0.2;
   cursor: not-allowed;
 }
+
+/* === Nº Socio Inline Edit === */
+.id-interno-cell {
+  min-width: 80px;
+}
+
+.id-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.id-display:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.id-value {
+  font-family: 'Monaco', 'Consolas', monospace;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.edit-hint {
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.id-display:hover .edit-hint {
+  opacity: 0.6;
+}
+
+.id-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.small-input {
+  width: 70px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.85rem;
+  background: #0f172a;
+  border: 1px solid var(--primary);
+  color: white;
+  border-radius: 4px;
+  outline: none;
+}
+
+.btn-save-inline {
+  background: var(--success, #22c55e);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.btn-save-inline:active {
+  transform: scale(0.9);
+}
