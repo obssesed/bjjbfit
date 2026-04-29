@@ -66,16 +66,27 @@ class DeportistaViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def activar_plan(self, request, pk=None):
         """
-        Activa un bono (MENSUAL o FAMILIAR) para un usuario específico.
+        Activa un bono para un usuario específico.
+        Recibe: tipo_plan (ADULTO|JUVENIL|INFANTIL) y es_familiar (bool).
         """
         deportista = self.get_object()
         tipo_plan = request.data.get('tipo_plan')
+        es_familiar = request.data.get('es_familiar', False)
         
-        if tipo_plan not in ['MENSUAL', 'FAMILIAR']:
-            return Response({'error': 'Tipo de plan inválido o no especificado'}, status=status.HTTP_400_BAD_REQUEST)
+        planes_validos = ['ADULTO', 'JUVENIL', 'INFANTIL']
+        if tipo_plan not in planes_validos:
+            return Response(
+                {'error': f'Tipo de plan inválido. Opciones: {", ".join(planes_validos)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         deportista.plan_activo = True
         deportista.tipo_plan = tipo_plan
+        deportista.es_familiar = bool(es_familiar)
         deportista.save()
         
-        return Response({'success': f'Plan {tipo_plan} activado correctamente'})
+        etiqueta = f"Mensual {tipo_plan.capitalize()}"
+        if es_familiar:
+            etiqueta += " Familiar"
+        
+        return Response({'success': f'{etiqueta} activado correctamente para {deportista.first_name or deportista.username}.'})

@@ -214,3 +214,44 @@
   font-size: 0.8rem;
   border: 1px solid rgba(255,255,255,0.05);
 }
+
+/* Toggle Familiar */
+.familiar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  transition: all 0.2s ease;
+}
+
+.familiar-toggle:hover {
+  border-color: rgba(234, 179, 8, 0.4);
+  background: rgba(234, 179, 8, 0.05);
+}
+
+.familiar-toggle input[type="checkbox"] {
+  accent-color: #eab308;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.familiar-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.familiar-toggle:has(input:checked) {
+  border-color: rgba(234, 179, 8, 0.5);
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.familiar-toggle:has(input:checked) .familiar-label {
+  color: #facc15;
+}

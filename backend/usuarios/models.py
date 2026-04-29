@@ -84,9 +84,18 @@ class Deportista(AbstractUser):
     )
     tipo_plan = models.CharField(
         max_length=50,
-        choices=[('MENSUAL', 'Mensual'), ('FAMILIAR', 'Familiar')],
+        choices=[
+            ('ADULTO', 'Mensual Adulto'),
+            ('JUVENIL', 'Mensual Juvenil'),
+            ('INFANTIL', 'Mensual Infantil'),
+        ],
         null=True,
-        blank=True
+        blank=True,
+        help_text="Categoría del plan mensual según la edad del deportista."
+    )
+    es_familiar = models.BooleanField(
+        default=False,
+        help_text="Si es True, el deportista tiene un plan Familiar (descuento del 50%% para ambos familiares)."
     )
     
     # --- Relación Familiar (1:N) ---

@@ -76,13 +76,35 @@ class TestUsuariosViews:
         )
         auth_client.force_authenticate(user=staff)
 
-        # Activar plan mensual
-        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'tipo_plan': 'MENSUAL'})
+        # Activar plan mensual adulto
+        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'tipo_plan': 'ADULTO'})
         assert response.status_code == 200
 
         deportista.refresh_from_db()
         assert deportista.plan_activo is True
-        assert deportista.tipo_plan == 'MENSUAL'
+        assert deportista.tipo_plan == 'ADULTO'
+        assert deportista.es_familiar is False
+
+    def test_activar_plan_familiar(self, auth_client):
+        """Verifica que se puede activar un plan con flag familiar."""
+        staff = Deportista.objects.create_superuser(
+            username="admin_fam", password="123", email="fam@ad.com"
+        )
+        deportista = Deportista.objects.create_user(
+            username="alumno_fam", password="123", email="fam@test.com", plan_activo=False
+        )
+        auth_client.force_authenticate(user=staff)
+
+        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {
+            'tipo_plan': 'JUVENIL',
+            'es_familiar': True
+        })
+        assert response.status_code == 200
+
+        deportista.refresh_from_db()
+        assert deportista.plan_activo is True
+        assert deportista.tipo_plan == 'JUVENIL'
+        assert deportista.es_familiar is True
 
     def test_activar_plan_rechaza_tipo_invalido(self, auth_client):
         """Verifica que no se puede activar un plan con tipo inválido."""

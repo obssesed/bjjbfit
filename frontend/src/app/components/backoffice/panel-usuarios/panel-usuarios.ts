@@ -77,10 +77,12 @@ export class PanelUsuarios implements OnInit {
     this.activandoId = deportista.id;
     this.cdr.detectChanges();
 
-    this.authService.activarPlan(deportista.id, deportista.tipo_plan_seleccionado).subscribe({
-      next: () => {
+    const esFamiliar = deportista.es_familiar_seleccionado || false;
+
+    this.authService.activarPlan(deportista.id, deportista.tipo_plan_seleccionado, esFamiliar).subscribe({
+      next: (res) => {
         this.activandoId = null;
-        this.mensajeExito = `Plan ${deportista.tipo_plan_seleccionado} activado correctamente para ${deportista.first_name}.`;
+        this.mensajeExito = res.success || 'Plan activado correctamente.';
         
         // Refrescar toda la carga
         this.cargarUsuarios();

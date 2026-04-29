@@ -87,9 +87,15 @@
         <td>
           <div class="activar-plan-col">
              <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
-                <option value="MENSUAL">Mensual</option>
-                <option value="FAMILIAR">Familiar</option>
+                <option value="" disabled selected hidden>Tipo...</option>
+                <option value="ADULTO">Adulto</option>
+                <option value="JUVENIL">Juvenil</option>
+                <option value="INFANTIL">Infantil</option>
              </select>
+             <label class="familiar-toggle">
+                <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
+                <span class="familiar-label">Familiar</span>
+             </label>
              <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
                 {{ activandoId === u.id ? '...' : 'Activar' }}
              </button>
@@ -141,9 +147,15 @@
         <td>
           <div class="activar-plan-col">
              <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
-                <option value="MENSUAL">Mensual</option>
-                <option value="FAMILIAR">Familiar</option>
+                <option value="" disabled selected hidden>Tipo...</option>
+                <option value="ADULTO">Adulto</option>
+                <option value="JUVENIL">Juvenil</option>
+                <option value="INFANTIL">Infantil</option>
              </select>
+             <label class="familiar-toggle">
+                <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
+                <span class="familiar-label">Familiar</span>
+             </label>
              <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
                 {{ activandoId === u.id ? '...' : 'Reactivar' }}
              </button>
