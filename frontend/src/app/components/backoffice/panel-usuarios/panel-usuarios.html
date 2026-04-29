@@ -140,9 +140,7 @@
           <div class="activar-plan-col">
             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
               <option value="" disabled selected hidden>Tipo...</option>
-              <option value="ADULTO">Adulto</option>
-              <option value="JUVENIL">Juvenil</option>
-              <option value="INFANTIL">Infantil</option>
+              <option *ngFor="let plan of getPlanesPermitidos(u)" [value]="plan.value">{{ plan.label }}</option>
             </select>
             <label class="familiar-toggle">
               <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
@@ -205,9 +203,7 @@
           <div class="activar-plan-col">
             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
               <option value="" disabled selected hidden>Tipo...</option>
-              <option value="ADULTO">Adulto</option>
-              <option value="JUVENIL">Juvenil</option>
-              <option value="INFANTIL">Infantil</option>
+              <option *ngFor="let plan of getPlanesPermitidos(u)" [value]="plan.value">{{ plan.label }}</option>
             </select>
             <label class="familiar-toggle">
               <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
@@ -269,9 +265,7 @@
       <label class="modal-form-label">Nuevo plan</label>
       <select [(ngModel)]="deportistaSeleccionado.tipo_plan_seleccionado" class="control-select modal-select">
         <option value="" disabled selected hidden>Selecciona tipo...</option>
-        <option value="ADULTO">Mensual Adulto</option>
-        <option value="JUVENIL">Mensual Juvenil</option>
-        <option value="INFANTIL">Mensual Infantil</option>
+        <option *ngFor="let plan of getPlanesPermitidos(deportistaSeleccionado)" [value]="plan.value">{{ plan.label }}</option>
       </select>
 
       <label class="familiar-toggle modal-familiar-toggle">

@@ -296,4 +296,30 @@ export class PanelUsuarios implements OnInit {
     if (u.es_familiar) label += ' Fam.';
     return label;
   }
+
+  getPlanesPermitidos(u: PerfilDeportista): { value: string, label: string }[] {
+    if (!u.fecha_nacimiento) return [];
+    
+    const edad = this.calcularEdad(u.fecha_nacimiento);
+    
+    if (edad < 14) {
+      return [{ value: 'INFANTIL', label: 'Mensual Infantil' }];
+    } else if (edad < 18) {
+      return [{ value: 'JUVENIL', label: 'Mensual Juvenil' }];
+    } else {
+      return [{ value: 'ADULTO', label: 'Mensual Adulto' }];
+    }
+  }
+
+  private calcularEdad(fechaStr: string): number {
+    const today = new Date();
+    const birthDate = new Date(fechaStr);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
 }
+
