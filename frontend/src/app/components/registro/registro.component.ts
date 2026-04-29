@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -30,10 +30,15 @@ export class RegistroComponent {
   cargando: boolean = false;
   showExitoModal: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   registrar() {
     this.errorMsg = null;
+    console.log('Iniciando proceso de registro...', this.registroData);
     
     // Validación básica obligatoria según negocio
     const d = this.registroData;
@@ -43,15 +48,19 @@ export class RegistroComponent {
     }
 
     this.cargando = true;
+    this.cdr.detectChanges();
 
     this.authService.registro(this.registroData).subscribe({
-      next: () => {
+      next: (res) => {
+        console.log('Registro exitoso en el servidor!', res);
         this.cargando = false;
         this.showExitoModal = true;
+        this.cdr.detectChanges(); // Forzamos a Angular a mostrar el modal
       },
       error: (err) => {
         this.cargando = false;
         console.error('Error detallado de registro:', err);
+        this.cdr.detectChanges();
         
         if (err.error && typeof err.error === 'object') {
           // Extraer mensajes de error de Django REST Framework
