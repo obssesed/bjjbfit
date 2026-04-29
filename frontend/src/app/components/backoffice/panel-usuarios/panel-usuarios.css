@@ -97,7 +97,7 @@
 .pill.error-pill { background: rgba(239, 68, 68, 0.2); color: #f87171; }
 .pill.pending-pill { background: rgba(234, 179, 8, 0.2); color: #facc15; }
 
-/* Reciclado de Belt styles */
+/* Reciclado de Belt styles (para tablas pendientes/inactivos) */
 .belt-badge {
   font-size: 0.75rem;
   padding: 0.2rem 0.6rem;
@@ -116,6 +116,94 @@
 .belt-marron, .belt-marrón { background-color: #78350f; color: white; }
 .belt-negro { background-color: #0f172a; color: white; border: 1px solid #334155; }
 .empty-state { text-align: center; padding: 2rem; color: var(--text-secondary); }
+
+/* === Mini Cinturón Visual === */
+.mini-belt {
+  display: flex;
+  align-items: center;
+  width: 90px;
+  height: 22px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.mini-belt-body {
+  flex: 1;
+  height: 100%;
+}
+
+.mini-belt-tip {
+  width: 28px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 3px;
+  box-shadow: -2px 0 4px rgba(0,0,0,0.3);
+}
+
+.mini-belt-tip.tip-negra { background-color: #020617; }
+.mini-belt-tip.tip-roja { background-color: #dc2626; }
+
+.mini-stripe {
+  width: 3px;
+  height: 100%;
+  background-color: #ffffff;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+/* Colores del cuerpo del mini cinturón */
+.belt-color-blanco .mini-belt-body { background-color: #f8fafc; }
+.belt-color-gris .mini-belt-body { background-color: #64748b; }
+.belt-color-amarillo .mini-belt-body { background-color: #eab308; }
+.belt-color-naranja .mini-belt-body { background-color: #f97316; }
+.belt-color-verde .mini-belt-body { background-color: #22c55e; }
+.belt-color-azul .mini-belt-body { background-color: #2563eb; }
+.belt-color-morado .mini-belt-body { background-color: #9333ea; }
+.belt-color-marrón .mini-belt-body, .belt-color-marron .mini-belt-body { background-color: #78350f; }
+.belt-color-negro .mini-belt-body { background-color: #0f172a; border-right: 1px solid #334155; }
+
+/* === Sexo Badge === */
+.sexo-badge {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #60a5fa;
+}
+.sexo-badge.fem { color: #f472b6; }
+.sexo-badge.nd { color: var(--text-muted); }
+
+/* === Estado + Baja === */
+.estado-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btn-baja {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-baja:hover:not([disabled]) {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+}
+
+.btn-baja[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 
 /* Controles de activación */
 .activar-plan-col {

@@ -90,3 +90,40 @@ class DeportistaViewSet(viewsets.ModelViewSet):
             etiqueta += " Familiar"
         
         return Response({'success': f'{etiqueta} activado correctamente para {deportista.first_name or deportista.username}.'})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def dar_baja(self, request, pk=None):
+        """
+        Desactiva el plan de un deportista (pasa a estado Baja/Inactivo).
+        """
+        deportista = self.get_object()
+        deportista.plan_activo = False
+        deportista.save()
+        
+        return Response({'success': f'{deportista.first_name or deportista.username} dado de baja correctamente.'})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def cambiar_plan(self, request, pk=None):
+        """
+        Cambia el tipo de plan de un deportista activo sin tocar plan_activo.
+        """
+        deportista = self.get_object()
+        tipo_plan = request.data.get('tipo_plan')
+        es_familiar = request.data.get('es_familiar', False)
+        
+        planes_validos = ['ADULTO', 'JUVENIL', 'INFANTIL']
+        if tipo_plan not in planes_validos:
+            return Response(
+                {'error': f'Tipo de plan inválido. Opciones: {", ".join(planes_validos)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        deportista.tipo_plan = tipo_plan
+        deportista.es_familiar = bool(es_familiar)
+        deportista.save()
+        
+        etiqueta = f"Mensual {tipo_plan.capitalize()}"
+        if es_familiar:
+            etiqueta += " Familiar"
+        
+        return Response({'success': f'Plan cambiado a {etiqueta} para {deportista.first_name or deportista.username}.'})

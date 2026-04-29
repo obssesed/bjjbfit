@@ -15,8 +15,12 @@
       <tr>
         <th>Deportista</th>
         <th>Cinturón</th>
+        <th>Sexo</th>
+        <th>Nacimiento</th>
         <th>Contacto</th>
-        <th>Hijos Asociados</th>
+        <th>Hijos</th>
+        <th>Plan Actual</th>
+        <th>Cambiar Plan</th>
         <th>Estado</th>
       </tr>
     </thead>
@@ -25,11 +29,25 @@
         <td>
           <div class="user-meta">
             <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
-            <span class="user-alias">@{{ u.username }}</span>
+            <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
           </div>
         </td>
         <td>
-          <span class="belt-badge belt-{{ u.cinturon | lowercase }}">{{ u.cinturon }}</span>
+          <div class="mini-belt belt-color-{{ u.cinturon | lowercase }}">
+            <div class="mini-belt-body"></div>
+            <div class="mini-belt-tip" [ngClass]="{'tip-roja': u.cinturon === 'Negro', 'tip-negra': u.cinturon !== 'Negro'}">
+              <div class="mini-stripe" *ngFor="let _ of [].constructor(u.grados)"></div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <span class="sexo-badge" *ngIf="u.sexo === 'M'">♂ Masc.</span>
+          <span class="sexo-badge fem" *ngIf="u.sexo === 'F'">♀ Fem.</span>
+          <span class="sexo-badge nd" *ngIf="!u.sexo">—</span>
+        </td>
+        <td>
+          <span class="registration-date" *ngIf="u.fecha_nacimiento">{{ u.fecha_nacimiento | date:'dd/MM/yyyy' }}</span>
+          <span class="registration-date" *ngIf="!u.fecha_nacimiento">—</span>
         </td>
         <td class="contact-col">
           <span class="contact-item"><span class="contact-icon">@</span>{{ u.email }}</span>
@@ -42,7 +60,32 @@
           <span class="pill gray" *ngIf="!u.hijos_a_cargo || u.hijos_a_cargo.length === 0">0</span>
         </td>
         <td>
-          <span class="pill success">✔️ Alta</span>
+          <span class="pill success">{{ getPlanLabel(u) }}</span>
+        </td>
+        <td>
+          <div class="activar-plan-col">
+             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
+                <option value="" disabled selected hidden>Tipo...</option>
+                <option value="ADULTO">Adulto</option>
+                <option value="JUVENIL">Juvenil</option>
+                <option value="INFANTIL">Infantil</option>
+             </select>
+             <label class="familiar-toggle">
+                <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
+                <span class="familiar-label">Fam.</span>
+             </label>
+             <button (click)="cambiarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
+                {{ activandoId === u.id ? '...' : 'Cambiar' }}
+             </button>
+          </div>
+        </td>
+        <td>
+          <div class="estado-col">
+            <span class="pill success">✔️ Alta</span>
+            <button class="btn-baja" (click)="darBaja(u)" [disabled]="activandoId === u.id">
+              {{ activandoId === u.id ? '...' : 'Dar Baja' }}
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

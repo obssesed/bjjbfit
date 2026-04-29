@@ -26,6 +26,9 @@ export interface PerfilDeportista {
   tipo_plan_seleccionado?: string; // UI Temporary state
   es_familiar_seleccionado?: boolean; // UI Temporary state
   telefono?: string;
+  nif?: string;
+  sexo?: string;
+  fecha_nacimiento?: string;
   date_joined?: string;
   hijos_a_cargo: HijoDelegado[];
   is_staff: boolean;
@@ -103,6 +106,14 @@ export class AuthService {
 
   activarPlan(deportistaId: number, tipoPlan: string, esFamiliar: boolean = false): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/activar_plan/`, { tipo_plan: tipoPlan, es_familiar: esFamiliar });
+  }
+
+  darBaja(deportistaId: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/dar_baja/`, {});
+  }
+
+  cambiarPlan(deportistaId: number, tipoPlan: string, esFamiliar: boolean = false): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/cambiar_plan/`, { tipo_plan: tipoPlan, es_familiar: esFamiliar });
   }
 
   getToken() {

@@ -105,4 +105,61 @@ export class PanelUsuarios implements OnInit {
       }
     });
   }
+
+  darBaja(deportista: PerfilDeportista) {
+    if (!confirm(`¿Seguro que deseas dar de baja a ${deportista.first_name || deportista.username}?`)) return;
+    
+    this.activandoId = deportista.id;
+    this.cdr.detectChanges();
+
+    this.authService.darBaja(deportista.id).subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.mensajeExito = res.success || 'Usuario dado de baja.';
+        this.cargarUsuarios();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        alert('Error al dar de baja.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cambiarPlan(deportista: PerfilDeportista) {
+    if (!deportista.tipo_plan_seleccionado) {
+      alert("Selecciona un tipo de plan primero.");
+      return;
+    }
+    
+    this.activandoId = deportista.id;
+    this.cdr.detectChanges();
+
+    const esFamiliar = deportista.es_familiar_seleccionado || false;
+
+    this.authService.cambiarPlan(deportista.id, deportista.tipo_plan_seleccionado, esFamiliar).subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.mensajeExito = res.success || 'Plan cambiado.';
+        this.cargarUsuarios();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        alert('Error al cambiar plan.');
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getPlanLabel(u: PerfilDeportista): string {
+    if (!u.tipo_plan) return '—';
+    const nombres: Record<string, string> = { ADULTO: 'Adulto', JUVENIL: 'Juvenil', INFANTIL: 'Infantil' };
+    let label = nombres[u.tipo_plan] || u.tipo_plan;
+    if (u.es_familiar) label += ' Fam.';
+    return label;
+  }
 }
