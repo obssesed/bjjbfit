@@ -2,6 +2,25 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, BehaviorSubject, switchMap } from 'rxjs';
 
+export interface Plan {
+  id?: number;
+  nombre: string;
+  precio_base: number;
+  beneficios: string;
+  categoria_edad: 'ADULTO' | 'JUVENIL' | 'INFANTIL';
+  activo: boolean;
+}
+
+export interface PlantillaClase {
+  id?: number;
+  titulo: string;
+  descripcion?: string;
+  icono: string;
+  hora_inicio: string; // "HH:mm:ss"
+  duracion_minutos: number;
+  capacidad_maxima: number;
+}
+
 export interface HijoDelegado {
   id: number;
   username: string;
@@ -21,9 +40,9 @@ export interface PerfilDeportista {
   grados: number;
   fecha_ultima_graduacion?: string;
   plan_activo: boolean;
-  tipo_plan?: string;
+  tipo_plan?: number; // Ahora es el ID del objeto Plan
   es_familiar?: boolean;
-  tipo_plan_seleccionado?: string; // UI Temporary state
+  tipo_plan_seleccionado?: number; // UI Temporary state
   es_familiar_seleccionado?: boolean; // UI Temporary state
   telefono?: string;
   nif?: string;
@@ -43,6 +62,7 @@ export class AuthService {
   private registerUrl = 'http://127.0.0.1:8000/api/deportistas/';
   private meUrl = 'http://127.0.0.1:8000/api/deportistas/me/';
   private apiUrl = 'http://127.0.0.1:8000/api';
+  private planesUrl = 'http://127.0.0.1:8000/api/planes/';
   
   // Usamos BehaviorSubject para asegurar que Angular detecte cambios desde el Nav
   public loggedIn$ = new BehaviorSubject<boolean>(this.checkToken());
@@ -105,16 +125,16 @@ export class AuthService {
     return this.http.get<PerfilDeportista[]>(`${this.apiUrl}/deportistas/pendientes_backoffice/`);
   }
 
-  activarPlan(deportistaId: number, tipoPlan: string, esFamiliar: boolean = false): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/activar_plan/`, { tipo_plan: tipoPlan, es_familiar: esFamiliar });
+  activarPlan(deportistaId: number, planId: number | undefined, esFamiliar: boolean = false): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/activar_plan/`, { plan_id: planId, es_familiar: esFamiliar });
   }
 
   darBaja(deportistaId: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/dar_baja/`, {});
   }
 
-  cambiarPlan(deportistaId: number, tipoPlan: string, esFamiliar: boolean = false): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/cambiar_plan/`, { tipo_plan: tipoPlan, es_familiar: esFamiliar });
+  cambiarPlan(deportistaId: number, planId: number | undefined, esFamiliar: boolean = false): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/cambiar_plan/`, { plan_id: planId, es_familiar: esFamiliar });
   }
 
   actualizarGraduacion(deportistaId: number, cinturon: string, grados: number): Observable<any> {
@@ -126,6 +146,22 @@ export class AuthService {
   }
 
 
+  // --- Gestión de Planes ---
+  getPlanes(): Observable<Plan[]> {
+    return this.http.get<Plan[]>(this.planesUrl);
+  }
+
+  createPlan(plan: Plan): Observable<Plan> {
+    return this.http.post<Plan>(this.planesUrl, plan);
+  }
+
+  updatePlan(id: number, plan: Plan): Observable<Plan> {
+    return this.http.put<Plan>(`${this.planesUrl}${id}/`, plan);
+  }
+
+  deletePlan(id: number): Observable<any> {
+    return this.http.delete(`${this.planesUrl}${id}/`);
+  }
 
   getToken() {
     if (typeof window !== 'undefined') {
@@ -136,5 +172,26 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     return this.loggedIn$.value;
+  }
+
+  // --- Gestión de Programación (Plantillas) ---
+  getPlantillas(): Observable<PlantillaClase[]> {
+    return this.http.get<PlantillaClase[]>(`${this.apiUrl}/programacion/`);
+  }
+
+  createPlantilla(p: PlantillaClase): Observable<PlantillaClase> {
+    return this.http.post<PlantillaClase>(`${this.apiUrl}/programacion/`, p);
+  }
+
+  updatePlantilla(id: number, p: PlantillaClase): Observable<PlantillaClase> {
+    return this.http.put<PlantillaClase>(`${this.apiUrl}/programacion/${id}/`, p);
+  }
+
+  deletePlantilla(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/programacion/${id}/`);
+  }
+
+  propagarClases(id: number, config: { fecha_inicio: string, fecha_fin: string, dias_semana: number[] }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/programacion/${id}/propagar/`, config);
   }
 }

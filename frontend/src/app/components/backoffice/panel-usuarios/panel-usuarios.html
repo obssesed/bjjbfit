@@ -60,9 +60,7 @@
       <label>Plan</label>
       <select [(ngModel)]="filtros.plan">
         <option value="">Todos</option>
-        <option value="ADULTO">Bono Adulto</option>
-        <option value="JUVENIL">Bono Juvenil</option>
-        <option value="INFANTIL">Bono Infantil</option>
+        <option *ngFor="let p of planes" [value]="p.id">{{ p.nombre }}</option>
       </select>
     </div>
 

@@ -177,6 +177,13 @@
   font-weight: 700;
   margin: 0;
   line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.class-emoji {
+  font-size: 1.2rem;
 }
 
 .mini-card-actions {

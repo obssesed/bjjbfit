@@ -26,6 +26,11 @@ class ClaseBJJ(models.Model):
         default=30,
         help_text="Número máximo de personas que pueden asistir a la clase."
     )
+    icono = models.CharField(
+        max_length=50,
+        default="🥋",
+        help_text="Icono visual para la clase (emoji o nombre de icono)."
+    )
 
     def plazas_ocupadas(self) -> int:
         """Devuelve el total de reservas activas"""
@@ -42,10 +47,21 @@ class ClaseBJJ(models.Model):
         return self.capacidad_maxima - self.plazas_ocupadas()
 
     def __str__(self) -> str:
-        """
-        Retorna una cadena legible para el administrador.
-        """
-        return f"{self.titulo} - {self.fecha_hora_inicio.strftime('%Y-%m-%d %H:%M')}"
+        return f"{self.icono} {self.titulo} - {self.fecha_hora_inicio.strftime('%Y-%m-%d %H:%M')}"
+
+class PlantillaClase(models.Model):
+    """
+    Molde para generar clases repetitivas.
+    """
+    titulo = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True, null=True)
+    icono = models.CharField(max_length=50, default="🥋")
+    hora_inicio = models.TimeField(help_text="Hora de comienzo por defecto.")
+    duracion_minutos = models.PositiveIntegerField(default=90)
+    capacidad_maxima = models.PositiveIntegerField(default=30)
+
+    def __str__(self):
+        return f"Plantilla: {self.icono} {self.titulo} ({self.hora_inicio})"
 
 
 class Reserva(models.Model):

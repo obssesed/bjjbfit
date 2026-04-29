@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService, PerfilDeportista } from '../../../services/auth.service';
+import { AuthService, PerfilDeportista, Plan } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-panel-usuarios',
@@ -14,6 +14,7 @@ export class PanelUsuarios implements OnInit {
   usuariosActivos: PerfilDeportista[] = [];
   usuariosPendientes: PerfilDeportista[] = [];
   usuariosInactivos: PerfilDeportista[] = [];
+  planes: Plan[] = [];
   cargando: boolean = true;
   error: string | null = null;
 
@@ -48,7 +49,14 @@ export class PanelUsuarios implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.cargarPlanes();
     this.cargarUsuarios();
+  }
+
+  cargarPlanes() {
+    this.authService.getPlanes().subscribe(data => {
+      this.planes = data;
+    });
   }
 
   cargarUsuarios() {
@@ -166,7 +174,7 @@ export class PanelUsuarios implements OnInit {
   // === Modal Cambiar Plan ===
   abrirCambioPlan(deportista: PerfilDeportista) {
     this.deportistaSeleccionado = { ...deportista }; // Clonar para no mutar la lista
-    this.deportistaSeleccionado.tipo_plan_seleccionado = '';
+    this.deportistaSeleccionado.tipo_plan_seleccionado = undefined;
     this.deportistaSeleccionado.es_familiar_seleccionado = false;
     this.showCambioPlanModal = true;
     this.cdr.detectChanges();
@@ -329,7 +337,7 @@ export class PanelUsuarios implements OnInit {
       // 2. Filtros exactos
       const cumpleCinturon = !this.filtros.cinturon || u.cinturon === this.filtros.cinturon;
       const cumpleSexo = !this.filtros.sexo || u.sexo === this.filtros.sexo;
-      const cumplePlan = !this.filtros.plan || u.tipo_plan === this.filtros.plan;
+      const cumplePlan = !this.filtros.plan || u.tipo_plan?.toString() === this.filtros.plan;
       
       // 3. Categoría por edad
       let cumpleCategoria = true;
@@ -429,24 +437,25 @@ export class PanelUsuarios implements OnInit {
   // === Helpers ===
   getPlanLabel(u: PerfilDeportista): string {
     if (!u.tipo_plan) return '—';
-    const nombres: Record<string, string> = { ADULTO: 'Adulto', JUVENIL: 'Juvenil', INFANTIL: 'Infantil' };
-    let label = nombres[u.tipo_plan] || u.tipo_plan;
+    const plan = this.planes.find(p => p.id === u.tipo_plan);
+    let label = plan ? plan.nombre : 'Plan Desconocido';
     if (u.es_familiar) label += ' Fam.';
     return label;
   }
 
-  getPlanesPermitidos(u: PerfilDeportista): { value: string, label: string }[] {
-    if (!u.fecha_nacimiento) return [];
+  getPlanesPermitidos(u: PerfilDeportista): { value: number, label: string }[] {
+    if (!u.fecha_nacimiento || this.planes.length === 0) return [];
     
     const edad = this.calcularEdad(u.fecha_nacimiento);
-    
-    if (edad < 14) {
-      return [{ value: 'INFANTIL', label: 'Mensual Infantil' }];
-    } else if (edad < 18) {
-      return [{ value: 'JUVENIL', label: 'Mensual Juvenil' }];
-    } else {
-      return [{ value: 'ADULTO', label: 'Mensual Adulto' }];
-    }
+    let categoria: 'ADULTO' | 'JUVENIL' | 'INFANTIL';
+
+    if (edad < 14) categoria = 'INFANTIL';
+    else if (edad < 18) categoria = 'JUVENIL';
+    else categoria = 'ADULTO';
+
+    return this.planes
+      .filter(p => p.categoria_edad === categoria && p.activo)
+      .map(p => ({ value: p.id!, label: p.nombre }));
   }
 
   private calcularEdad(fechaStr: string): number {

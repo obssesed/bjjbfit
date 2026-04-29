@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from usuarios.models import Deportista
-from .models import ClaseBJJ, Reserva
+from .models import ClaseBJJ, Reserva, PlantillaClase
 
 class ClaseBJJSerializer(serializers.ModelSerializer):
     """
@@ -13,7 +13,7 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClaseBJJ
-        fields = ['id', 'titulo', 'descripcion', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
+        fields = ['id', 'titulo', 'descripcion', 'icono', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
 
     def get_plazas_disponibles(self, obj: ClaseBJJ) -> int:
         return obj.plazas_disponibles()
@@ -23,6 +23,11 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
         
     def get_en_espera(self, obj: ClaseBJJ) -> int:
         return obj.en_espera()
+
+class PlantillaClaseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlantillaClase
+        fields = '__all__'
 
 class ReservaSerializer(serializers.ModelSerializer):
     """

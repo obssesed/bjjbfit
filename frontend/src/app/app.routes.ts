@@ -6,6 +6,8 @@ import { MiPerfilComponent } from './components/mi-perfil/mi-perfil.component';
 import { AuthGuard } from './guards/auth.guard';
 import { Backoffice } from './components/backoffice/backoffice/backoffice';
 import { PanelUsuarios } from './components/backoffice/panel-usuarios/panel-usuarios';
+import { PanelPlanes } from './components/backoffice/panel-planes/panel-planes';
+import { PanelProgramacion } from './components/backoffice/panel-programacion/panel-programacion';
 
 export const routes: Routes = [
   { path: '', component: ListaClasesComponent },
@@ -18,6 +20,8 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: 'usuarios', component: PanelUsuarios },
+      { path: 'planes', component: PanelPlanes },
+      { path: 'clases', component: PanelProgramacion },
       { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
     ]
   },

@@ -43,7 +43,9 @@
           <div class="time-badge">
             {{ obtenerFormatoHorario(clase.fecha_hora_inicio) }}
           </div>
-          <h4 class="mini-title">{{ clase.titulo }}</h4>
+          <h4 class="mini-title">
+            <span class="class-emoji">{{ clase.icono }}</span> {{ clase.titulo }}
+          </h4>
         </div>
         
         <div class="mini-card-actions">

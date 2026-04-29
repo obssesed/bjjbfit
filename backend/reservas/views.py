@@ -1,20 +1,67 @@
 from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.exceptions import ValidationError
-from .models import ClaseBJJ, Reserva
-from .serializers import ClaseBJJSerializer, ReservaSerializer
+from .models import ClaseBJJ, Reserva, PlantillaClase
+from .serializers import ClaseBJJSerializer, ReservaSerializer, PlantillaClaseSerializer
+import datetime
 
-class ClaseBJJViewSet(viewsets.ReadOnlyModelViewSet):
+class ClaseBJJViewSet(viewsets.ModelViewSet):
     """
-    Vista que permite listar las clases de BJJ disponibles (Lectura pública).
-    Usamos 'prefetch_related' para asegurar que la futura consulta de reservas anidadas no provoque el problema N+1.
+    Vista que permite listar las clases de BJJ disponibles.
+    Permisos: Lectura para todos, escritura solo para STAFF.
     """
     queryset = ClaseBJJ.objects.prefetch_related('reservas').all()
     serializer_class = ClaseBJJSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+class PlantillaClaseViewSet(viewsets.ModelViewSet):
+    queryset = PlantillaClase.objects.all()
+    serializer_class = PlantillaClaseSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    @action(detail=True, methods=['post'])
+    def propagar(self, request, pk=None):
+        plantilla = self.get_object()
+        fecha_inicio_str = request.data.get('fecha_inicio')
+        fecha_fin_str = request.data.get('fecha_fin')
+        dias_semana = request.data.get('dias_semana', []) # List of ints 0-6 (Mon-Sun)
+
+        if not fecha_inicio_str or not fecha_fin_str:
+            return Response({'error': 'Faltan fechas de inicio/fin'}, status=400)
+
+        fecha_inicio = datetime.datetime.strptime(fecha_inicio_str, '%Y-%m-%d').date()
+        fecha_fin = datetime.datetime.strptime(fecha_fin_str, '%Y-%m-%d').date()
+
+        clases_creadas = 0
+        curr = fecha_inicio
+        while curr <= fecha_fin:
+            if curr.weekday() in dias_semana:
+                # Combinar fecha con hora de la plantilla
+                dt_inicio = datetime.datetime.combine(curr, plantilla.hora_inicio)
+                dt_fin = dt_inicio + datetime.timedelta(minutes=plantilla.duracion_minutos)
+                
+                # Evitar duplicados exactos en el mismo momento
+                if not ClaseBJJ.objects.filter(titulo=plantilla.titulo, fecha_hora_inicio=dt_inicio).exists():
+                    ClaseBJJ.objects.create(
+                        titulo=plantilla.titulo,
+                        descripcion=plantilla.descripcion,
+                        icono=plantilla.icono,
+                        fecha_hora_inicio=dt_inicio,
+                        fecha_hora_fin=dt_fin,
+                        capacidad_maxima=plantilla.capacidad_maxima
+                    )
+                    clases_creadas += 1
+            curr += datetime.timedelta(days=1)
+
+        return Response({'success': f'Se han generado {clases_creadas} clases correctamente.'})
 
 class ReservaViewSet(viewsets.ModelViewSet):
     """

@@ -1,6 +1,30 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
+class Plan(models.Model):
+    """
+    Modelo para gestionar los planes mensuales dinámicamente.
+    """
+    CATEGORIAS_EDAD = [
+        ('ADULTO', 'Adulto (18+)'),
+        ('JUVENIL', 'Juvenil (14-17)'),
+        ('INFANTIL', 'Infantil (<14)'),
+    ]
+
+    nombre = models.CharField(max_length=100, unique=True)
+    precio_base = models.DecimalField(max_digits=6, decimal_places=2, help_text="Precio mensual normal")
+    beneficios = models.TextField(help_text="Lista de beneficios separados por comas o saltos de línea")
+    categoria_edad = models.CharField(max_length=20, choices=CATEGORIAS_EDAD, default='ADULTO')
+    activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.nombre} - {self.precio_base}€"
+
+    class Meta:
+        verbose_name = "Plan"
+        verbose_name_plural = "Planes"
+
+
 class Deportista(AbstractUser):
     """
     Modelo que representa a un usuario o cliente del gimnasio de BJJ.
@@ -82,16 +106,13 @@ class Deportista(AbstractUser):
         default=False,
         help_text="El admin activa manualmente el plan. Sin esto a True, no puede reservar."
     )
-    tipo_plan = models.CharField(
-        max_length=50,
-        choices=[
-            ('ADULTO', 'Mensual Adulto'),
-            ('JUVENIL', 'Mensual Juvenil'),
-            ('INFANTIL', 'Mensual Infantil'),
-        ],
+    tipo_plan = models.ForeignKey(
+        Plan,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="Categoría del plan mensual según la edad del deportista."
+        related_name='usuarios',
+        help_text="Plan mensual asignado al deportista."
     )
     es_familiar = models.BooleanField(
         default=False,

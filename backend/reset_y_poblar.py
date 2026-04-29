@@ -6,17 +6,50 @@ from datetime import date, timedelta
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from usuarios.models import Deportista
+from usuarios.models import Deportista, Plan
 
 def reset_y_poblar():
-    print("--- Iniciando Reset de Usuarios ---")
+    print("--- Iniciando Reset de Usuarios y Planes ---")
     
-    # 1. Borrar todos excepto obssesed
+    # 1. Asegurar Admin y borrar otros
     admin_username = "obssesed"
+    if not Deportista.objects.filter(username=admin_username).exists():
+        Deportista.objects.create_superuser(
+            username=admin_username,
+            email="admin@bjjfit.com",
+            password="admin1234"
+        )
+        print(f"Superusuario {admin_username} creado.")
+    
     Deportista.objects.exclude(username=admin_username).delete()
-    print(f"Limpieza completada. Solo queda el usuario: {admin_username}")
+    
+    # 2. Borrar y recrear planes
+    Plan.objects.all().delete()
+    
+    plan_adulto = Plan.objects.create(
+        nombre="Adulto",
+        precio_base=70.00,
+        beneficios="Todas las actividades excepto las de infantiles y juveniles",
+        categoria_edad="ADULTO"
+    )
+    
+    plan_juvenil = Plan.objects.create(
+        nombre="Juvenil",
+        precio_base=50.00,
+        beneficios="Solo las actividades juveniles",
+        categoria_edad="JUVENIL"
+    )
+    
+    plan_infantil = Plan.objects.create(
+        nombre="Infantil",
+        precio_base=40.00,
+        beneficios="Solo las actividades infantiles",
+        categoria_edad="INFANTIL"
+    )
+    
+    print("Planes base creados con éxito.")
 
-    # 2. Crear Perfiles
+    # 3. Crear Perfiles de prueba
     
     # --- PADRE CON HIJOS ---
     padre = Deportista.objects.create_user(
@@ -32,17 +65,17 @@ def reset_y_poblar():
         cinturon="Morado",
         grados=2,
         plan_activo=True,
-        tipo_plan="ADULTO",
+        tipo_plan=plan_adulto,
         es_familiar=True
     )
     
-    hijo1 = Deportista.objects.create_user(
+    Deportista.objects.create_user(
         username="hijo_juan",
         email="hijo1@test.com",
         password="password123",
         first_name="Juan",
         last_name="García",
-        nif="11111111A", # Comparte NIF del padre
+        nif="11111111A",
         sexo="M",
         fecha_nacimiento=date(2015, 8, 10),
         telefono="600111222",
@@ -50,10 +83,10 @@ def reset_y_poblar():
         grados=1,
         padre_tutor=padre,
         plan_activo=True,
-        tipo_plan="INFANTIL"
+        tipo_plan=plan_infantil
     )
 
-    hijo2 = Deportista.objects.create_user(
+    Deportista.objects.create_user(
         username="hija_sofia",
         email="hija2@test.com",
         password="password123",
@@ -67,11 +100,10 @@ def reset_y_poblar():
         grados=0,
         padre_tutor=padre,
         plan_activo=True,
-        tipo_plan="INFANTIL"
+        tipo_plan=plan_infantil
     )
-    print("Creada familia García (Padre + 2 Hijos)")
 
-    # --- ADULTA INDIVIDUAL (ACTIVA) ---
+    # --- ADULTA INDIVIDUAL ---
     Deportista.objects.create_user(
         username="elena_bjj",
         email="elena@test.com",
@@ -85,10 +117,10 @@ def reset_y_poblar():
         cinturon="Azul",
         grados=4,
         plan_activo=True,
-        tipo_plan="ADULTO"
+        tipo_plan=plan_adulto
     )
 
-    # --- JUVENIL (ACTIVO) ---
+    # --- JUVENIL ---
     Deportista.objects.create_user(
         username="marcos_juvenil",
         email="marcos@test.com",
@@ -97,32 +129,15 @@ def reset_y_poblar():
         last_name="López",
         nif="33333333C",
         sexo="M",
-        fecha_nacimiento=date(2009, 6, 30), # 15 años
+        fecha_nacimiento=date(2009, 6, 30),
         telefono="655666777",
         cinturon="Amarillo",
         grados=3,
         plan_activo=True,
-        tipo_plan="JUVENIL"
+        tipo_plan=plan_juvenil
     )
 
-    # --- PENDIENTE (ALTA NUEVA) ---
-    Deportista.objects.create_user(
-        username="nuevo_alumno",
-        email="nuevo@test.com",
-        password="password123",
-        first_name="Pablo",
-        last_name="Sanz",
-        nif="44444444D",
-        sexo="M",
-        fecha_nacimiento=date(1995, 1, 1),
-        telefono="677888999",
-        cinturon="Blanco",
-        grados=0,
-        plan_activo=False,
-        tipo_plan=None # Sin plan = Pendiente de activación
-    )
-
-    # --- INACTIVO (BAJA) ---
+    # --- INACTIVO ---
     Deportista.objects.create_user(
         username="ex_alumno",
         email="baja@test.com",
@@ -136,11 +151,13 @@ def reset_y_poblar():
         cinturon="Azul",
         grados=2,
         plan_activo=False,
-        tipo_plan="ADULTO" # Tiene plan asignado pero plan_activo=False = Baja
+        tipo_plan=plan_adulto
     )
 
-
     print("--- Población finalizada con éxito ---")
+
+if __name__ == "__main__":
+    reset_y_poblar()
 
 if __name__ == "__main__":
     reset_y_poblar()

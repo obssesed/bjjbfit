@@ -19,13 +19,15 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from usuarios.views import DeportistaViewSet
-from reservas.views import ClaseBJJViewSet, ReservaViewSet
+from usuarios.views import DeportistaViewSet, PlanViewSet
+from reservas.views import ClaseBJJViewSet, ReservaViewSet, PlantillaClaseViewSet
 
 router = DefaultRouter()
 router.register(r'deportistas', DeportistaViewSet, basename='deportista')
 router.register(r'clases', ClaseBJJViewSet, basename='clase')
 router.register(r'reservas', ReservaViewSet, basename='reserva')
+router.register(r'planes', PlanViewSet, basename='plan')
+router.register(r'programacion', PlantillaClaseViewSet, basename='programacion')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

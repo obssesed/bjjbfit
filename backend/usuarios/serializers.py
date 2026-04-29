@@ -1,5 +1,10 @@
 from rest_framework import serializers
-from .models import Deportista
+from .models import Deportista, Plan
+
+class PlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plan
+        fields = ['id', 'nombre', 'precio_base', 'beneficios', 'categoria_edad', 'activo']
 
 class HijoSerializer(serializers.ModelSerializer):
     """

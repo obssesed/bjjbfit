@@ -2,8 +2,8 @@ from django.utils import timezone
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .models import Deportista
-from .serializers import DeportistaSerializer
+from .models import Deportista, Plan
+from .serializers import DeportistaSerializer, PlanSerializer
 
 class DeportistaViewSet(viewsets.ModelViewSet):
     """
@@ -71,26 +71,23 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         Recibe: tipo_plan (ADULTO|JUVENIL|INFANTIL) y es_familiar (bool).
         """
         deportista = self.get_object()
-        tipo_plan = request.data.get('tipo_plan')
+        plan_id = request.data.get('plan_id')
         es_familiar = request.data.get('es_familiar', False)
         
-        planes_validos = ['ADULTO', 'JUVENIL', 'INFANTIL']
-        if tipo_plan not in planes_validos:
+        try:
+            plan = Plan.objects.get(id=plan_id)
+        except (Plan.DoesNotExist, ValueError):
             return Response(
-                {'error': f'Tipo de plan inválido. Opciones: {", ".join(planes_validos)}'},
+                {'error': 'Plan no encontrado.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        deportista.plan_activo = True
-        deportista.tipo_plan = tipo_plan
+        deportista.tipo_plan = plan
         deportista.es_familiar = bool(es_familiar)
+        deportista.plan_activo = True
         deportista.save()
         
-        etiqueta = f"Mensual {tipo_plan.capitalize()}"
-        if es_familiar:
-            etiqueta += " Familiar"
-        
-        return Response({'success': f'{etiqueta} activado correctamente para {deportista.first_name or deportista.username}.'})
+        return Response({'success': f'Plan {plan.nombre} activado correctamente para {deportista.first_name or deportista.username}.'})
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def dar_baja(self, request, pk=None):
@@ -109,25 +106,23 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         Cambia el tipo de plan de un deportista activo sin tocar plan_activo.
         """
         deportista = self.get_object()
-        tipo_plan = request.data.get('tipo_plan')
+        plan_id = request.data.get('plan_id')
         es_familiar = request.data.get('es_familiar', False)
         
-        planes_validos = ['ADULTO', 'JUVENIL', 'INFANTIL']
-        if tipo_plan not in planes_validos:
+        try:
+            plan = Plan.objects.get(id=plan_id)
+        except (Plan.DoesNotExist, ValueError):
             return Response(
-                {'error': f'Tipo de plan inválido. Opciones: {", ".join(planes_validos)}'},
+                {'error': 'Plan no encontrado.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        deportista.tipo_plan = tipo_plan
+        deportista.tipo_plan = plan
         deportista.es_familiar = bool(es_familiar)
+        deportista.plan_activo = True # Al activar plan, marcamos como activo
         deportista.save()
         
-        etiqueta = f"Mensual {tipo_plan.capitalize()}"
-        if es_familiar:
-            etiqueta += " Familiar"
-        
-        return Response({'success': f'Plan cambiado a {etiqueta} para {deportista.first_name or deportista.username}.'})
+        return Response({'success': f'Plan {plan.nombre} activado correctamente para {deportista.first_name or deportista.username}.'})
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
     def actualizar_graduacion(self, request, pk=None):
@@ -165,5 +160,19 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         deportista.id_interno = nuevo_id
         deportista.save()
         return Response({'success': f'Nº Socio de {deportista.first_name} actualizado a {nuevo_id}.'})
+
+class PlanViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para que el administrador gestione los planes (CRUD).
+    """
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        # Solo admin puede crear/editar/borrar. Todos pueden ver (para el registro).
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
 
 
