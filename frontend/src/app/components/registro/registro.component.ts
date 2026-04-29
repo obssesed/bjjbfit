@@ -16,8 +16,14 @@ export class RegistroComponent {
     username: '',
     email: '',
     password: '',
+    first_name: '',
+    last_name: '',
+    nif: '',
+    sexo: '',
+    fecha_nacimiento: '',
     telefono: '',
-    cinturon: 'Blanco' // Por defecto para nuevos usuarios
+    cuenta_bancaria: '',
+    cinturon: 'Blanco'
   };
   
   errorMsg: string | null = null;
@@ -28,9 +34,10 @@ export class RegistroComponent {
   registrar() {
     this.errorMsg = null;
     
-    // Validación básica
-    if (!this.registroData.username || !this.registroData.email || !this.registroData.password) {
-      this.errorMsg = 'Por favor, rellena los campos obligatorios.';
+    // Validación básica obligatoria según negocio
+    const d = this.registroData;
+    if (!d.username || !d.email || !d.password || !d.first_name || !d.last_name || !d.nif || !d.sexo || !d.fecha_nacimiento) {
+      this.errorMsg = 'Por favor, rellena todos los campos obligatorios marcados con asterisco (*).';
       return;
     }
 

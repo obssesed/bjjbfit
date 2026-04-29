@@ -20,9 +20,15 @@ class DeportistaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'tipo_plan', 'es_familiar', 'telefono', 'nif', 'sexo', 'fecha_nacimiento', 'hijos_a_cargo', 'is_staff', 'date_joined']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'tipo_plan', 'es_familiar', 'telefono', 'nif', 'sexo', 'fecha_nacimiento', 'cuenta_bancaria', 'hijos_a_cargo', 'is_staff', 'date_joined']
         extra_kwargs = {
             'password': {'write_only': True},
+            'first_name': {'required': True, 'allow_blank': False},
+            'last_name': {'required': True, 'allow_blank': False},
+            'email': {'required': True, 'allow_blank': False},
+            'nif': {'required': True, 'allow_blank': False},
+            'sexo': {'required': True, 'allow_blank': False},
+            'fecha_nacimiento': {'required': True},
             'plan_activo': {'read_only': True},
             'fecha_ultima_graduacion': {'read_only': True}
         }

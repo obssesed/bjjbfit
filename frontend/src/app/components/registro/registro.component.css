@@ -11,7 +11,7 @@
   border-radius: 20px;
   padding: 2.5rem;
   width: 100%;
-  max-width: 400px;
+  max-width: 650px; /* Aumentado para el grid de 2 columnas */
   box-shadow: var(--shadow-premium);
 }
 
@@ -35,7 +35,25 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.form-divider {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 0.5rem;
 }
 
 .input-group {
@@ -50,33 +68,43 @@
   color: var(--text-secondary);
 }
 
-.input-group input {
+.input-group input, .select-control {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--glass-border);
   border-radius: 10px;
   padding: 0.8rem 1rem;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: var(--transition-smooth);
 }
 
-.input-group input:focus {
+.select-control {
+  cursor: pointer;
+}
+
+.input-group input:focus, .select-control:focus {
   outline: none;
   border-color: var(--accent-gold);
   background: rgba(255, 255, 255, 0.08);
+}
+
+/* Estilo específico para input date (calendario en oscuro) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
 }
 
 .submit-btn {
   background: var(--accent-gold);
   color: #000;
   border: none;
-  padding: 1rem;
+  padding: 1.1rem;
   border-radius: 10px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: var(--transition-smooth);
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 .submit-btn:hover:not(:disabled) {
@@ -129,5 +157,10 @@
   
   .auth-title {
     font-size: 1.5rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr; /* Columna única en móviles */
+    gap: 1.2rem;
   }
 }
