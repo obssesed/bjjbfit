@@ -1,0 +1,132 @@
+<div class="planes-header">
+  <div class="header-content">
+    <h1>Gestión de Planes Mensuales</h1>
+    <p>Define los precios, beneficios y categorías de las membresías del club.</p>
+  </div>
+  <button class="btn-add-plan" (click)="abrirNuevoPlan()">
+    <span>+</span> Nuevo Plan
+  </button>
+</div>
+
+<!-- Mensajes de Feedback -->
+<div class="alert-success" *ngIf="mensajeExito">
+  {{ mensajeExito }}
+</div>
+
+<!-- Loader -->
+<div class="loader-container" *ngIf="cargando">
+  <div class="loader"></div>
+  <p>Cargando catálogo de planes...</p>
+</div>
+
+<!-- Grid de Planes -->
+<div class="planes-grid" *ngIf="!cargando && planes.length > 0">
+  <div class="plan-card" *ngFor="let plan of planes" [class.inactive]="!plan.activo">
+    <div class="plan-badge" [ngClass]="plan.categoria_edad">
+      {{ plan.categoria_edad }}
+    </div>
+    
+    <div class="plan-info">
+      <h3>{{ plan.nombre }}</h3>
+      <div class="plan-price">
+        <span class="currency">€</span>
+        <span class="amount">{{ plan.precio_base }}</span>
+        <span class="period">/mes</span>
+      </div>
+
+      <div class="plan-beneficios">
+        <h4>Beneficios:</h4>
+        <ul>
+          <li *ngFor="let b of getBeneficiosList(plan.beneficios)">
+            <span class="check">✓</span> {{ b }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="plan-actions">
+      <button class="btn-edit" (click)="editarPlan(plan)" title="Editar Plan">
+        ✏️ Editar
+      </button>
+      <button class="btn-delete" (click)="abrirConfirmarEliminar(plan)" title="Eliminar Plan">
+        🗑️ Borrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="empty-state" *ngIf="!cargando && planes.length === 0">
+  <div class="empty-icon">📂</div>
+  <h3>No hay planes configurados</h3>
+  <p>Crea el primer plan para empezar a recibir inscripciones.</p>
+</div>
+
+<!-- MODAL PARA CREAR/EDITAR -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="cerrarModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Plan' : 'Añadir Nuevo Plan' }}</h2>
+      <button class="btn-close" (click)="cerrarModal()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nombre del Plan</label>
+          <input type="text" [(ngModel)]="planForm.nombre" placeholder="Ej: Adulto Pro">
+        </div>
+
+        <div class="form-group">
+          <label>Precio Mensual (€)</label>
+          <input type="number" [(ngModel)]="planForm.precio_base" placeholder="70.00">
+        </div>
+
+        <div class="form-group">
+          <label>Categoría de Edad</label>
+          <select [(ngModel)]="planForm.categoria_edad">
+            <option value="ADULTO">Adulto (18+ años)</option>
+            <option value="JUVENIL">Juvenil (14-17 años)</option>
+            <option value="INFANTIL">Infantil (<14 años)</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Beneficios (Separa con comas o saltos de línea)</label>
+          <textarea [(ngModel)]="planForm.beneficios" rows="4" placeholder="Acceso total, Vídeos semanales..."></textarea>
+        </div>
+
+        <div class="form-group checkbox">
+          <label class="switch-label">
+            <input type="checkbox" [(ngModel)]="planForm.activo">
+            <span class="slider"></span>
+            Plan Activo y Visible
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+      <button type="button" class="btn-save" (click)="guardarPlan()" [disabled]="!planForm.nombre">
+        {{ editando ? 'Actualizar Cambios' : 'Crear Plan' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
+<div class="modal-overlay danger-mode" *ngIf="mostrarConfirmarEliminar" (click)="cerrarConfirmarEliminar()">
+  <div class="modal-card danger-card" (click)="$event.stopPropagation()">
+    <div class="danger-icon">⚠️</div>
+    <h3 class="danger-title">¿Eliminar Plan?</h3>
+    <p class="danger-text">
+      Estás a punto de borrar el plan <strong>{{ planAEliminar?.nombre }}</strong>.<br>
+      Esta acción no se puede deshacer y podría afectar a los usuarios que tengan este plan asignado.
+    </p>
+    
+    <div class="danger-actions">
+      <button class="btn-cancel-danger" (click)="cerrarConfirmarEliminar()">No, Mantener</button>
+      <button class="btn-confirm-danger" (click)="confirmarEliminar()">Sí, Eliminar Permanentemente</button>
+    </div>
+  </div>
+</div>

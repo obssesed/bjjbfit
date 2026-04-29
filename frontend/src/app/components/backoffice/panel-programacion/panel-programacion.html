@@ -1,0 +1,149 @@
+<div class="prog-header">
+  <div class="header-content">
+    <h1>Programación de Clases</h1>
+    <p>Define tipos de clase y propágalas por el calendario de forma masiva.</p>
+  </div>
+  <button class="btn-primary" (click)="abrirNueva()">
+    <span>+</span> Crear Tipo de Clase
+  </button>
+</div>
+
+<!-- Feedback -->
+<div class="alert-success" *ngIf="mensajeExito">
+  {{ mensajeExito }}
+</div>
+
+<div class="loader-container" *ngIf="cargando">
+  <div class="loader"></div>
+</div>
+
+<!-- Listado de Plantillas -->
+<div class="plantillas-grid" *ngIf="!cargando && plantillas.length > 0">
+  <div class="plantilla-card" *ngFor="let p of plantillas">
+    <div class="card-icon">{{ p.icono }}</div>
+    <div class="card-info">
+      <h3>{{ p.titulo }}</h3>
+      <div class="card-meta">
+        <span class="meta-item">⏰ {{ p.hora_inicio.substring(0,5) }}</span>
+        <span class="meta-item">⏳ {{ p.duracion_minutos }} min</span>
+        <span class="meta-item">👥 Aforo: {{ p.capacidad_maxima }}</span>
+        <span class="meta-item badge-cat" [ngClass]="p.categoria_acceso">🏷️ {{ p.categoria_acceso }}</span>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button class="btn-propagate" (click)="abrirPropagar(p)">
+        🚀 Propagar...
+      </button>
+      <div class="mini-actions">
+        <button class="btn-icon" (click)="editar(p)" title="Editar">✏️</button>
+        <button class="btn-icon delete" (click)="eliminar(p.id)" title="Eliminar">🗑️</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="empty-state" *ngIf="!cargando && plantillas.length === 0">
+  <div class="empty-icon">📅</div>
+  <h3>No hay clases programadas</h3>
+  <p>Define tu primera clase maestra para empezar a llenar el calendario.</p>
+</div>
+
+<!-- MODAL: Crear/Editar Plantilla -->
+<div class="modal-overlay" *ngIf="mostrarModal" (click)="mostrarModal = false">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editando ? 'Editar Tipo de Clase' : 'Nuevo Tipo de Clase' }}</h2>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Título de la Clase</label>
+          <input type="text" [(ngModel)]="formPlantilla.titulo" placeholder="Ej: BJJ No-Gi Avanzado">
+        </div>
+        
+        <div class="form-group">
+          <label>Icono</label>
+          <div class="icon-selector">
+            <button *ngFor="let i of iconosSugeridos" 
+                    [class.active]="formPlantilla.icono === i"
+                    (click)="formPlantilla.icono = i">
+              {{ i }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Hora de Comienzo</label>
+          <input type="time" [(ngModel)]="formPlantilla.hora_inicio">
+        </div>
+
+        <div class="form-group">
+          <label>Duración (minutos)</label>
+          <input type="number" [(ngModel)]="formPlantilla.duracion_minutos">
+        </div>
+
+        <div class="form-group">
+          <label>Aforo Máximo</label>
+          <input type="number" [(ngModel)]="formPlantilla.capacidad_maxima">
+        </div>
+
+        <div class="form-group full">
+          <label>Categoría de Acceso (Plan Requerido)</label>
+          <select [(ngModel)]="formPlantilla.categoria_acceso">
+            <option value="ADULTO">Solo Adultos (18+ años)</option>
+            <option value="JUVENIL">Solo Juveniles (14-17 años)</option>
+            <option value="INFANTIL">Solo Infantiles (<14 años)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="mostrarModal = false">Cancelar</button>
+      <button class="btn-primary" (click)="guardar()" [disabled]="!formPlantilla.titulo">
+        {{ editando ? 'Actualizar' : 'Crear Plantilla' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Propagar Clases -->
+<div class="modal-overlay" *ngIf="mostrarModalPropagar" (click)="mostrarModalPropagar = false">
+  <div class="modal-content propagate-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>🚀 Propagar: {{ plantillaSeleccionada?.titulo }}</h2>
+      <p>Genera múltiples sesiones automáticamente en el calendario.</p>
+    </div>
+    <div class="modal-body">
+      <div class="propagate-form">
+        <div class="date-range">
+          <div class="form-group">
+            <label>Desde</label>
+            <input type="date" [(ngModel)]="configPropagacion.fecha_inicio">
+          </div>
+          <div class="form-group">
+            <label>Hasta</label>
+            <input type="date" [(ngModel)]="configPropagacion.fecha_fin">
+          </div>
+        </div>
+
+        <label class="section-label">Repetir estos días:</label>
+        <div class="days-selector">
+          <label *ngFor="let d of configPropagacion.dias" class="day-chip" [class.active]="d.selected">
+            <input type="checkbox" [(ngModel)]="d.selected">
+            {{ d.nombre }}
+          </label>
+        </div>
+        
+        <div class="propagate-summary" *ngIf="configPropagacion.fecha_inicio && configPropagacion.fecha_fin">
+           💡 Se crearán clases de <strong>{{ plantillaSeleccionada?.hora_inicio?.substring(0,5) }}</strong> en el rango seleccionado.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="mostrarModalPropagar = false">Cancelar</button>
+      <button class="btn-primary" (click)="confirmarPropagacion()">
+        Generar Sesiones
+      </button>
+    </div>
+  </div>
+</div>
