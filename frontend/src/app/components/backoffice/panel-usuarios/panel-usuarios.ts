@@ -23,7 +23,10 @@ export class PanelUsuarios implements OnInit {
   // Estado de modales
   showBajaModal: boolean = false;
   showCambioPlanModal: boolean = false;
+  showGraduacionModal: boolean = false;
   deportistaSeleccionado: PerfilDeportista | null = null;
+
+  opcionesCinturon: string[] = ['Blanco', 'Azul', 'Morado', 'Marrón', 'Negro', 'Gris', 'Amarillo', 'Naranja', 'Verde'];
 
   constructor(
     private authService: AuthService,
@@ -184,6 +187,75 @@ export class PanelUsuarios implements OnInit {
         this.showCambioPlanModal = false;
         this.deportistaSeleccionado = null;
         this.mensajeExito = '❌ Error al cambiar plan.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
+
+  // === Modal Graduación (Cinturón/Grados) ===
+  abrirGraduacion(deportista: PerfilDeportista) {
+    this.deportistaSeleccionado = { ...deportista }; // Clonar para edición
+    this.showGraduacionModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarGraduacionModal() {
+    this.showGraduacionModal = false;
+    this.deportistaSeleccionado = null;
+    this.cdr.detectChanges();
+  }
+
+  cambiarColorCinturon(nuevoColor: string) {
+    if (!this.deportistaSeleccionado) return;
+    if (this.deportistaSeleccionado.cinturon !== nuevoColor) {
+      this.deportistaSeleccionado.cinturon = nuevoColor;
+      this.deportistaSeleccionado.grados = 0; // Regla de negocio: reset grados al cambiar cinturón
+      this.cdr.detectChanges();
+    }
+  }
+
+  subirGrado() {
+    if (!this.deportistaSeleccionado) return;
+    if (this.deportistaSeleccionado.grados < 4) {
+      this.deportistaSeleccionado.grados++;
+      this.cdr.detectChanges();
+    }
+  }
+
+  bajarGrado() {
+    if (!this.deportistaSeleccionado) return;
+    if (this.deportistaSeleccionado.grados > 0) {
+      this.deportistaSeleccionado.grados--;
+      this.cdr.detectChanges();
+    }
+  }
+
+  confirmarGraduacion() {
+    if (!this.deportistaSeleccionado) return;
+    
+    this.activandoId = this.deportistaSeleccionado.id;
+    this.cdr.detectChanges();
+
+    this.authService.actualizarGraduacion(
+      this.deportistaSeleccionado.id, 
+      this.deportistaSeleccionado.cinturon, 
+      this.deportistaSeleccionado.grados
+    ).subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.showGraduacionModal = false;
+        this.mensajeExito = res.success || 'Graduación actualizada.';
+        this.deportistaSeleccionado = null;
+        this.cargarUsuarios();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        this.showGraduacionModal = false;
+        this.deportistaSeleccionado = null;
+        this.mensajeExito = '❌ Error al actualizar graduación.';
         this.cdr.detectChanges();
         setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       }

@@ -116,6 +116,11 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/cambiar_plan/`, { tipo_plan: tipoPlan, es_familiar: esFamiliar });
   }
 
+  actualizarGraduacion(deportistaId: number, cinturon: string, grados: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_graduacion/`, { cinturon, grados });
+  }
+
+
   getToken() {
     if (typeof window !== 'undefined') {
       return localStorage.getItem('access_token');

@@ -33,12 +33,16 @@
           </div>
         </td>
         <td>
-          <div class="mini-belt belt-color-{{ u.cinturon | lowercase }}">
-            <div class="mini-belt-body"></div>
-            <div class="mini-belt-tip"
-              [ngClass]="{'tip-roja': u.cinturon === 'Negro', 'tip-negra': u.cinturon !== 'Negro'}">
-              <div class="mini-stripe" *ngFor="let _ of [].constructor(u.grados)"></div>
+          <div class="belt-cell">
+            <div class="mini-belt belt-color-{{ u.cinturon | lowercase }}">
+              <div class="mini-belt-body"></div>
+              <div class="mini-belt-tip" [ngClass]="{'tip-roja': u.cinturon === 'Negro', 'tip-negra': u.cinturon !== 'Negro'}">
+                <div class="mini-stripe" *ngFor="let _ of [].constructor(u.grados)"></div>
+              </div>
             </div>
+            <button class="btn-edit-belt" (click)="abrirGraduacion(u)" title="Graduar atleta">
+              ✏️
+            </button>
           </div>
         </td>
         <td>
@@ -261,6 +265,59 @@
         [disabled]="!deportistaSeleccionado.tipo_plan_seleccionado || activandoId === deportistaSeleccionado.id"
         (click)="confirmarCambioPlan()">
         {{ activandoId === deportistaSeleccionado.id ? 'Guardando...' : 'Guardar Cambio' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: Graduación (Cinturón/Grados) ====== -->
+<div class="modal-overlay" *ngIf="showGraduacionModal && deportistaSeleccionado">
+  <div class="modal-card graduacion-card">
+    <h3 class="modal-title">Graduación</h3>
+    <p class="modal-subtitle">
+      Actualiza el rango de
+      <strong style="color: #93c5fd;">{{ deportistaSeleccionado.first_name }} {{ deportistaSeleccionado.last_name }}</strong>
+    </p>
+
+    <!-- Visualización previa -->
+    <div class="graduacion-preview">
+      <div class="mini-belt belt-color-{{ deportistaSeleccionado.cinturon | lowercase }} large-belt">
+        <div class="mini-belt-body"></div>
+        <div class="mini-belt-tip" [ngClass]="{'tip-roja': deportistaSeleccionado.cinturon === 'Negro', 'tip-negra': deportistaSeleccionado.cinturon !== 'Negro'}">
+          <div class="mini-stripe" *ngFor="let _ of [].constructor(deportistaSeleccionado.grados)"></div>
+        </div>
+      </div>
+      <div class="graduacion-label">
+        {{ deportistaSeleccionado.cinturon }} - {{ deportistaSeleccionado.grados }} Grados
+      </div>
+    </div>
+
+    <div class="modal-plan-form">
+      <label class="modal-form-label">Seleccionar Cinturón</label>
+      <div class="belt-selector-grid">
+        <button *ngFor="let color of opcionesCinturon" 
+                class="belt-option color-{{ color | lowercase }}"
+                [class.active]="deportistaSeleccionado.cinturon === color"
+                (click)="cambiarColorCinturon(color)">
+          {{ color }}
+        </button>
+      </div>
+
+      <label class="modal-form-label" style="margin-top: 1.5rem;">Gestionar Grados</label>
+      <div class="grados-control">
+        <button class="btn-grado-minus" (click)="bajarGrado()" [disabled]="deportistaSeleccionado.grados <= 0">-</button>
+        <div class="grados-display">
+          <span class="grados-number">{{ deportistaSeleccionado.grados }}</span>
+          <span class="grados-text">Rayas</span>
+        </div>
+        <button class="btn-grado-plus" (click)="subirGrado()" [disabled]="deportistaSeleccionado.grados >= 4">+</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarGraduacionModal()">Cancelar</button>
+      <button class="btn-confirm" [disabled]="activandoId === deportistaSeleccionado.id" (click)="confirmarGraduacion()">
+        {{ activandoId === deportistaSeleccionado.id ? 'Guardando...' : 'Confirmar Graduación' }}
       </button>
     </div>
   </div>

@@ -510,3 +510,166 @@
 .modal-familiar-toggle {
   padding: 0.6rem 0.8rem;
 }
+
+/* === Graduación Modal & Belt Cell === */
+.belt-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.btn-edit-belt {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.btn-edit-belt:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.graduacion-card {
+  max-width: 500px;
+}
+
+.graduacion-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(0,0,0,0.2);
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px dashed rgba(255,255,255,0.1);
+}
+
+.large-belt {
+  width: 180px;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.large-belt .mini-belt-tip {
+  width: 50px;
+  gap: 4px;
+}
+
+.large-belt .mini-stripe {
+  width: 5px;
+}
+
+.graduacion-label {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.belt-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.belt-option {
+  padding: 0.6rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #334155;
+  color: white;
+  text-transform: uppercase;
+}
+
+.belt-option:hover {
+  transform: translateY(-2px);
+}
+
+.belt-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+}
+
+/* Colores de botones del selector */
+.color-blanco { background: #f8fafc; color: #0f172a; }
+.color-azul { background: #2563eb; }
+.color-morado { background: #9333ea; }
+.color-marrón, .color-marron { background: #78350f; }
+.color-negro { background: #0f172a; border: 1px solid #334155; }
+.color-gris { background: #64748b; }
+.color-amarillo { background: #eab308; color: #0f172a; }
+.color-naranja { background: #f97316; }
+.color-verde { background: #22c55e; }
+
+/* Controles de grados */
+.grados-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  background: rgba(255,255,255,0.03);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.grados-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.grados-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--primary);
+}
+
+.grados-text {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.btn-grado-minus, .btn-grado-plus {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-grado-minus:hover:not([disabled]), .btn-grado-plus:hover:not([disabled]) {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+.btn-grado-minus[disabled], .btn-grado-plus[disabled] {
+  opacity: 0.2;
+  cursor: not-allowed;
+}

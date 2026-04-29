@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -127,3 +128,29 @@ class DeportistaViewSet(viewsets.ModelViewSet):
             etiqueta += " Familiar"
         
         return Response({'success': f'Plan cambiado a {etiqueta} para {deportista.first_name or deportista.username}.'})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def actualizar_graduacion(self, request, pk=None):
+        """
+        Permite al profesor subir de grado o cambiar el cinturón de un atleta.
+        Si el cinturón cambia, los grados se resetean a 0 automáticamente.
+        """
+        deportista = self.get_object()
+        nuevo_cinturon = request.data.get('cinturon')
+        nuevos_grados = request.data.get('grados')
+
+        if nuevo_cinturon is not None:
+            # Si el cinturón cambia, reseteamos grados a 0
+            if nuevo_cinturon != deportista.cinturon:
+                deportista.cinturon = nuevo_cinturon
+                deportista.grados = 0
+            elif nuevos_grados is not None:
+                # Si es el mismo cinturón, solo actualizamos grados
+                deportista.grados = nuevos_grados
+            
+            deportista.fecha_ultima_graduacion = timezone.now().date()
+            deportista.save()
+            return Response({'success': f'Graduación de {deportista.first_name} actualizada correctamente.'})
+        
+        return Response({'error': 'Faltan datos para la graduación.'}, status=status.HTTP_400_BAD_REQUEST)
+
