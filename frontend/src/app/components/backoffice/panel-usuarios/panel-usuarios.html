@@ -5,7 +5,8 @@
 
 <div *ngIf="cargando" class="state-msg">Cargando base de datos...</div>
 <div *ngIf="error" class="state-msg error">{{ error }}</div>
-<div *ngIf="mensajeExito" class="state-msg" style="background-color: var(--success-bg); border-color: var(--success); color: #fff;">
+<div *ngIf="mensajeExito" class="state-msg"
+  style="background-color: var(--success-bg); border-color: var(--success); color: #fff;">
   {{ mensajeExito }}
 </div>
 
@@ -19,8 +20,7 @@
         <th>Nacimiento</th>
         <th>Contacto</th>
         <th>Hijos</th>
-        <th>Plan Actual</th>
-        <th>Cambiar Plan</th>
+        <th>Plan</th>
         <th>Estado</th>
       </tr>
     </thead>
@@ -35,7 +35,8 @@
         <td>
           <div class="mini-belt belt-color-{{ u.cinturon | lowercase }}">
             <div class="mini-belt-body"></div>
-            <div class="mini-belt-tip" [ngClass]="{'tip-roja': u.cinturon === 'Negro', 'tip-negra': u.cinturon !== 'Negro'}">
+            <div class="mini-belt-tip"
+              [ngClass]="{'tip-roja': u.cinturon === 'Negro', 'tip-negra': u.cinturon !== 'Negro'}">
               <div class="mini-stripe" *ngFor="let _ of [].constructor(u.grados)"></div>
             </div>
           </div>
@@ -60,29 +61,17 @@
           <span class="pill gray" *ngIf="!u.hijos_a_cargo || u.hijos_a_cargo.length === 0">0</span>
         </td>
         <td>
-          <span class="pill success">{{ getPlanLabel(u) }}</span>
-        </td>
-        <td>
-          <div class="activar-plan-col">
-             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
-                <option value="" disabled selected hidden>Tipo...</option>
-                <option value="ADULTO">Adulto</option>
-                <option value="JUVENIL">Juvenil</option>
-                <option value="INFANTIL">Infantil</option>
-             </select>
-             <label class="familiar-toggle">
-                <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
-                <span class="familiar-label">Fam.</span>
-             </label>
-             <button (click)="cambiarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
-                {{ activandoId === u.id ? '...' : 'Cambiar' }}
-             </button>
+          <div class="plan-cell">
+            <span class="pill success">{{ getPlanLabel(u) }}</span>
+            <button class="btn-edit-plan" (click)="abrirCambioPlan(u)" title="Cambiar plan">
+              ✏️
+            </button>
           </div>
         </td>
         <td>
           <div class="estado-col">
             <span class="pill success">✔️ Alta</span>
-            <button class="btn-baja" (click)="darBaja(u)" [disabled]="activandoId === u.id">
+            <button class="btn-baja" (click)="abrirBaja(u)" [disabled]="activandoId === u.id">
               {{ activandoId === u.id ? '...' : 'Dar Baja' }}
             </button>
           </div>
@@ -116,7 +105,8 @@
       <tr *ngFor="let u of usuariosPendientes">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta'
+              }}</span>
             <span class="user-alias">@{{ u.username }}</span>
           </div>
         </td>
@@ -129,28 +119,28 @@
         </td>
         <td>
           <div class="activar-plan-col">
-             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
-                <option value="" disabled selected hidden>Tipo...</option>
-                <option value="ADULTO">Adulto</option>
-                <option value="JUVENIL">Juvenil</option>
-                <option value="INFANTIL">Infantil</option>
-             </select>
-             <label class="familiar-toggle">
-                <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
-                <span class="familiar-label">Familiar</span>
-             </label>
-             <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
-                {{ activandoId === u.id ? '...' : 'Activar' }}
-             </button>
+            <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
+              <option value="" disabled selected hidden>Tipo...</option>
+              <option value="ADULTO">Adulto</option>
+              <option value="JUVENIL">Juvenil</option>
+              <option value="INFANTIL">Infantil</option>
+            </select>
+            <label class="familiar-toggle">
+              <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
+              <span class="familiar-label">Familiar</span>
+            </label>
+            <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
+              {{ activandoId === u.id ? '...' : 'Activar' }}
+            </button>
           </div>
         </td>
         <td>
-          <span class="pill pending-pill">⏳ Pendiente Activar</span>
+          <span class="pill pending-pill">⏳ Pendiente</span>
         </td>
       </tr>
     </tbody>
   </table>
-  
+
   <div class="empty-state" *ngIf="usuariosPendientes.length === 0">
     No hay usuarios pendientes de alta.
   </div>
@@ -176,7 +166,8 @@
       <tr *ngFor="let u of usuariosInactivos">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta'
+              }}</span>
             <span class="user-alias">@{{ u.username }}</span>
           </div>
         </td>
@@ -189,19 +180,19 @@
         </td>
         <td>
           <div class="activar-plan-col">
-             <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
-                <option value="" disabled selected hidden>Tipo...</option>
-                <option value="ADULTO">Adulto</option>
-                <option value="JUVENIL">Juvenil</option>
-                <option value="INFANTIL">Infantil</option>
-             </select>
-             <label class="familiar-toggle">
-                <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
-                <span class="familiar-label">Familiar</span>
-             </label>
-             <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
-                {{ activandoId === u.id ? '...' : 'Reactivar' }}
-             </button>
+            <select [(ngModel)]="u.tipo_plan_seleccionado" class="control-select">
+              <option value="" disabled selected hidden>Tipo...</option>
+              <option value="ADULTO">Adulto</option>
+              <option value="JUVENIL">Juvenil</option>
+              <option value="INFANTIL">Infantil</option>
+            </select>
+            <label class="familiar-toggle">
+              <input type="checkbox" [(ngModel)]="u.es_familiar_seleccionado">
+              <span class="familiar-label">Familiar</span>
+            </label>
+            <button (click)="activarPlan(u)" [disabled]="activandoId === u.id" class="btn primary small-btn">
+              {{ activandoId === u.id ? '...' : 'Reactivar' }}
+            </button>
           </div>
         </td>
         <td>
@@ -210,8 +201,69 @@
       </tr>
     </tbody>
   </table>
-  
+
   <div class="empty-state" *ngIf="usuariosInactivos.length === 0">
     No hay usuarios inactivos registrados.
+  </div>
+</div>
+
+<!-- ====== MODAL: Dar de Baja ====== -->
+<div class="modal-overlay danger-mode" *ngIf="showBajaModal && deportistaSeleccionado">
+  <div class="modal-card" style="border-color: #ef4444;">
+    <h3 class="modal-title" style="color: #ef4444;">Dar de Baja</h3>
+    <p class="modal-subtitle">
+      ¿Seguro que deseas dar de baja a
+      <strong style="color:#fca5a5;">{{ deportistaSeleccionado.first_name }} {{ deportistaSeleccionado.last_name
+        }}</strong>?
+    </p>
+    <p class="modal-detail">
+      El deportista perderá su plan activo y pasará al listado de <strong>Inactivos / Bajas</strong>.
+    </p>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarBajaModal()">Cancelar</button>
+      <button class="btn-confirm danger-btn" [disabled]="activandoId === deportistaSeleccionado.id"
+        (click)="confirmarBaja()">
+        {{ activandoId === deportistaSeleccionado.id ? 'Procesando...' : 'Sí, Dar de Baja' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: Cambiar Plan ====== -->
+<div class="modal-overlay" *ngIf="showCambioPlanModal && deportistaSeleccionado">
+  <div class="modal-card" style="border-color: var(--primary);">
+    <h3 class="modal-title" style="color: var(--primary);">Cambiar Plan</h3>
+    <p class="modal-subtitle">
+      Modifica el plan de
+      <strong style="color: #93c5fd;">{{ deportistaSeleccionado.first_name }} {{ deportistaSeleccionado.last_name
+        }}</strong>
+    </p>
+    <p class="modal-detail" style="margin-bottom: 1rem;">
+      Plan actual: <strong style="color: #4ade80;">{{ getPlanLabel(deportistaSeleccionado) }}</strong>
+    </p>
+
+    <div class="modal-plan-form">
+      <label class="modal-form-label">Nuevo plan</label>
+      <select [(ngModel)]="deportistaSeleccionado.tipo_plan_seleccionado" class="control-select modal-select">
+        <option value="" disabled selected hidden>Selecciona tipo...</option>
+        <option value="ADULTO">Mensual Adulto</option>
+        <option value="JUVENIL">Mensual Juvenil</option>
+        <option value="INFANTIL">Mensual Infantil</option>
+      </select>
+
+      <label class="familiar-toggle modal-familiar-toggle">
+        <input type="checkbox" [(ngModel)]="deportistaSeleccionado.es_familiar_seleccionado">
+        <span class="familiar-label">Plan Familiar (50% descuento para ambos)</span>
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarCambioPlanModal()">Cancelar</button>
+      <button class="btn-confirm"
+        [disabled]="!deportistaSeleccionado.tipo_plan_seleccionado || activandoId === deportistaSeleccionado.id"
+        (click)="confirmarCambioPlan()">
+        {{ activandoId === deportistaSeleccionado.id ? 'Guardando...' : 'Guardar Cambio' }}
+      </button>
+    </div>
   </div>
 </div>

@@ -47,9 +47,9 @@ class DeportistaViewSet(viewsets.ModelViewSet):
     def inactivos_backoffice(self, request):
         """
         Endpoint exclusivo para el Backoffice. Devuelve todos los usuarios 
-        con plan_activo=False y que hayan tenido reservas (inactivos históricos).
+        con plan_activo=False y que ya tengan un tipo_plan asignado (bajas).
         """
-        inactivos = Deportista.objects.filter(plan_activo=False, mis_reservas__isnull=False).distinct().order_by('first_name', 'last_name')
+        inactivos = Deportista.objects.filter(plan_activo=False, tipo_plan__isnull=False).order_by('first_name', 'last_name')
         serializer = self.get_serializer(inactivos, many=True)
         return Response(serializer.data)
 
@@ -57,9 +57,9 @@ class DeportistaViewSet(viewsets.ModelViewSet):
     def pendientes_backoffice(self, request):
         """
         Endpoint exclusivo para el Backoffice. Devuelve todos los usuarios 
-        con plan_activo=False y sin historial de reservas (recién registrados).
+        con plan_activo=False y que nunca han tenido un tipo_plan asignado (nuevos).
         """
-        pendientes = Deportista.objects.filter(plan_activo=False, mis_reservas__isnull=True, is_staff=False).distinct().order_by('-date_joined')
+        pendientes = Deportista.objects.filter(plan_activo=False, tipo_plan__isnull=True, is_staff=False).order_by('-date_joined')
         serializer = self.get_serializer(pendientes, many=True)
         return Response(serializer.data)
 

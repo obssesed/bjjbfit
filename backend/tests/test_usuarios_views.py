@@ -27,16 +27,13 @@ class TestUsuariosViews:
         Deportista.objects.create_user(
             username="user_activo", password="123", email="b@b.com", plan_activo=True, first_name="Ana"
         )
-        # Crear usuario inactivo CON historial de reservas (baja)
+        # Crear usuario inactivo que ya tuvo plan (baja)
         user_baja = Deportista.objects.create_user(
-            username="user_baja", password="123", email="c@c.com", plan_activo=False, first_name="Zac"
+            username="user_baja", password="123", email="c@c.com", plan_activo=False, 
+            first_name="Zac", tipo_plan="ADULTO"
         )
-        clase = ClaseBJJ.objects.create(
-            titulo="Clase Test", fecha_hora_inicio=timezone.now() - timezone.timedelta(days=30)
-        )
-        Reserva.objects.create(clase=clase, deportista=user_baja, estado='CONFIRMADA')
 
-        # Crear usuario pendiente SIN historial de reservas (alta nueva)
+        # Crear usuario pendiente SIN historial de reservas y SIN plan (alta nueva)
         Deportista.objects.create_user(
             username="user_pendiente", password="123", email="d@d.com", plan_activo=False, first_name="Nuevo"
         )

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // File touched to clear TS cache
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, PerfilDeportista } from '../../../services/auth.service';
@@ -16,6 +16,14 @@ export class PanelUsuarios implements OnInit {
   usuariosInactivos: PerfilDeportista[] = [];
   cargando: boolean = true;
   error: string | null = null;
+
+  activandoId: number | null = null;
+  mensajeExito: string | null = null;
+
+  // Estado de modales
+  showBajaModal: boolean = false;
+  showCambioPlanModal: boolean = false;
+  deportistaSeleccionado: PerfilDeportista | null = null;
 
   constructor(
     private authService: AuthService,
@@ -65,12 +73,13 @@ export class PanelUsuarios implements OnInit {
     });
   }
 
-  activandoId: number | null = null;
-  mensajeExito: string | null = null;
-
+  // === Activar Plan (pendientes/inactivos) ===
   activarPlan(deportista: PerfilDeportista) {
     if (!deportista.tipo_plan_seleccionado) {
-      alert("Selecciona un tipo de plan del desplegable primero.");
+      // No hay plan seleccionado - mostrar feedback inline
+      this.mensajeExito = '⚠️ Selecciona un tipo de plan del desplegable antes de activar.';
+      this.cdr.detectChanges();
+      setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       return;
     }
     
@@ -83,78 +92,105 @@ export class PanelUsuarios implements OnInit {
       next: (res) => {
         this.activandoId = null;
         this.mensajeExito = res.success || 'Plan activado correctamente.';
-        
-        // Refrescar toda la carga
         this.cargarUsuarios();
         this.cdr.detectChanges();
-        
-        setTimeout(() => {
-            this.mensajeExito = null;
-            this.cdr.detectChanges();
-        }, 4000);
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       },
       error: (err) => {
         console.error(err);
         this.activandoId = null;
-        let errorMessage = "No se pudo activar el plan.";
-        if (err.error && err.error.error) {
-           errorMessage = err.error.error;
-        }
-        alert(errorMessage);
+        this.mensajeExito = '❌ ' + (err.error?.error || 'No se pudo activar el plan.');
         this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       }
     });
   }
 
-  darBaja(deportista: PerfilDeportista) {
-    if (!confirm(`¿Seguro que deseas dar de baja a ${deportista.first_name || deportista.username}?`)) return;
+  // === Modal Dar de Baja ===
+  abrirBaja(deportista: PerfilDeportista) {
+    this.deportistaSeleccionado = deportista;
+    this.showBajaModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarBajaModal() {
+    this.showBajaModal = false;
+    this.deportistaSeleccionado = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmarBaja() {
+    if (!this.deportistaSeleccionado) return;
     
-    this.activandoId = deportista.id;
+    this.activandoId = this.deportistaSeleccionado.id;
     this.cdr.detectChanges();
 
-    this.authService.darBaja(deportista.id).subscribe({
+    this.authService.darBaja(this.deportistaSeleccionado.id).subscribe({
       next: (res) => {
         this.activandoId = null;
+        this.showBajaModal = false;
         this.mensajeExito = res.success || 'Usuario dado de baja.';
+        this.deportistaSeleccionado = null;
         this.cargarUsuarios();
         this.cdr.detectChanges();
         setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       },
       error: (err) => {
         this.activandoId = null;
-        alert('Error al dar de baja.');
+        this.showBajaModal = false;
+        this.deportistaSeleccionado = null;
+        this.mensajeExito = '❌ Error al dar de baja.';
         this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       }
     });
   }
 
-  cambiarPlan(deportista: PerfilDeportista) {
-    if (!deportista.tipo_plan_seleccionado) {
-      alert("Selecciona un tipo de plan primero.");
-      return;
-    }
+  // === Modal Cambiar Plan ===
+  abrirCambioPlan(deportista: PerfilDeportista) {
+    this.deportistaSeleccionado = { ...deportista }; // Clonar para no mutar la lista
+    this.deportistaSeleccionado.tipo_plan_seleccionado = '';
+    this.deportistaSeleccionado.es_familiar_seleccionado = false;
+    this.showCambioPlanModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarCambioPlanModal() {
+    this.showCambioPlanModal = false;
+    this.deportistaSeleccionado = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmarCambioPlan() {
+    if (!this.deportistaSeleccionado || !this.deportistaSeleccionado.tipo_plan_seleccionado) return;
     
-    this.activandoId = deportista.id;
+    this.activandoId = this.deportistaSeleccionado.id;
     this.cdr.detectChanges();
 
-    const esFamiliar = deportista.es_familiar_seleccionado || false;
+    const esFamiliar = this.deportistaSeleccionado.es_familiar_seleccionado || false;
 
-    this.authService.cambiarPlan(deportista.id, deportista.tipo_plan_seleccionado, esFamiliar).subscribe({
+    this.authService.cambiarPlan(this.deportistaSeleccionado.id, this.deportistaSeleccionado.tipo_plan_seleccionado, esFamiliar).subscribe({
       next: (res) => {
         this.activandoId = null;
+        this.showCambioPlanModal = false;
         this.mensajeExito = res.success || 'Plan cambiado.';
+        this.deportistaSeleccionado = null;
         this.cargarUsuarios();
         this.cdr.detectChanges();
         setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       },
       error: (err) => {
         this.activandoId = null;
-        alert('Error al cambiar plan.');
+        this.showCambioPlanModal = false;
+        this.deportistaSeleccionado = null;
+        this.mensajeExito = '❌ Error al cambiar plan.';
         this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       }
     });
   }
 
+  // === Helpers ===
   getPlanLabel(u: PerfilDeportista): string {
     if (!u.tipo_plan) return '—';
     const nombres: Record<string, string> = { ADULTO: 'Adulto', JUVENIL: 'Juvenil', INFANTIL: 'Infantil' };
