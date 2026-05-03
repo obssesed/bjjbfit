@@ -69,6 +69,11 @@
       <input type="date" [(ngModel)]="filtros.fechaAlta">
     </div>
 
+    <div class="filter-item">
+      <label>Última Graduación</label>
+      <input type="date" [(ngModel)]="filtros.fechaGraduacion">
+    </div>
+
     <div class="filter-actions">
       <button class="btn-clear" (click)="limpiarFiltros()" title="Limpiar filtros">
         ✕ Limpiar
@@ -85,6 +90,7 @@
         <th>Deportista</th>
         <th>Nº Socio</th>
         <th>Cinturón</th>
+        <th>Última Grad.</th>
         <th>Sexo</th>
         <th>Nacimiento</th>
         <th>Contacto</th>
@@ -128,6 +134,10 @@
               ✏️
             </button>
           </div>
+        </td>
+        <td>
+          <span class="registration-date" *ngIf="u.fecha_ultima_graduacion">{{ u.fecha_ultima_graduacion | date:'dd/MM/yyyy' }}</span>
+          <span class="registration-date" *ngIf="!u.fecha_ultima_graduacion">—</span>
         </td>
         <td>
           <span class="sexo-badge" *ngIf="u.sexo === 'M'">♂ Masc.</span>
@@ -242,6 +252,7 @@
       <tr>
         <th>Deportista</th>
         <th>Cinturón</th>
+        <th>Última Grad.</th>
         <th>Contacto</th>
         <th>Activar Plan</th>
         <th>Estado</th>
@@ -262,6 +273,10 @@
               <div class="mini-stripe" *ngFor="let _ of [].constructor(u.grados)"></div>
             </div>
           </div>
+        </td>
+        <td>
+          <span class="registration-date" *ngIf="u.fecha_ultima_graduacion">{{ u.fecha_ultima_graduacion | date:'dd/MM/yyyy' }}</span>
+          <span class="registration-date" *ngIf="!u.fecha_ultima_graduacion">—</span>
         </td>
         <td class="contact-col">
           <span class="contact-item"><span class="contact-icon">@</span>{{ u.email }}</span>

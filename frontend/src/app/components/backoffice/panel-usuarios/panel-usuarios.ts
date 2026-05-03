@@ -37,7 +37,8 @@ export class PanelUsuarios implements OnInit {
     sexo: '',
     categoria: '',
     plan: '',
-    fechaAlta: ''
+    fechaAlta: '',
+    fechaGraduacion: ''
   };
 
   opcionesCinturon: string[] = ['Blanco', 'Azul', 'Morado', 'Marrón', 'Negro', 'Gris', 'Amarillo', 'Naranja', 'Verde'];
@@ -352,9 +353,19 @@ export class PanelUsuarios implements OnInit {
       let cumpleFecha = true;
       if (this.filtros.fechaAlta && u.date_joined) {
         cumpleFecha = u.date_joined.startsWith(this.filtros.fechaAlta);
+      } else if (this.filtros.fechaAlta && !u.date_joined) {
+        cumpleFecha = false;
       }
 
-      return cumpleTexto && cumpleCinturon && cumpleSexo && cumplePlan && cumpleCategoria && cumpleFecha;
+      // 5. Fecha Última Graduación
+      let cumpleFechaGraduacion = true;
+      if (this.filtros.fechaGraduacion && u.fecha_ultima_graduacion) {
+        cumpleFechaGraduacion = u.fecha_ultima_graduacion.startsWith(this.filtros.fechaGraduacion);
+      } else if (this.filtros.fechaGraduacion && !u.fecha_ultima_graduacion) {
+        cumpleFechaGraduacion = false;
+      }
+
+      return cumpleTexto && cumpleCinturon && cumpleSexo && cumplePlan && cumpleCategoria && cumpleFecha && cumpleFechaGraduacion;
     });
   }
 
@@ -365,7 +376,8 @@ export class PanelUsuarios implements OnInit {
       sexo: '',
       categoria: '',
       plan: '',
-      fechaAlta: ''
+      fechaAlta: '',
+      fechaGraduacion: ''
     };
     this.cdr.detectChanges();
   }
@@ -390,7 +402,7 @@ export class PanelUsuarios implements OnInit {
     const cabeceras = [
       'Nombre', 'Apellidos', 'DNI/NIF', 'Nº Socio', 'Email', 'Teléfono',
       'Sexo', 'Fecha Nacimiento', 'Categoría', 'Cinturón', 'Grados',
-      'Plan', 'Familiar', 'Estado', 'Fecha Alta', 'Hijos a Cargo'
+      'Fecha Última Graduación', 'Plan', 'Familiar', 'Estado', 'Fecha Alta', 'Hijos a Cargo'
     ];
 
     const filas = datos.map(({ deportista: u, estado }) => {
@@ -407,11 +419,12 @@ export class PanelUsuarios implements OnInit {
       const hijosCount = u.hijos_a_cargo ? u.hijos_a_cargo.length : 0;
       const fechaNac = u.fecha_nacimiento || '';
       const fechaAlta = u.date_joined ? u.date_joined.split('T')[0] : '';
+      const fechaGraduacion = u.fecha_ultima_graduacion ? u.fecha_ultima_graduacion.split('T')[0] : '';
 
       return [
         u.first_name || '', u.last_name || '', u.nif || '', u.id_interno || '',
         u.email || '', u.telefono || '', sexoLabel, fechaNac, categoria,
-        u.cinturon || '', u.grados ?? '', planLabel, familiarLabel,
+        u.cinturon || '', u.grados ?? '', fechaGraduacion, planLabel, familiarLabel,
         estado, fechaAlta, hijosCount
       ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(separador);
     });

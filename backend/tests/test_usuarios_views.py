@@ -116,3 +116,59 @@ class TestUsuariosViews:
         response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'tipo_plan': 'INEXISTENTE'})
         assert response.status_code == 400
 
+    def test_actualizar_graduacion_actualiza_fecha(self, auth_client):
+        """Verifica que actualizar la graduación vía API asigne la fecha del día de hoy a fecha_ultima_graduacion."""
+        staff = Deportista.objects.create_superuser(
+            username="admin_grad", password="123", email="grad@ad.com"
+        )
+        deportista = Deportista.objects.create_user(
+            username="alumno_grad", password="123", email="grad@test.com", cinturon="Blanco", grados=0
+        )
+        auth_client.force_authenticate(user=staff)
+
+        # Simular que la fecha era nula o antigua
+        deportista.fecha_ultima_graduacion = None
+        deportista.save()
+
+        # Actualizar a Azul 1 grado
+        response = auth_client.post(f'/api/deportistas/{deportista.id}/actualizar_graduacion/', {
+            'cinturon': 'Azul',
+            'grados': 1
+        })
+        assert response.status_code == 200
+
+        deportista.refresh_from_db()
+        assert deportista.cinturon == 'Azul'
+        assert deportista.grados == 1
+        assert deportista.fecha_ultima_graduacion == timezone.now().date()
+
+    def test_reporte_ingresos_aplica_descuento_familiar(self, auth_client):
+        """Verifica que el reporte suma las cuotas y aplica el 50% de descuento a familiares."""
+        from decimal import Decimal
+        from usuarios.models import Plan
+        
+        staff = Deportista.objects.create_superuser(
+            username="admin_reporte", password="123", email="rep@ad.com"
+        )
+        plan_test = Plan.objects.create(nombre="Test Plan", precio_base=Decimal('100.00'), activo=True)
+        
+        # Usuario normal (100€)
+        Deportista.objects.create_user(
+            username="usuario_normal", email="n@n.com", plan_activo=True, tipo_plan=plan_test, es_familiar=False
+        )
+        # Usuario familiar (50€)
+        Deportista.objects.create_user(
+            username="usuario_familiar", email="f@f.com", plan_activo=True, tipo_plan=plan_test, es_familiar=True
+        )
+        
+        auth_client.force_authenticate(user=staff)
+        response = auth_client.get('/api/deportistas/reporte_ingresos/')
+        assert response.status_code == 200
+        
+        data = response.json()
+        # 100 + 50 = 150
+        assert data['mes_actual']['total'] == 150.0
+        assert 'etiqueta' in data['mes_actual']
+        assert 'etiqueta' in data['mes_anterior']
+        assert 'etiqueta' in data['hace_dos_meses']
+

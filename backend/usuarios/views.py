@@ -2,6 +2,7 @@ from django.utils import timezone
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from decimal import Decimal
 from .models import Deportista, Plan
 from .serializers import DeportistaSerializer, PlanSerializer
 
@@ -135,10 +136,10 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         nuevos_grados = request.data.get('grados')
 
         if nuevo_cinturon is not None:
-            # Si el cinturón cambia, reseteamos grados a 0
+            # Si el cinturón cambia, asignamos el nuevo cinturón y los grados (o 0 por defecto)
             if nuevo_cinturon != deportista.cinturon:
                 deportista.cinturon = nuevo_cinturon
-                deportista.grados = 0
+                deportista.grados = nuevos_grados if nuevos_grados is not None else 0
             elif nuevos_grados is not None:
                 # Si es el mismo cinturón, solo actualizamos grados
                 deportista.grados = nuevos_grados
@@ -160,6 +161,63 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         deportista.id_interno = nuevo_id
         deportista.save()
         return Response({'success': f'Nº Socio de {deportista.first_name} actualizado a {nuevo_id}.'})
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def reporte_ingresos(self, request):
+        """
+        Calcula una estimación de ingresos en tiempo real basada en los planes
+        activos actuales y la antigüedad de los usuarios (mes actual, -1, -2).
+        Aplica el 50% de descuento a las cuentas marcadas como 'es_familiar'.
+        """
+        hoy = timezone.now().date()
+        mes_actual = hoy.replace(day=1)
+        
+        # Retroceder 1 mes
+        ultimo_dia_mes_ant = mes_actual - timezone.timedelta(days=1)
+        mes_anterior = ultimo_dia_mes_ant.replace(day=1)
+        
+        # Retroceder 2 meses
+        ultimo_dia_hace_2 = mes_anterior - timezone.timedelta(days=1)
+        hace_dos_meses = ultimo_dia_hace_2.replace(day=1)
+        
+        MESES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+        
+        usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
+        
+        ingresos_actual = Decimal('0.00')
+        ingresos_anterior = Decimal('0.00')
+        ingresos_hace_2 = Decimal('0.00')
+        
+        for u in usuarios:
+            precio = u.tipo_plan.precio_base
+            if u.es_familiar:
+                precio = precio * Decimal('0.5')
+                
+            # Siempre se cobra en el mes actual si están activos hoy
+            ingresos_actual += precio
+            
+            # Si se dieron de alta antes del día 1 del mes actual, se asume que pagaron el mes anterior
+            if u.date_joined.date() < mes_actual:
+                ingresos_anterior += precio
+                
+            # Si se dieron de alta antes del día 1 del mes anterior, pagaron hace 2 meses
+            if u.date_joined.date() < mes_anterior:
+                ingresos_hace_2 += precio
+                
+        return Response({
+            'mes_actual': {
+                'etiqueta': f"{MESES_ES[hoy.month-1]} {hoy.year}",
+                'total': float(ingresos_actual)
+            },
+            'mes_anterior': {
+                'etiqueta': f"{MESES_ES[mes_anterior.month-1]} {mes_anterior.year}",
+                'total': float(ingresos_anterior)
+            },
+            'hace_dos_meses': {
+                'etiqueta': f"{MESES_ES[hace_dos_meses.month-1]} {hace_dos_meses.year}",
+                'total': float(ingresos_hace_2)
+            }
+        })
 
 class PlanViewSet(viewsets.ModelViewSet):
     """

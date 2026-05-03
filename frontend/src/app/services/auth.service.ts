@@ -197,4 +197,9 @@ export class AuthService {
   propagarClases(id: number, config: { fecha_inicio: string, fecha_fin: string, dias_semana: number[] }): Observable<any> {
     return this.http.post(`${this.apiUrl}/programacion/${id}/propagar/`, config);
   }
+
+  // --- Reportes y Métricas ---
+  getReporteIngresos(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/deportistas/reporte_ingresos/`);
+  }
 }

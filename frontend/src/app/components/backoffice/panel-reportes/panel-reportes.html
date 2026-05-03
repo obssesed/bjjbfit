@@ -1,0 +1,47 @@
+<div class="panel-header">
+  <h3>Métricas de Ingresos Estimados</h3>
+  <p>Estimación de facturación en tiempo real en base a las cuotas de los usuarios actualmente activos.</p>
+</div>
+
+<div *ngIf="loading" class="state-msg">
+  Calculando ingresos en tiempo real...
+</div>
+
+<div *ngIf="error" class="state-msg error">
+  {{ error }}
+</div>
+
+<div *ngIf="!loading && !error && reporte" class="reportes-grid">
+  
+  <div class="metric-card current-month">
+    <div class="metric-icon">💰</div>
+    <div class="metric-content">
+      <h4>{{ reporte.mes_actual.etiqueta }} (Actual)</h4>
+      <div class="metric-value">{{ reporte.mes_actual.total | currency:'EUR' }}</div>
+      <p class="metric-desc">Ingresos del mes en curso</p>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">📈</div>
+    <div class="metric-content">
+      <h4>{{ reporte.mes_anterior.etiqueta }}</h4>
+      <div class="metric-value">{{ reporte.mes_anterior.total | currency:'EUR' }}</div>
+      <p class="metric-desc">Ingresos estimados mes anterior</p>
+    </div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">📊</div>
+    <div class="metric-content">
+      <h4>{{ reporte.hace_dos_meses.etiqueta }}</h4>
+      <div class="metric-value">{{ reporte.hace_dos_meses.total | currency:'EUR' }}</div>
+      <p class="metric-desc">Ingresos estimados hace 2 meses</p>
+    </div>
+  </div>
+
+</div>
+
+<div *ngIf="!loading && !error && reporte" class="info-alert">
+  <strong>Nota:</strong> Estos valores son una estimación dinámica. Asumen que todos los usuarios con "Plan Activo" han pagado su cuota en el mes correspondiente según su fecha de alta y su plan vigente. Si un usuario tiene activado el modo <strong>"Familiar"</strong>, se aplica de manera automática el 50% de descuento.
+</div>

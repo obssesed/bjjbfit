@@ -169,9 +169,9 @@
 .sexo-badge {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #60a5fa;
+  color: #cbd5e1;
 }
-.sexo-badge.fem { color: #f472b6; }
+.sexo-badge.fem { color: #cbd5e1; }
 .sexo-badge.nd { color: var(--text-muted); }
 
 /* === Estado + Baja === */

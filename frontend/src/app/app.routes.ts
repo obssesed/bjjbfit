@@ -8,6 +8,7 @@ import { Backoffice } from './components/backoffice/backoffice/backoffice';
 import { PanelUsuarios } from './components/backoffice/panel-usuarios/panel-usuarios';
 import { PanelPlanes } from './components/backoffice/panel-planes/panel-planes';
 import { PanelProgramacion } from './components/backoffice/panel-programacion/panel-programacion';
+import { PanelReportesComponent } from './components/backoffice/panel-reportes/panel-reportes';
 
 export const routes: Routes = [
   { path: '', component: ListaClasesComponent },
@@ -22,6 +23,7 @@ export const routes: Routes = [
       { path: 'usuarios', component: PanelUsuarios },
       { path: 'planes', component: PanelPlanes },
       { path: 'clases', component: PanelProgramacion },
+      { path: 'reportes', component: PanelReportesComponent },
       { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
     ]
   },
