@@ -1,8 +1,11 @@
 .panel-header {
   margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.panel-header h3 {
+.header-titles h3 {
   font-size: 1.8rem;
   font-weight: 800;
   margin: 0;
@@ -10,7 +13,7 @@
   letter-spacing: -0.5px;
 }
 
-.panel-header p {
+.header-titles p {
   color: var(--text-secondary);
   margin-top: 0.5rem;
 }
@@ -125,3 +128,122 @@
 .info-alert strong {
   color: #facc15;
 }
+
+.metric-card {
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.metric-card.active-card {
+  border-color: #3b82f6;
+  background: rgba(37, 99, 235, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+}
+
+.btn-export {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.btn-export:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.breakdown-section {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.breakdown-section h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+  font-size: 1.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 1rem;
+}
+
+.breakdown-stats {
+  display: flex;
+  gap: 3rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-item.highlight .stat-val {
+  color: #10b981;
+  font-weight: 800;
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-val {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.breakdown-table th, .breakdown-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.breakdown-table th {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+.breakdown-table td {
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.breakdown-table .money-val {
+  font-weight: 700;
+  color: #60a5fa;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+

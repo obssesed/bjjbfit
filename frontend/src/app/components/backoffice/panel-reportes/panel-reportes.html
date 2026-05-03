@@ -1,6 +1,11 @@
 <div class="panel-header">
-  <h3>Métricas de Ingresos Estimados</h3>
-  <p>Estimación de facturación en tiempo real en base a las cuotas de los usuarios actualmente activos.</p>
+  <div class="header-titles">
+    <h3>Métricas de Ingresos Estimados</h3>
+    <p>Estimación de facturación en tiempo real en base a las cuotas de los usuarios actualmente activos.</p>
+  </div>
+  <button class="btn-export" (click)="exportarCSV()" *ngIf="!loading && !error && reporte">
+    <span class="icon">⬇️</span> Exportar CSV
+  </button>
 </div>
 
 <div *ngIf="loading" class="state-msg">
@@ -13,7 +18,9 @@
 
 <div *ngIf="!loading && !error && reporte" class="reportes-grid">
   
-  <div class="metric-card current-month">
+  <div class="metric-card" 
+       [class.active-card]="mesSeleccionado === 'mes_actual'" 
+       (click)="seleccionarMes('mes_actual')">
     <div class="metric-icon">💰</div>
     <div class="metric-content">
       <h4>{{ reporte.mes_actual.etiqueta }} (Actual)</h4>
@@ -22,7 +29,9 @@
     </div>
   </div>
 
-  <div class="metric-card">
+  <div class="metric-card" 
+       [class.active-card]="mesSeleccionado === 'mes_anterior'" 
+       (click)="seleccionarMes('mes_anterior')">
     <div class="metric-icon">📈</div>
     <div class="metric-content">
       <h4>{{ reporte.mes_anterior.etiqueta }}</h4>
@@ -31,7 +40,9 @@
     </div>
   </div>
 
-  <div class="metric-card">
+  <div class="metric-card" 
+       [class.active-card]="mesSeleccionado === 'hace_dos_meses'" 
+       (click)="seleccionarMes('hace_dos_meses')">
     <div class="metric-icon">📊</div>
     <div class="metric-content">
       <h4>{{ reporte.hace_dos_meses.etiqueta }}</h4>
@@ -40,6 +51,45 @@
     </div>
   </div>
 
+</div>
+
+<div *ngIf="!loading && !error && reporte && reporte[mesSeleccionado]" class="breakdown-section">
+  <h3>Desglose de {{ reporte[mesSeleccionado].etiqueta }}</h3>
+  
+  <div class="breakdown-stats">
+    <div class="stat-item">
+      <span class="stat-label">Usuarios Activos:</span>
+      <span class="stat-val">{{ reporte[mesSeleccionado].usuarios_activos }}</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Planes Familiares (50%):</span>
+      <span class="stat-val">{{ reporte[mesSeleccionado].usuarios_familiares }}</span>
+    </div>
+    <div class="stat-item highlight">
+      <span class="stat-label">Total Ingresos:</span>
+      <span class="stat-val">{{ reporte[mesSeleccionado].total | currency:'EUR' }}</span>
+    </div>
+  </div>
+
+  <table class="breakdown-table">
+    <thead>
+      <tr>
+        <th>Tipo de Plan</th>
+        <th>Usuarios Facturados</th>
+        <th>Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let plan of reporte[mesSeleccionado].desglose">
+        <td>{{ plan.plan }}</td>
+        <td>{{ plan.cantidad }}</td>
+        <td class="money-val">{{ plan.ingresos | currency:'EUR' }}</td>
+      </tr>
+      <tr *ngIf="!reporte[mesSeleccionado].desglose || reporte[mesSeleccionado].desglose.length === 0">
+        <td colspan="3" class="text-center">No hay datos para este mes.</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <div *ngIf="!loading && !error && reporte" class="info-alert">

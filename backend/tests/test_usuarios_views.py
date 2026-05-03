@@ -19,6 +19,9 @@ class TestUsuariosViews:
         assert response.status_code == 403
 
     def test_activos_backoffice_permite_staff_y_filtra_activos(self, auth_client):
+        from usuarios.models import Plan
+        from decimal import Decimal
+        plan_test = Plan.objects.create(nombre="ADULTO", precio_base=Decimal('60.00'), activo=True)
         # Crear staff
         staff = Deportista.objects.create_superuser(
             username="admin_test", password="123", email="ad@ad.com", plan_activo=True
@@ -30,7 +33,7 @@ class TestUsuariosViews:
         # Crear usuario inactivo que ya tuvo plan (baja)
         user_baja = Deportista.objects.create_user(
             username="user_baja", password="123", email="c@c.com", plan_activo=False, 
-            first_name="Zac", tipo_plan="ADULTO"
+            first_name="Zac", tipo_plan=plan_test
         )
 
         # Crear usuario pendiente SIN historial de reservas y SIN plan (alta nueva)
@@ -65,6 +68,9 @@ class TestUsuariosViews:
 
     def test_activar_plan(self, auth_client):
         """Verifica que el admin puede activar un plan para un deportista."""
+        from usuarios.models import Plan
+        from decimal import Decimal
+        plan = Plan.objects.create(nombre="ADULTO", precio_base=Decimal('60.00'), activo=True)
         staff = Deportista.objects.create_superuser(
             username="admin_plan", password="123", email="plan@ad.com"
         )
@@ -74,16 +80,19 @@ class TestUsuariosViews:
         auth_client.force_authenticate(user=staff)
 
         # Activar plan mensual adulto
-        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'tipo_plan': 'ADULTO'})
+        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'plan_id': plan.id})
         assert response.status_code == 200
 
         deportista.refresh_from_db()
         assert deportista.plan_activo is True
-        assert deportista.tipo_plan == 'ADULTO'
+        assert deportista.tipo_plan == plan
         assert deportista.es_familiar is False
 
     def test_activar_plan_familiar(self, auth_client):
         """Verifica que se puede activar un plan con flag familiar."""
+        from usuarios.models import Plan
+        from decimal import Decimal
+        plan = Plan.objects.create(nombre="JUVENIL", precio_base=Decimal('40.00'), activo=True)
         staff = Deportista.objects.create_superuser(
             username="admin_fam", password="123", email="fam@ad.com"
         )
@@ -93,14 +102,14 @@ class TestUsuariosViews:
         auth_client.force_authenticate(user=staff)
 
         response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {
-            'tipo_plan': 'JUVENIL',
+            'plan_id': plan.id,
             'es_familiar': True
         })
         assert response.status_code == 200
 
         deportista.refresh_from_db()
         assert deportista.plan_activo is True
-        assert deportista.tipo_plan == 'JUVENIL'
+        assert deportista.tipo_plan == plan
         assert deportista.es_familiar is True
 
     def test_activar_plan_rechaza_tipo_invalido(self, auth_client):
@@ -113,7 +122,7 @@ class TestUsuariosViews:
         )
         auth_client.force_authenticate(user=staff)
 
-        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'tipo_plan': 'INEXISTENTE'})
+        response = auth_client.post(f'/api/deportistas/{deportista.id}/activar_plan/', {'plan_id': 9999})
         assert response.status_code == 400
 
     def test_actualizar_graduacion_actualiza_fecha(self, auth_client):
@@ -168,7 +177,52 @@ class TestUsuariosViews:
         data = response.json()
         # 100 + 50 = 150
         assert data['mes_actual']['total'] == 150.0
+        assert data['mes_actual']['usuarios_activos'] == 2
+        assert data['mes_actual']['usuarios_familiares'] == 1
+        assert len(data['mes_actual']['desglose']) == 1
+        assert data['mes_actual']['desglose'][0]['plan'] == 'Test Plan'
+        assert data['mes_actual']['desglose'][0]['cantidad'] == 2
+        assert data['mes_actual']['desglose'][0]['ingresos'] == 150.0
+
         assert 'etiqueta' in data['mes_actual']
         assert 'etiqueta' in data['mes_anterior']
         assert 'etiqueta' in data['hace_dos_meses']
 
+    def test_reporte_ingresos_desglose_correcto(self, auth_client):
+        """Verifica que el desglose agrupe correctamente los planes en el mes."""
+        from decimal import Decimal
+        from usuarios.models import Plan
+        
+        staff = Deportista.objects.create_superuser(
+            username="admin_reporte_2", password="123", email="rep2@ad.com"
+        )
+        plan_adulto = Plan.objects.create(nombre="Plan Adulto", precio_base=Decimal('60.00'), activo=True)
+        plan_infantil = Plan.objects.create(nombre="Plan Infantil", precio_base=Decimal('40.00'), activo=True)
+        
+        # 2 Adultos
+        Deportista.objects.create_user(username="u1", email="u1@a.com", plan_activo=True, tipo_plan=plan_adulto)
+        Deportista.objects.create_user(username="u2", email="u2@a.com", plan_activo=True, tipo_plan=plan_adulto)
+        # 1 Infantil familiar
+        Deportista.objects.create_user(username="u3", email="u3@a.com", plan_activo=True, tipo_plan=plan_infantil, es_familiar=True)
+
+        auth_client.force_authenticate(user=staff)
+        response = auth_client.get('/api/deportistas/reporte_ingresos/')
+        assert response.status_code == 200
+        
+        data = response.json()
+        mes_actual = data['mes_actual']
+        assert mes_actual['usuarios_activos'] == 3
+        assert mes_actual['usuarios_familiares'] == 1
+        assert mes_actual['total'] == 140.0  # 60 + 60 + 20
+        
+        # El desglose debe estar ordenado alfabéticamente por defecto
+        desglose = mes_actual['desglose']
+        assert len(desglose) == 2
+        
+        assert desglose[0]['plan'] == 'Plan Adulto'
+        assert desglose[0]['cantidad'] == 2
+        assert desglose[0]['ingresos'] == 120.0
+        
+        assert desglose[1]['plan'] == 'Plan Infantil'
+        assert desglose[1]['cantidad'] == 1
+        assert desglose[1]['ingresos'] == 20.0

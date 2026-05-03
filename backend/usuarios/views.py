@@ -184,39 +184,61 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
         
-        ingresos_actual = Decimal('0.00')
-        ingresos_anterior = Decimal('0.00')
-        ingresos_hace_2 = Decimal('0.00')
+        data_actual = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}}
+        data_anterior = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}}
+        data_hace_2 = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}}
         
+        def registrar_ingreso(data_mes, plan_nombre, precio, es_fam):
+            data_mes['total'] += precio
+            data_mes['activos'] += 1
+            if es_fam:
+                data_mes['familiares'] += 1
+            if plan_nombre not in data_mes['desglose']:
+                data_mes['desglose'][plan_nombre] = {'cantidad': 0, 'ingresos': Decimal('0.00')}
+            data_mes['desglose'][plan_nombre]['cantidad'] += 1
+            data_mes['desglose'][plan_nombre]['ingresos'] += precio
+
         for u in usuarios:
             precio = u.tipo_plan.precio_base
-            if u.es_familiar:
+            plan_nombre = u.tipo_plan.nombre
+            es_fam = u.es_familiar
+            
+            if es_fam:
                 precio = precio * Decimal('0.5')
                 
             # Siempre se cobra en el mes actual si están activos hoy
-            ingresos_actual += precio
+            registrar_ingreso(data_actual, plan_nombre, precio, es_fam)
             
             # Si se dieron de alta antes del día 1 del mes actual, se asume que pagaron el mes anterior
             if u.date_joined.date() < mes_actual:
-                ingresos_anterior += precio
+                registrar_ingreso(data_anterior, plan_nombre, precio, es_fam)
                 
             # Si se dieron de alta antes del día 1 del mes anterior, pagaron hace 2 meses
             if u.date_joined.date() < mes_anterior:
-                ingresos_hace_2 += precio
+                registrar_ingreso(data_hace_2, plan_nombre, precio, es_fam)
+                
+        def format_response(data_mes, etiqueta):
+            desglose = []
+            for nombre, stats in data_mes['desglose'].items():
+                desglose.append({
+                    'plan': nombre,
+                    'cantidad': stats['cantidad'],
+                    'ingresos': float(stats['ingresos'])
+                })
+            desglose.sort(key=lambda x: x['plan'])
+
+            return {
+                'etiqueta': etiqueta,
+                'total': float(data_mes['total']),
+                'usuarios_activos': data_mes['activos'],
+                'usuarios_familiares': data_mes['familiares'],
+                'desglose': desglose
+            }
                 
         return Response({
-            'mes_actual': {
-                'etiqueta': f"{MESES_ES[hoy.month-1]} {hoy.year}",
-                'total': float(ingresos_actual)
-            },
-            'mes_anterior': {
-                'etiqueta': f"{MESES_ES[mes_anterior.month-1]} {mes_anterior.year}",
-                'total': float(ingresos_anterior)
-            },
-            'hace_dos_meses': {
-                'etiqueta': f"{MESES_ES[hace_dos_meses.month-1]} {hace_dos_meses.year}",
-                'total': float(ingresos_hace_2)
-            }
+            'mes_actual': format_response(data_actual, f"{MESES_ES[hoy.month-1]} {hoy.year}"),
+            'mes_anterior': format_response(data_anterior, f"{MESES_ES[mes_anterior.month-1]} {mes_anterior.year}"),
+            'hace_dos_meses': format_response(data_hace_2, f"{MESES_ES[hace_dos_meses.month-1]} {hace_dos_meses.year}")
         })
 
 class PlanViewSet(viewsets.ModelViewSet):
