@@ -238,3 +238,20 @@
     </div>
   </div>
 </div>
+
+<!-- MODAL: Error -->
+<div class="modal-overlay" *ngIf="mostrarModalError" (click)="mostrarModalError = false">
+  <div class="modal-content error-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 style="color: #ef4444;">❌ Error</h2>
+    </div>
+    <div class="modal-body text-center">
+      <div class="error-icon-large">🚫</div>
+      <h3>No se pudo completar</h3>
+      <p>{{ mensajeError }}</p>
+    </div>
+    <div class="modal-footer" style="justify-content: center;">
+      <button class="btn-primary" (click)="mostrarModalError = false">Aceptar</button>
+    </div>
+  </div>
+</div>

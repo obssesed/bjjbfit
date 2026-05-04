@@ -414,3 +414,14 @@ select option {
   border-radius: 8px;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
+
+/* Modal Error */
+.error-modal {
+  max-width: 400px;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.error-icon-large {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}

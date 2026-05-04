@@ -42,6 +42,8 @@ export class PanelProgramacion implements OnInit {
 
   // Formulario Clase Puntual
   mostrarModalClasePuntual = false;
+  mostrarModalError = false;
+  mensajeError = '';
   fechaSeleccionadaParaClase: Date | null = null;
   configClasePuntual = {
     plantilla_id: null as number | null,
@@ -280,7 +282,10 @@ export class PanelProgramacion implements OnInit {
         this.mostrarModalClasePuntual = false;
         this.cargarCalendario();
       },
-      error: () => alert('Error al crear la clase puntual.')
+      error: (err) => {
+        this.mensajeError = err.error?.non_field_errors?.[0] || err.error?.[0] || 'Error al crear la clase puntual.';
+        this.mostrarModalError = true;
+      }
     });
   }
 
