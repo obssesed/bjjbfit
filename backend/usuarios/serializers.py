@@ -27,7 +27,7 @@ class DeportistaSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Deportista
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'tipo_plan', 'categoria_plan', 'es_familiar', 'telefono', 'nif', 'sexo', 'fecha_nacimiento', 'cuenta_bancaria', 'id_interno', 'hijos_a_cargo', 'is_staff', 'date_joined']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'cinturon', 'grados', 'fecha_ultima_graduacion', 'plan_activo', 'tipo_plan', 'categoria_plan', 'es_familiar', 'telefono', 'nif', 'sexo', 'fecha_nacimiento', 'cuenta_bancaria', 'metodo_pago', 'id_interno', 'hijos_a_cargo', 'is_staff', 'date_joined']
         extra_kwargs = {
             'password': {'write_only': True},
             'first_name': {'required': True, 'allow_blank': False},

@@ -1,3 +1,4 @@
+<!-- Panel de Gestión de Usuarios - Bjjfit -->
 <div class="panel-header">
   <h3>Deportistas Activos</h3>
   <p>Gestión de altas y seguimiento del alumnado matriculado.</p>
@@ -89,6 +90,7 @@
       <tr>
         <th>Deportista</th>
         <th>Nº Socio</th>
+        <th>Abono</th>
         <th>Cinturón</th>
         <th>Última Grad.</th>
         <th>Sexo</th>
@@ -110,15 +112,33 @@
         <td>
           <div class="id-interno-cell">
             <div *ngIf="editandoIdSocio !== u.id" class="id-display" (click)="editandoIdSocio = u.id">
-              <span class="id-value">{{ u.id_interno || 'S/N' }}</span>
+              <span class="id-value">{{ $any(u).id_interno || 'S/N' }}</span>
               <span class="edit-hint">✏️</span>
             </div>
             <div *ngIf="editandoIdSocio === u.id" class="id-edit">
-              <input type="text" [(ngModel)]="u.id_interno" 
+              <input type="text" [(ngModel)]="$any(u).id_interno" 
                      (keyup.enter)="guardarIdInterno(u)"
                      class="control-input small-input" 
                      placeholder="Nº..." autofocus>
               <button class="btn-save-inline" (click)="guardarIdInterno(u)">✔️</button>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="payment-cell">
+            <select [(ngModel)]="$any(u).metodo_pago" (change)="cambiarMetodoPago(u)" class="payment-select">
+              <option value="EFECTIVO">💵 Efec.</option>
+              <option value="CUENTA">🏦 Cta.</option>
+            </select>
+            
+            <div class="iban-status" *ngIf="$any(u).metodo_pago === 'CUENTA'">
+              <span *ngIf="$any(u).cuenta_bancaria" class="iban-check" title="Cuenta configurada">✔️ C.C.</span>
+              <button *ngIf="!$any(u).cuenta_bancaria" class="btn-add-iban" (click)="abrirModalCuenta(u)" title="Añadir Nº Cuenta">
+                ⚠️ Añadir
+              </button>
+              <button *ngIf="$any(u).cuenta_bancaria" class="btn-edit-iban" (click)="abrirModalCuenta(u)" title="Editar Nº Cuenta">
+                ✏️
+              </button>
             </div>
           </div>
         </td>
@@ -416,6 +436,34 @@
       <button class="btn-cancel" (click)="cerrarGraduacionModal()">Cancelar</button>
       <button class="btn-confirm" [disabled]="activandoId === deportistaSeleccionado.id" (click)="confirmarGraduacion()">
         {{ activandoId === deportistaSeleccionado.id ? 'Guardando...' : 'Confirmar Graduación' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL: Cuenta Bancaria ====== -->
+<div class="modal-overlay" *ngIf="showCuentaModal && deportistaSeleccionado">
+  <div class="modal-card">
+    <h3 class="modal-title">Configurar Cuenta</h3>
+    <p class="modal-subtitle">
+      Introduce el IBAN para
+      <strong style="color: #93c5fd;">{{ deportistaSeleccionado.first_name }} {{ deportistaSeleccionado.last_name }}</strong>
+    </p>
+
+    <div class="modal-plan-form">
+      <label class="modal-form-label">Número de Cuenta / IBAN</label>
+      <input type="text" [(ngModel)]="deportistaSeleccionado.cuenta_bancaria" 
+             class="control-input" placeholder="ES00 0000 0000 0000 0000 0000"
+             style="width: 100%; margin-top: 0.5rem; text-align: center; font-family: monospace; letter-spacing: 1px;">
+      <p class="modal-detail" style="margin-top: 1rem; color: #94a3b8; font-size: 0.8rem;">
+        * Este dato solo se utilizará para la generación de reportes administrativos y remesas.
+      </p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarModalCuenta()">Cancelar</button>
+      <button class="btn-confirm" [disabled]="activandoId === deportistaSeleccionado.id" (click)="confirmarCuenta()">
+        {{ activandoId === deportistaSeleccionado.id ? 'Guardando...' : 'Guardar Cuenta' }}
       </button>
     </div>
   </div>

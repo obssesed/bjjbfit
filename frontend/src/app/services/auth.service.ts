@@ -30,6 +30,7 @@ export interface HijoDelegado {
   plan_activo: boolean;
   cinturon: string;
   categoria_plan?: string;
+  id_interno?: string;
 }
 
 export interface PerfilDeportista {
@@ -42,16 +43,18 @@ export interface PerfilDeportista {
   grados: number;
   fecha_ultima_graduacion?: string;
   plan_activo: boolean;
-  tipo_plan?: number; // Ahora es el ID del objeto Plan
+  tipo_plan?: number;
   categoria_plan?: string;
   es_familiar?: boolean;
-  tipo_plan_seleccionado?: number; // UI Temporary state
-  es_familiar_seleccionado?: boolean; // UI Temporary state
+  tipo_plan_seleccionado?: number;
+  es_familiar_seleccionado?: boolean;
   telefono?: string;
   nif?: string;
   sexo?: string;
   fecha_nacimiento?: string;
   id_interno?: string;
+  cuenta_bancaria?: string;
+  metodo_pago?: 'EFECTIVO' | 'CUENTA';
   date_joined?: string;
   hijos_a_cargo: HijoDelegado[];
   is_staff: boolean;
@@ -67,7 +70,6 @@ export class AuthService {
   private apiUrl = 'http://127.0.0.1:8000/api';
   private planesUrl = 'http://127.0.0.1:8000/api/planes/';
   
-  // Usamos BehaviorSubject para asegurar que Angular detecte cambios desde el Nav
   public loggedIn$ = new BehaviorSubject<boolean>(this.checkToken());
   public isStaff$ = new BehaviorSubject<boolean>(false);
   
@@ -148,8 +150,13 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_id_interno/`, { id_interno: idInterno });
   }
 
+  actualizarDatosPago(deportistaId: number, metodoPago: string, cuentaBancaria: string): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/deportistas/${deportistaId}/`, { 
+      metodo_pago: metodoPago, 
+      cuenta_bancaria: cuentaBancaria 
+    });
+  }
 
-  // --- Gestión de Planes ---
   getPlanes(): Observable<Plan[]> {
     return this.http.get<Plan[]>(this.planesUrl);
   }
@@ -177,7 +184,6 @@ export class AuthService {
     return this.loggedIn$.value;
   }
 
-  // --- Gestión de Programación (Plantillas) ---
   getPlantillas(): Observable<PlantillaClase[]> {
     return this.http.get<PlantillaClase[]>(`${this.apiUrl}/programacion/`);
   }
@@ -210,7 +216,6 @@ export class AuthService {
     return this.http.delete(`${this.apiUrl}/clases/${id}/`);
   }
 
-  // --- Reportes y Métricas ---
   getReporteIngresos(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/deportistas/reporte_ingresos/`);
   }

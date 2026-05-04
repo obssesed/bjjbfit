@@ -100,6 +100,12 @@ class Deportista(AbstractUser):
         null=True,
         help_text="IBAN o cuenta (solo lo ve el admin)."
     )
+    metodo_pago = models.CharField(
+        max_length=20,
+        choices=[('EFECTIVO', 'Efectivo'), ('CUENTA', 'Cuenta')],
+        default='EFECTIVO',
+        help_text="Método de pago preferente del deportista."
+    )
     
     # --- Membresías y Roles ---
     plan_activo = models.BooleanField(

@@ -1,3 +1,4 @@
+/** Componente para la gestión de usuarios del gimnasio */
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,7 @@ export class PanelUsuarios implements OnInit {
   showBajaModal: boolean = false;
   showCambioPlanModal: boolean = false;
   showGraduacionModal: boolean = false;
+  showCuentaModal: boolean = false;
   deportistaSeleccionado: PerfilDeportista | null = null;
   editandoIdSocio: number | null = null; // Para edición inline del Nº Socio
 
@@ -309,6 +311,65 @@ export class PanelUsuarios implements OnInit {
     });
   }
 
+  // === Gestión de Pagos e IBAN ===
+  cambiarMetodoPago(deportista: PerfilDeportista) {
+    this.activandoId = deportista.id;
+    this.cdr.detectChanges();
+
+    this.authService.actualizarDatosPago(deportista.id, deportista.metodo_pago || 'EFECTIVO', deportista.cuenta_bancaria || '').subscribe({
+      next: () => {
+        this.activandoId = null;
+        this.mensajeExito = `Método de pago actualizado para ${deportista.first_name}.`;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 3000);
+      },
+      error: () => {
+        this.activandoId = null;
+        this.mensajeExito = '❌ Error al actualizar método de pago.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  abrirModalCuenta(deportista: PerfilDeportista) {
+    this.deportistaSeleccionado = { ...deportista };
+    this.showCuentaModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarModalCuenta() {
+    this.showCuentaModal = false;
+    this.deportistaSeleccionado = null;
+    this.cdr.detectChanges();
+  }
+
+  confirmarCuenta() {
+    if (!this.deportistaSeleccionado) return;
+
+    this.activandoId = this.deportistaSeleccionado.id;
+    this.cdr.detectChanges();
+
+    this.authService.actualizarDatosPago(
+      this.deportistaSeleccionado.id, 
+      this.deportistaSeleccionado.metodo_pago || 'CUENTA', 
+      this.deportistaSeleccionado.cuenta_bancaria || ''
+    ).subscribe({
+      next: () => {
+        this.activandoId = null;
+        this.showCuentaModal = false;
+        this.mensajeExito = 'Cuenta bancaria guardada correctamente.';
+        this.cargarUsuarios(); // Recargamos para ver el check verde
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: () => {
+        this.activandoId = null;
+        this.mensajeExito = '❌ Error al guardar la cuenta.';
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
 
   // === Gestión de Filtros (Getters Reactivos) ===
   get usuariosActivosFiltrados(): PerfilDeportista[] {
@@ -402,7 +463,7 @@ export class PanelUsuarios implements OnInit {
     const cabeceras = [
       'Nombre', 'Apellidos', 'DNI/NIF', 'Nº Socio', 'Email', 'Teléfono',
       'Sexo', 'Fecha Nacimiento', 'Categoría', 'Cinturón', 'Grados',
-      'Fecha Última Graduación', 'Plan', 'Familiar', 'Estado', 'Fecha Alta', 'Hijos a Cargo'
+      'Fecha Última Graduación', 'Plan', 'Familiar', 'Abono', 'Cuenta Bancaria', 'Estado', 'Fecha Alta', 'Hijos a Cargo'
     ];
 
     const filas = datos.map(({ deportista: u, estado }) => {
@@ -421,11 +482,14 @@ export class PanelUsuarios implements OnInit {
       const fechaAlta = u.date_joined ? u.date_joined.split('T')[0] : '';
       const fechaGraduacion = u.fecha_ultima_graduacion ? u.fecha_ultima_graduacion.split('T')[0] : '';
 
+      const abonoLabel = u.metodo_pago === 'CUENTA' ? 'Cuenta' : 'Efectivo';
+      const iban = u.metodo_pago === 'CUENTA' ? (u.cuenta_bancaria || '') : '';
+
       return [
         u.first_name || '', u.last_name || '', u.nif || '', u.id_interno || '',
         u.email || '', u.telefono || '', sexoLabel, fechaNac, categoria,
         u.cinturon || '', u.grados ?? '', fechaGraduacion, planLabel, familiarLabel,
-        estado, fechaAlta, hijosCount
+        abonoLabel, iban, estado, fechaAlta, hijosCount
       ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(separador);
     });
 
