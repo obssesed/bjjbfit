@@ -202,4 +202,8 @@ export class AuthService {
   getReporteIngresos(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/deportistas/reporte_ingresos/`);
   }
+
+  getReporteAnual(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/deportistas/reporte_anual/`);
+  }
 }

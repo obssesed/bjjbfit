@@ -226,3 +226,33 @@ class TestUsuariosViews:
         assert desglose[1]['plan'] == 'Plan Infantil'
         assert desglose[1]['cantidad'] == 1
         assert desglose[1]['ingresos'] == 20.0
+        
+        assert 'desglose_sexo' in mes_actual
+
+    def test_reporte_anual_devuelve_12_meses(self, auth_client):
+        """Verifica que el endpoint de reporte anual devuelve los últimos 12 meses correctamente."""
+        from decimal import Decimal
+        from usuarios.models import Plan
+        import datetime
+        
+        staff = Deportista.objects.create_superuser(
+            username="admin_anual", password="123", email="anual@ad.com"
+        )
+        plan_test = Plan.objects.create(nombre="Test Anual", precio_base=Decimal('50.00'), activo=True)
+        
+        # Crear un usuario con un plan activo
+        user_anual = Deportista.objects.create_user(
+            username="u_anual", email="ua@a.com", plan_activo=True, tipo_plan=plan_test
+        )
+        
+        auth_client.force_authenticate(user=staff)
+        response = auth_client.get('/api/deportistas/reporte_anual/')
+        assert response.status_code == 200
+        
+        data = response.json()
+        assert len(data) == 12  # Debe haber 12 meses
+        
+        # El mes actual (el último en la lista) debe tener al usuario
+        ultimo_mes = data[-1]
+        assert ultimo_mes['activos'] == 1
+        assert ultimo_mes['total'] == 50.0

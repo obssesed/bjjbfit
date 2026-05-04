@@ -184,38 +184,46 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
         
-        data_actual = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}}
-        data_anterior = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}}
-        data_hace_2 = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}}
+        data_actual = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}, 'sexo': {}}
+        data_anterior = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}, 'sexo': {}}
+        data_hace_2 = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}, 'sexo': {}}
         
-        def registrar_ingreso(data_mes, plan_nombre, precio, es_fam):
+        def registrar_ingreso(data_mes, plan_nombre, precio, es_fam, sexo_val):
             data_mes['total'] += precio
             data_mes['activos'] += 1
             if es_fam:
                 data_mes['familiares'] += 1
+            
             if plan_nombre not in data_mes['desglose']:
                 data_mes['desglose'][plan_nombre] = {'cantidad': 0, 'ingresos': Decimal('0.00')}
             data_mes['desglose'][plan_nombre]['cantidad'] += 1
             data_mes['desglose'][plan_nombre]['ingresos'] += precio
 
+            # Agrupar por sexo
+            s_key = sexo_val if sexo_val in ['M', 'F'] else 'No Especificado'
+            if s_key not in data_mes['sexo']:
+                data_mes['sexo'][s_key] = 0
+            data_mes['sexo'][s_key] += 1
+
         for u in usuarios:
             precio = u.tipo_plan.precio_base
             plan_nombre = u.tipo_plan.nombre
             es_fam = u.es_familiar
+            sexo_val = u.sexo
             
             if es_fam:
                 precio = precio * Decimal('0.5')
                 
             # Siempre se cobra en el mes actual si están activos hoy
-            registrar_ingreso(data_actual, plan_nombre, precio, es_fam)
+            registrar_ingreso(data_actual, plan_nombre, precio, es_fam, sexo_val)
             
             # Si se dieron de alta antes del día 1 del mes actual, se asume que pagaron el mes anterior
             if u.date_joined.date() < mes_actual:
-                registrar_ingreso(data_anterior, plan_nombre, precio, es_fam)
+                registrar_ingreso(data_anterior, plan_nombre, precio, es_fam, sexo_val)
                 
             # Si se dieron de alta antes del día 1 del mes anterior, pagaron hace 2 meses
             if u.date_joined.date() < mes_anterior:
-                registrar_ingreso(data_hace_2, plan_nombre, precio, es_fam)
+                registrar_ingreso(data_hace_2, plan_nombre, precio, es_fam, sexo_val)
                 
         def format_response(data_mes, etiqueta):
             desglose = []
@@ -227,12 +235,21 @@ class DeportistaViewSet(viewsets.ModelViewSet):
                 })
             desglose.sort(key=lambda x: x['plan'])
 
+            desglose_sexo = []
+            for k, v in data_mes['sexo'].items():
+                desglose_sexo.append({
+                    'sexo': 'Masculino' if k == 'M' else ('Femenino' if k == 'F' else k),
+                    'cantidad': v
+                })
+            desglose_sexo.sort(key=lambda x: x['sexo'])
+
             return {
                 'etiqueta': etiqueta,
                 'total': float(data_mes['total']),
                 'usuarios_activos': data_mes['activos'],
                 'usuarios_familiares': data_mes['familiares'],
-                'desglose': desglose
+                'desglose': desglose,
+                'desglose_sexo': desglose_sexo
             }
                 
         return Response({
@@ -240,6 +257,66 @@ class DeportistaViewSet(viewsets.ModelViewSet):
             'mes_anterior': format_response(data_anterior, f"{MESES_ES[mes_anterior.month-1]} {mes_anterior.year}"),
             'hace_dos_meses': format_response(data_hace_2, f"{MESES_ES[hace_dos_meses.month-1]} {hace_dos_meses.year}")
         })
+
+    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
+    def reporte_anual(self, request):
+        """
+        Retorna la evolución de los últimos 12 meses (usuarios activos e ingresos estimados).
+        """
+        hoy = timezone.now().date()
+        MESES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+        
+        meses = []
+        fecha_iter = hoy.replace(day=1)
+        
+        for _ in range(12):
+            meses.append({
+                'fecha_corte': fecha_iter,
+                'etiqueta': f"{MESES_ES[fecha_iter.month-1]} {fecha_iter.year}",
+                'activos': 0,
+                'total': Decimal('0.00')
+            })
+            # Retroceder 1 mes
+            ultimo_dia_mes_ant = fecha_iter - timezone.timedelta(days=1)
+            fecha_iter = ultimo_dia_mes_ant.replace(day=1)
+            
+        usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
+        
+        for u in usuarios:
+            precio = u.tipo_plan.precio_base
+            if u.es_familiar:
+                precio = precio * Decimal('0.5')
+                
+            fecha_alta = u.date_joined.date()
+            
+            for m in meses:
+                # Si el usuario se unió ANTES del día 1 del "mes siguiente" a m['fecha_corte']
+                # Para simplificar, asumimos que todos los activos actuales pagaron en todos los meses pasados
+                # en los que ya estaban dados de alta.
+                # m['fecha_corte'] es el día 1 de ese mes.
+                # Si se unió en Mayo o antes de Mayo, paga Mayo.
+                # Técnicamente si date_joined < (m['fecha_corte'] + 1 mes)
+                
+                # Para calcular el inicio del mes siguiente al m['fecha_corte']
+                if m['fecha_corte'].month == 12:
+                    inicio_mes_siguiente = m['fecha_corte'].replace(year=m['fecha_corte'].year+1, month=1)
+                else:
+                    inicio_mes_siguiente = m['fecha_corte'].replace(month=m['fecha_corte'].month+1)
+                
+                if fecha_alta < inicio_mes_siguiente:
+                    m['activos'] += 1
+                    m['total'] += precio
+
+        # Convertir a formato de respuesta y ordenar cronológicamente (el más antiguo primero)
+        resultado = []
+        for m in reversed(meses):
+            resultado.append({
+                'etiqueta': m['etiqueta'],
+                'activos': m['activos'],
+                'total': float(m['total'])
+            })
+            
+        return Response(resultado)
 
 class PlanViewSet(viewsets.ModelViewSet):
     """

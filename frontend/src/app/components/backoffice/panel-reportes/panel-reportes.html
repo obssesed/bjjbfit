@@ -95,3 +95,45 @@
 <div *ngIf="!loading && !error && reporte" class="info-alert">
   <strong>Nota:</strong> Estos valores son una estimación dinámica. Asumen que todos los usuarios con "Plan Activo" han pagado su cuota en el mes correspondiente según su fecha de alta y su plan vigente. Si un usuario tiene activado el modo <strong>"Familiar"</strong>, se aplica de manera automática el 50% de descuento.
 </div>
+
+<div *ngIf="!loading && !error && reporte" class="dashboard-section">
+  <h3>Visualización Gráfica</h3>
+  
+  <div class="charts-row">
+    <div class="chart-container">
+      <h4>Activos por Sexo ({{ reporte[mesSeleccionado]?.etiqueta }})</h4>
+      <div class="canvas-wrapper">
+        <canvas baseChart *ngIf="pieChartData"
+          [data]="pieChartData"
+          [options]="pieChartOptions"
+          [type]="'doughnut'">
+        </canvas>
+        <p *ngIf="!pieChartData" class="no-data">Sin datos para mostrar</p>
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <h4>Activos por Plan ({{ reporte[mesSeleccionado]?.etiqueta }})</h4>
+      <div class="canvas-wrapper">
+        <canvas baseChart *ngIf="barChartData"
+          [data]="barChartData"
+          [options]="barChartOptions"
+          [type]="'bar'">
+        </canvas>
+        <p *ngIf="!barChartData" class="no-data">Sin datos para mostrar</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-container full-width">
+    <h4>Evolución Anual (Últimos 12 meses)</h4>
+    <div class="canvas-wrapper-large">
+      <canvas baseChart *ngIf="lineChartData"
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="'line'">
+      </canvas>
+      <p *ngIf="!lineChartData" class="no-data">Cargando datos anuales...</p>
+    </div>
+  </div>
+</div>
