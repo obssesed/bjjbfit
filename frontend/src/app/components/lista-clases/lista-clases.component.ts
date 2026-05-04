@@ -65,6 +65,17 @@ export class ListaClasesComponent implements OnInit {
     }
   }
 
+  esImagen(icono: string | null | undefined): boolean {
+    if (!icono) return false;
+    return icono.includes('/') || icono.includes('.') || icono.startsWith('http');
+  }
+
+  getImagenUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    return `http://localhost:8000${url}`;
+  }
+
   cargarMisReservas() {
     this.clasesService.getMisReservas().subscribe({
       next: (data) => {

@@ -20,7 +20,9 @@
 <!-- Listado de Plantillas -->
 <div class="plantillas-grid" *ngIf="!cargando && plantillas.length > 0">
   <div class="plantilla-card" *ngFor="let p of plantillas">
-    <div class="card-icon">{{ p.icono }}</div>
+    <div class="card-icon" *ngIf="p.imagen_icono || esImagen(p.icono)">
+      <img [src]="getImagenUrl(p.imagen_icono || p.icono)" alt="Icono" class="class-img-icon">
+    </div>
     <div class="card-info">
       <h3>{{ p.titulo }}</h3>
       <div class="card-meta">
@@ -77,7 +79,9 @@
       </div>
       <div class="classes-list" *ngIf="dia.classes.length > 0">
         <div class="class-pill" *ngFor="let c of dia.classes">
-          <span class="pill-icon">{{ c.icono }}</span>
+          <span class="pill-icon" *ngIf="c.imagen_icono || esImagen(c.icono)">
+            <img [src]="getImagenUrl(c.imagen_icono || c.icono)" alt="icon" class="mini-class-img">
+          </span>
           <span class="pill-time">{{ c.fecha_hora_inicio | date:'HH:mm' }}</span>
           <span class="pill-title">{{ c.titulo }}</span>
           <button class="btn-del-class" (click)="eliminarClase(c, $event)">×</button>
@@ -100,15 +104,19 @@
           <input type="text" [(ngModel)]="formPlantilla.titulo" placeholder="Ej: BJJ No-Gi Avanzado">
         </div>
         
-        <div class="form-group">
-          <label>Icono</label>
-          <div class="icon-selector">
-            <button *ngFor="let i of iconosSugeridos" 
-                    [class.active]="formPlantilla.icono === i"
-                    (click)="formPlantilla.icono = i">
-              {{ i }}
-            </button>
+        <div class="form-group full">
+          <label>Imagen de Icono (Requerido para mostrar icono)</label>
+          <div class="upload-container">
+            <div class="preview-box" *ngIf="vistaPreviaImagen">
+              <img [src]="getImagenUrl(vistaPreviaImagen)" alt="Preview">
+              <button type="button" class="btn-remove-img" (click)="archivoSeleccionado = null; vistaPreviaImagen = null">×</button>
+            </div>
+            <div class="upload-btn-wrapper" *ngIf="!vistaPreviaImagen">
+              <button type="button" class="btn-upload">📸 Subir nueva imagen...</button>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*">
+            </div>
           </div>
+          <p class="form-hint">Si no subes una imagen, la clase no tendrá icono visual.</p>
         </div>
 
         <div class="form-group">

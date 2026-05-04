@@ -33,8 +33,15 @@ class ClaseBJJ(models.Model):
     )
     icono = models.CharField(
         max_length=50,
-        default="🥋",
-        help_text="Icono visual para la clase (emoji o nombre de icono)."
+        blank=True,
+        null=True,
+        help_text="Icono visual opcional (emoji)."
+    )
+    imagen_icono = models.FileField(
+        upload_to='iconos_clases/',
+        null=True,
+        blank=True,
+        help_text="Imagen personalizada para la clase."
     )
     categoria_acceso = models.CharField(
         max_length=20,
@@ -66,7 +73,13 @@ class PlantillaClase(models.Model):
     """
     titulo = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True, null=True)
-    icono = models.CharField(max_length=50, default="🥋")
+    icono = models.CharField(max_length=50, blank=True, null=True)
+    imagen_icono = models.FileField(
+        upload_to='iconos_clases/',
+        null=True,
+        blank=True,
+        help_text="Imagen personalizada para la plantilla."
+    )
     hora_inicio = models.TimeField(help_text="Hora de comienzo por defecto.")
     duracion_minutos = models.PositiveIntegerField(default=90)
     capacidad_maxima = models.PositiveIntegerField(default=30)

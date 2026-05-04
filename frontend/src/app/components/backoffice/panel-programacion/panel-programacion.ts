@@ -23,6 +23,8 @@ export class PanelProgramacion implements OnInit {
 
   // Formulario Plantilla
   formPlantilla: PlantillaClase = this.resetForm();
+  archivoSeleccionado: File | null = null;
+  vistaPreviaImagen: string | null = null;
 
   // Formulario Propagación
   plantillaSeleccionada: PlantillaClase | null = null;
@@ -50,13 +52,40 @@ export class PanelProgramacion implements OnInit {
     hora_inicio: ''
   };
 
-  iconosSugeridos = ['🥋', '🤼', '🥊', '🔥', '⏲️', '🏆', '👨‍👩‍👧‍👦', '👶', '🦁'];
+  iconosSugeridos = [];
 
   constructor(private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarPlantillas();
     this.cargarCalendario();
+  }
+
+  esImagen(icono: string | null | undefined): boolean {
+    if (!icono) return false;
+    // Si es una URL completa (http) o una ruta relativa de media (/media/)
+    return icono.includes('/') || icono.includes('.') || icono.startsWith('http');
+  }
+
+  // Helper para asegurar que la imagen tiene la URL del backend si es relativa
+  getImagenUrl(url: string | null | undefined): string {
+    if (!url) return '';
+    if (url.startsWith('http')) return url;
+    // Asumimos que si empieza por /media/ es relativa al backend
+    return `http://localhost:8000${url}`;
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.archivoSeleccionado = file;
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.vistaPreviaImagen = e.target.result;
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   cargarPlantillas() {
@@ -78,7 +107,7 @@ export class PanelProgramacion implements OnInit {
   resetForm(): PlantillaClase {
     return {
       titulo: '',
-      icono: '🥋',
+      icono: '',
       hora_inicio: '10:00',
       duracion_minutos: 90,
       capacidad_maxima: 30,
@@ -89,6 +118,8 @@ export class PanelProgramacion implements OnInit {
   abrirNueva() {
     this.editando = false;
     this.formPlantilla = this.resetForm();
+    this.archivoSeleccionado = null;
+    this.vistaPreviaImagen = null;
     this.mostrarModal = true;
   }
 
@@ -105,17 +136,39 @@ export class PanelProgramacion implements OnInit {
   guardar() {
     if (!this.formPlantilla.titulo) return;
 
+    // Usamos FormData para permitir el envío de archivos
+    const formData = new FormData();
+    formData.append('titulo', this.formPlantilla.titulo);
+    formData.append('icono', this.formPlantilla.icono);
+    formData.append('hora_inicio', this.formPlantilla.hora_inicio);
+    formData.append('duracion_minutos', this.formPlantilla.duracion_minutos.toString());
+    formData.append('capacidad_maxima', this.formPlantilla.capacidad_maxima.toString());
+    formData.append('categoria_acceso', this.formPlantilla.categoria_acceso);
+    
+    if (this.formPlantilla.descripcion) {
+      formData.append('descripcion', this.formPlantilla.descripcion);
+    }
+
+    if (this.archivoSeleccionado) {
+      formData.append('imagen_icono', this.archivoSeleccionado);
+    }
+
     const request = this.editando && this.formPlantilla.id
-      ? this.authService.updatePlantilla(this.formPlantilla.id, this.formPlantilla)
-      : this.authService.createPlantilla(this.formPlantilla);
+      ? this.authService.updatePlantilla(this.formPlantilla.id, formData)
+      : this.authService.createPlantilla(formData);
 
     request.subscribe({
       next: () => {
         this.mostrarMensaje(`Programación ${this.editando ? 'actualizada' : 'creada'} correctamente.`);
         this.mostrarModal = false;
+        this.archivoSeleccionado = null;
+        this.vistaPreviaImagen = null;
         this.cargarPlantillas();
       },
-      error: (err) => alert('Error al guardar la programación.')
+      error: (err) => {
+        console.error('Error al guardar:', err);
+        alert('Error al guardar la programación.');
+      }
     });
   }
 

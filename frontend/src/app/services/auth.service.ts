@@ -16,6 +16,7 @@ export interface PlantillaClase {
   titulo: string;
   descripcion?: string;
   icono: string;
+  imagen_icono?: string;
   hora_inicio: string; // "HH:mm:ss"
   duracion_minutos: number;
   capacidad_maxima: number;
@@ -188,12 +189,13 @@ export class AuthService {
     return this.http.get<PlantillaClase[]>(`${this.apiUrl}/programacion/`);
   }
 
-  createPlantilla(p: PlantillaClase): Observable<PlantillaClase> {
+  createPlantilla(p: any): Observable<PlantillaClase> {
     return this.http.post<PlantillaClase>(`${this.apiUrl}/programacion/`, p);
   }
 
-  updatePlantilla(id: number, p: PlantillaClase): Observable<PlantillaClase> {
-    return this.http.put<PlantillaClase>(`${this.apiUrl}/programacion/${id}/`, p);
+  updatePlantilla(id: number, p: any): Observable<PlantillaClase> {
+    // Usamos patch para permitir subir archivos sin tener que mandar todo el objeto de nuevo obligatoriamente
+    return this.http.patch<PlantillaClase>(`${this.apiUrl}/programacion/${id}/`, p);
   }
 
   deletePlantilla(id: number): Observable<any> {

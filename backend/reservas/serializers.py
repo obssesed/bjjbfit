@@ -13,7 +13,7 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClaseBJJ
-        fields = ['id', 'titulo', 'descripcion', 'icono', 'categoria_acceso', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
+        fields = ['id', 'titulo', 'descripcion', 'icono', 'imagen_icono', 'categoria_acceso', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
 
     def get_plazas_disponibles(self, obj: ClaseBJJ) -> int:
         return obj.plazas_disponibles()
@@ -45,7 +45,7 @@ class PlantillaClaseSerializer(serializers.ModelSerializer):
     categoria_acceso_display = serializers.CharField(source='get_categoria_acceso_display', read_only=True)
     class Meta:
         model = PlantillaClase
-        fields = ['id', 'titulo', 'descripcion', 'icono', 'hora_inicio', 'duracion_minutos', 'capacidad_maxima', 'categoria_acceso', 'categoria_acceso_display']
+        fields = ['id', 'titulo', 'descripcion', 'icono', 'imagen_icono', 'hora_inicio', 'duracion_minutos', 'capacidad_maxima', 'categoria_acceso', 'categoria_acceso_display']
 
 class ReservaSerializer(serializers.ModelSerializer):
     """

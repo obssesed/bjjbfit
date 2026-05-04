@@ -44,7 +44,9 @@
             {{ obtenerFormatoHorario(clase.fecha_hora_inicio) }}
           </div>
           <h4 class="mini-title">
-            <span class="class-emoji" *ngIf="clase.icono">{{ clase.icono }}</span>
+            <span class="class-emoji" *ngIf="clase.imagen_icono || esImagen(clase.icono)">
+              <img [src]="getImagenUrl(clase.imagen_icono || clase.icono)" alt="icon" class="dash-img-icon">
+            </span>
             <span>{{ clase.titulo }}</span>
           </h4>
           <span class="cat-tag" [ngClass]="clase.categoria_acceso">{{ clase.categoria_acceso }}</span>

@@ -132,6 +132,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# --- CONFIGURACIÓN DE ARCHIVOS MEDIA (SUBIDAS) ---
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # --- BJJBFIT CONFIG ---
 
 # Modelo de usuario personalizado (Fat Models)

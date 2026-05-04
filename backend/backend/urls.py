@@ -29,9 +29,15 @@ router.register(r'reservas', ReservaViewSet, basename='reserva')
 router.register(r'planes', PlanViewSet, basename='plan')
 router.register(r'programacion', PlantillaClaseViewSet, basename='programacion')
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
