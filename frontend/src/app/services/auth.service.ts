@@ -57,8 +57,8 @@ export interface PerfilDeportista {
   cuenta_bancaria?: string;
   metodo_pago?: 'EFECTIVO' | 'CUENTA';
   date_joined?: string;
-  hijos_a_cargo: HijoDelegado[];
   is_staff: boolean;
+  hijos_a_cargo: HijoDelegado[];
 }
 
 @Injectable({

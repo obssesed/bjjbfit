@@ -47,6 +47,12 @@ export class ListaClasesComponent implements OnInit {
   showErrorModal: boolean = false;
   mensajeErrorModal: string = '';
 
+  // Admin Asistencia
+  showAsistenciaModal: boolean = false;
+  claseAsistencia: ClaseBJJ | null = null;
+  showAdminConfirmModal: boolean = false;
+  reservaParaEliminar: any = null;
+
   constructor(
     private clasesService: ClasesService, 
     private authService: AuthService,
@@ -58,7 +64,10 @@ export class ListaClasesComponent implements OnInit {
     this.cargarClases();
     if (this.authService.isLoggedIn()) {
       this.authService.me().subscribe({
-        next: (data) => this.perfilDeportista = data,
+        next: (data) => {
+          this.perfilDeportista = data;
+          this.cdr.detectChanges();
+        },
         error: (err) => console.error('Error cargando perfil', err)
       });
       this.cargarMisReservas();
@@ -221,6 +230,12 @@ export class ListaClasesComponent implements OnInit {
   }
 
   reservar(clase: ClaseBJJ) {
+    // Si es administrador, al clicar vemos la lista de asistencia
+    if (this.perfilDeportista?.is_staff) {
+      this.abrirListaAsistencia(clase);
+      return;
+    }
+
     if (this.esClasePasada(clase.fecha_hora_inicio)) {
       alert("No puedes reservar una clase que ya está en el pasado.");
       return;
@@ -250,6 +265,53 @@ export class ListaClasesComponent implements OnInit {
     } else {
       this.ejecutarReservaReal(clase);
     }
+  }
+
+  // --- LÓGICA DE ASISTENCIA (ADMIN) ---
+  abrirListaAsistencia(clase: ClaseBJJ) {
+    this.claseAsistencia = clase;
+    this.showAsistenciaModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarAsistenciaModal() {
+    this.showAsistenciaModal = false;
+    this.claseAsistencia = null;
+  }
+
+  cancelarReservaAdmin(reservaId: number) {
+    this.showAdminConfirmModal = false;
+    
+    this.clasesService.cancelarReserva(reservaId).subscribe({
+      next: () => {
+        this.mensajeExito = "Reserva cancelada por el administrador.";
+        this.cdr.detectChanges();
+        // Actualizamos la lista local para feedback inmediato
+        if (this.claseAsistencia?.lista_asistencia) {
+          this.claseAsistencia.lista_asistencia = this.claseAsistencia.lista_asistencia.filter(r => r.reserva_id !== reservaId);
+        }
+        setTimeout(() => this.mensajeExito = null, 3000);
+        // Refresco total
+        this.cargarClases();
+        this.reservaParaEliminar = null;
+      },
+      error: (err) => {
+        alert("Error al cancelar la reserva.");
+        console.error(err);
+        this.reservaParaEliminar = null;
+      }
+    });
+  }
+
+  pedirConfirmacionAdmin(reserva: any) {
+    this.reservaParaEliminar = reserva;
+    this.showAdminConfirmModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarAdminConfirm() {
+    this.showAdminConfirmModal = false;
+    this.reservaParaEliminar = null;
   }
 
   cancelarReservaModal() {

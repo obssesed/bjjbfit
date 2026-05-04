@@ -38,7 +38,8 @@
 
       <div *ngFor="let clase of dia.clases" class="mini-card" 
            [class.full-card]="clase.plazas_disponibles <= 0 && !esClasePasada(clase.fecha_hora_inicio)"
-           [class.past-card]="esClasePasada(clase.fecha_hora_inicio)">
+           [class.past-card]="esClasePasada(clase.fecha_hora_inicio)"
+           (click)="reservar(clase)">
         <div class="mini-card-content">
           <div class="time-badge">
             {{ obtenerFormatoHorario(clase.fecha_hora_inicio) }}
@@ -54,7 +55,9 @@
         
         <div class="mini-card-actions">
           <!-- Indicadores Discretos de Plazas -->
-          <div class="class-metrics">
+          <div class="class-metrics" 
+               [class.admin-clickable]="perfilDeportista?.is_staff"
+               (click)="$event.stopPropagation(); perfilDeportista?.is_staff ? abrirListaAsistencia(clase) : null">
             <span class="metric" title="Ocupación de la clase"><span class="icon" style="font-size:0.75rem">👤</span> {{ clase.plazas_ocupadas }} / {{ clase.capacidad_maxima }}</span>
             <span class="metric waiting" *ngIf="clase.en_espera > 0" title="Personas en lista de espera"><span class="icon" style="font-size:0.75rem">⏳</span> {{ clase.en_espera }}</span>
           </div>
@@ -172,6 +175,57 @@
     <div class="modal-actions">
       <button class="btn-cancel" (click)="cerrarCancelModal()">Atrás</button>
       <button class="btn-confirm danger-btn" [disabled]="!reservaACancelarID" (click)="confirmarCancelModal(reservaACancelarID)">Sí, Liberar Plaza</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Lista de Asistencia (Admin) -->
+<div class="modal-overlay" *ngIf="showAsistenciaModal" (click)="cerrarAsistenciaModal()">
+    <div class="modal-card asistencia-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">Lista de Asistencia</h2>
+        <p class="modal-subtitle">{{ claseAsistencia?.titulo }} — {{ claseAsistencia?.fecha_hora_inicio | date:'HH:mm' }}</p>
+      </div>
+
+      <div class="asistencia-body">
+        <div class="asistencia-empty" *ngIf="!claseAsistencia?.lista_asistencia?.length">
+          <div class="empty-icon">📭</div>
+          <p>No hay alumnos apuntados aún en esta clase.</p>
+        </div>
+
+        <div class="asistencia-list" *ngIf="claseAsistencia?.lista_asistencia?.length">
+          <div class="alumno-item" *ngFor="let r of claseAsistencia?.lista_asistencia">
+            <div class="alumno-info">
+              <span class="belt-indicator" [class]="'belt-' + r.cinturon.toLowerCase()"></span>
+              <div class="alumno-details">
+                <span class="alumno-name">{{ r.nombre }}</span>
+                <span class="alumno-status" [class.espera]="r.estado === 'ESPERA'">
+                  {{ r.estado === 'ESPERA' ? 'Lista de Espera' : 'Confirmado' }}
+                </span>
+              </div>
+            </div>
+            <button class="btn-action-delete" (click)="pedirConfirmacionAdmin(r)" title="Eliminar de la lista">
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions full-width">
+        <button class="btn-cancel btn-dark-outline" (click)="cerrarAsistenciaModal()">Cerrar Lista</button>
+      </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación Admin (Rojo) -->
+<div class="modal-overlay danger-mode" *ngIf="showAdminConfirmModal" (click)="cerrarAdminConfirm()">
+  <div class="modal-card" (click)="$event.stopPropagation()" style="border-color: #ef4444; max-width: 400px;">
+    <h2 class="modal-title" style="color: #ef4444;">¿Eliminar Alumno?</h2>
+    <p class="modal-subtitle">Estás a punto de cancelar la reserva de <strong style="color:#fca5a5;">{{ reservaParaEliminar?.nombre }}</strong>.</p>
+    
+    <div class="modal-actions" style="margin-top: 2rem;">
+      <button class="btn-cancel" (click)="cerrarAdminConfirm()">Cancelar</button>
+      <button class="btn-confirm danger-btn" (click)="cancelarReservaAdmin(reservaParaEliminar?.reserva_id)">Sí, Eliminar</button>
     </div>
   </div>
 </div>

@@ -14,7 +14,7 @@ class ClaseBJJViewSet(viewsets.ModelViewSet):
     Vista que permite listar las clases de BJJ disponibles.
     Permisos: Lectura para todos, escritura solo para STAFF.
     """
-    queryset = ClaseBJJ.objects.prefetch_related('reservas').all()
+    queryset = ClaseBJJ.objects.prefetch_related('reservas__deportista').all()
     serializer_class = ClaseBJJSerializer
     
     def get_permissions(self):
@@ -82,8 +82,13 @@ class ReservaViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # SEGURIDAD CRÍTICA: El usuario ve SUS reservas y las de los MENORES DE EDAD A SU CARGO.
+        """
+        Administradores ven TODO. Usuarios normales ven lo suyo y sus hijos.
+        """
         user = self.request.user
+        if user.is_staff:
+            return Reserva.objects.select_related('clase', 'deportista').all().order_by('-fecha_reserva')
+            
         hijos_ids = user.hijos_a_cargo.values_list('id', flat=True)
         return Reserva.objects.select_related('clase', 'deportista').filter(
             models.Q(deportista=user) | models.Q(deportista_id__in=hijos_ids)
@@ -105,9 +110,12 @@ class ReservaViewSet(viewsets.ModelViewSet):
 
     def perform_destroy(self, instance):
         # Regla de Negocio: Cancelaciones solo hasta 30 mins antes.
-        tiempo_limite = instance.clase.fecha_hora_inicio - timedelta(minutes=30)
-        if timezone.now() > tiempo_limite:
-            raise ValidationError("Demasiado tarde para cancelar. La ventana de cancelación expira 30 minutos antes del inicio.")
+        # EXCEPCIÓN: Los administradores pueden cancelar en cualquier momento.
+        user = self.request.user
+        if not user.is_staff:
+            tiempo_limite = instance.clase.fecha_hora_inicio - timedelta(minutes=30)
+            if timezone.now() > tiempo_limite:
+                raise ValidationError("Demasiado tarde para cancelar. La ventana de cancelación expira 30 minutos antes del inicio.")
 
         # Lógica de Lista de Espera: Al cancelar una reserva, asciende la primera en espera.
         clase = instance.clase

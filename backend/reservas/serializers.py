@@ -10,10 +10,11 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
     plazas_disponibles = serializers.SerializerMethodField()
     plazas_ocupadas = serializers.SerializerMethodField()
     en_espera = serializers.SerializerMethodField()
+    lista_asistencia = serializers.SerializerMethodField()
 
     class Meta:
         model = ClaseBJJ
-        fields = ['id', 'titulo', 'descripcion', 'icono', 'imagen_icono', 'categoria_acceso', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera']
+        fields = ['id', 'titulo', 'descripcion', 'icono', 'imagen_icono', 'categoria_acceso', 'fecha_hora_inicio', 'fecha_hora_fin', 'capacidad_maxima', 'plazas_disponibles', 'plazas_ocupadas', 'en_espera', 'lista_asistencia']
 
     def get_plazas_disponibles(self, obj: ClaseBJJ) -> int:
         return obj.plazas_disponibles()
@@ -23,6 +24,26 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
         
     def get_en_espera(self, obj: ClaseBJJ) -> int:
         return obj.en_espera()
+
+    def get_lista_asistencia(self, obj: ClaseBJJ):
+        """
+        Retorna la lista de alumnos apuntados (confirmados y en espera)
+        SOLO si el usuario que hace la petición es administrador.
+        """
+        request = self.context.get('request')
+        if request and request.user.is_staff:
+            reservas = obj.reservas.filter(estado__in=['CONFIRMADA', 'ESPERA']).select_related('deportista').order_by('estado', 'fecha_reserva')
+            return [
+                {
+                    'reserva_id': r.id,
+                    'deportista_id': r.deportista.id,
+                    'nombre': f"{r.deportista.first_name} {r.deportista.last_name}".strip() or r.deportista.username,
+                    'estado': r.estado,
+                    'cinturon': r.deportista.cinturon,
+                    'es_niño': r.deportista.tipo_plan.categoria_edad == 'INFANTIL' if r.deportista.tipo_plan else False
+                } for r in reservas
+            ]
+        return []
 
     def validate(self, data):
         # Validar que no se cree otra clase igual (mismo título) en la misma fecha_hora_inicio
