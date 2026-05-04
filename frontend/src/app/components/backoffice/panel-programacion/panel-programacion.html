@@ -48,6 +48,41 @@
   <p>Define tu primera clase maestra para empezar a llenar el calendario.</p>
 </div>
 
+<!-- CALENDARIO MENSUAL -->
+<div class="calendar-section" *ngIf="!cargando">
+  <div class="calendar-header">
+    <h2>Vista de Calendario</h2>
+    <div class="calendar-nav">
+      <button class="btn-icon" (click)="mesAnterior()">◀</button>
+      <h3>{{ mesActualNombre }}</h3>
+      <button class="btn-icon" (click)="mesSiguiente()">▶</button>
+    </div>
+  </div>
+
+  <div class="calendar-grid">
+    <!-- Días de la semana -->
+    <div class="weekday-header">Lun</div>
+    <div class="weekday-header">Mar</div>
+    <div class="weekday-header">Mié</div>
+    <div class="weekday-header">Jue</div>
+    <div class="weekday-header">Vie</div>
+    <div class="weekday-header">Sáb</div>
+    <div class="weekday-header">Dom</div>
+
+    <!-- Celdas del mes -->
+    <div class="calendar-cell" *ngFor="let dia of diasCalendario" [ngClass]="{'not-in-month': !dia.isInMonth}">
+      <span class="date-number" *ngIf="dia.isInMonth">{{ dia.date.getDate() }}</span>
+      <div class="classes-list" *ngIf="dia.classes.length > 0">
+        <div class="class-pill" *ngFor="let c of dia.classes">
+          <span class="pill-icon">{{ c.icono }}</span>
+          <span class="pill-time">{{ c.fecha_hora_inicio | date:'HH:mm' }}</span>
+          <span class="pill-title">{{ c.titulo }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Crear/Editar Plantilla -->
 <div class="modal-overlay" *ngIf="mostrarModal" (click)="mostrarModal = false">
   <div class="modal-content" (click)="$event.stopPropagation()">

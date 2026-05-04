@@ -46,6 +46,7 @@ export class PanelProgramacion implements OnInit {
 
   ngOnInit() {
     this.cargarPlantillas();
+    this.cargarCalendario();
   }
 
   cargarPlantillas() {
@@ -147,6 +148,7 @@ export class PanelProgramacion implements OnInit {
       next: (res: any) => {
         this.mostrarMensaje(res.success);
         this.mostrarModalPropagar = false;
+        this.cargarCalendario();
       },
       error: (err) => alert('Error al propagar clases. Verifica el rango de fechas.')
     });
@@ -159,5 +161,73 @@ export class PanelProgramacion implements OnInit {
       this.mensajeExito = null;
       this.cdr.detectChanges();
     }, 4000);
+  }
+
+  // --- Lógica del Calendario ---
+  fechaCalendario = new Date();
+  diasCalendario: { date: Date, classes: any[], isInMonth: boolean }[] = [];
+  mesNombres = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+  get mesActualNombre(): string {
+    return `${this.mesNombres[this.fechaCalendario.getMonth()]} ${this.fechaCalendario.getFullYear()}`;
+  }
+
+  cargarCalendario() {
+    const year = this.fechaCalendario.getFullYear();
+    const month = this.fechaCalendario.getMonth() + 1;
+
+    this.authService.getClasesPorMes(year, month).subscribe({
+      next: (clases) => {
+        this.generarDiasCalendario(clases);
+        this.cdr.detectChanges();
+      },
+      error: () => console.error('Error cargando calendario')
+    });
+  }
+
+  generarDiasCalendario(clases: any[]) {
+    this.diasCalendario = [];
+    const year = this.fechaCalendario.getFullYear();
+    const month = this.fechaCalendario.getMonth();
+    
+    const primerDiaMes = new Date(year, month, 1);
+    const ultimoDiaMes = new Date(year, month + 1, 0);
+    
+    // Día de la semana en JS: 0=Domingo, 1=Lunes. Lo adaptamos a Lunes=0, Domingo=6.
+    let diaInicio = primerDiaMes.getDay() === 0 ? 6 : primerDiaMes.getDay() - 1;
+
+    // Generar días vacíos al principio si el mes no empieza en Lunes
+    for (let i = 0; i < diaInicio; i++) {
+      this.diasCalendario.push({ date: new Date(year, month, -diaInicio + i + 1), classes: [], isInMonth: false });
+    }
+
+    // Generar días del mes
+    for (let i = 1; i <= ultimoDiaMes.getDate(); i++) {
+      const currentDate = new Date(year, month, i);
+      const currentClasses = clases.filter(c => {
+        const d = new Date(c.fecha_hora_inicio);
+        return d.getDate() === i && d.getMonth() === month && d.getFullYear() === year;
+      });
+      // Ordenar clases por hora
+      currentClasses.sort((a, b) => new Date(a.fecha_hora_inicio).getTime() - new Date(b.fecha_hora_inicio).getTime());
+      
+      this.diasCalendario.push({ date: currentDate, classes: currentClasses, isInMonth: true });
+    }
+
+    // Rellenar hasta completar la última semana
+    const celdasRestantes = 42 - this.diasCalendario.length; // 6 semanas max
+    for (let i = 1; i <= celdasRestantes; i++) {
+      this.diasCalendario.push({ date: new Date(year, month + 1, i), classes: [], isInMonth: false });
+    }
+  }
+
+  mesAnterior() {
+    this.fechaCalendario.setMonth(this.fechaCalendario.getMonth() - 1);
+    this.cargarCalendario();
+  }
+
+  mesSiguiente() {
+    this.fechaCalendario.setMonth(this.fechaCalendario.getMonth() + 1);
+    this.cargarCalendario();
   }
 }

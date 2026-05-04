@@ -214,3 +214,116 @@ select option {
   background-color: #111827;
   color: #fff;
 }
+
+/* --- CALENDARIO MENSUAL --- */
+.calendar-section {
+  margin-top: 3rem;
+  background: rgba(17, 24, 39, 0.7);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.calendar-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #fff;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.calendar-nav h3 {
+  margin: 0;
+  min-width: 150px;
+  text-align: center;
+  color: var(--accent-gold);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.weekday-header {
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  padding-bottom: 0.5rem;
+}
+
+.calendar-cell {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  min-height: 100px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.calendar-cell.not-in-month {
+  background: transparent;
+  border-color: transparent;
+  opacity: 0.3;
+}
+
+.date-number {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+  align-self: flex-end;
+}
+
+.classes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.class-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #bfdbfe;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.pill-icon {
+  font-size: 0.85rem;
+}
+
+.pill-time {
+  font-weight: 700;
+  color: #fff;
+}
+
+.pill-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.9;
+}

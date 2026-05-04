@@ -198,6 +198,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/programacion/${id}/propagar/`, config);
   }
 
+  getClasesPorMes(year: number, month: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/clases/?year=${year}&month=${month}`);
+  }
+
   // --- Reportes y Métricas ---
   getReporteIngresos(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/deportistas/reporte_ingresos/`);

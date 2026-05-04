@@ -22,6 +22,14 @@ class ClaseBJJViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAdminUser()]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        year = self.request.query_params.get('year')
+        month = self.request.query_params.get('month')
+        if year and month:
+            qs = qs.filter(fecha_hora_inicio__year=year, fecha_hora_inicio__month=month)
+        return qs.order_by('fecha_hora_inicio')
+
 class PlantillaClaseViewSet(viewsets.ModelViewSet):
     queryset = PlantillaClase.objects.all()
     serializer_class = PlantillaClaseSerializer
