@@ -202,6 +202,14 @@ export class AuthService {
     return this.http.get<any[]>(`${this.apiUrl}/clases/?year=${year}&month=${month}`);
   }
 
+  createClase(clase: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/clases/`, clase);
+  }
+
+  deleteClase(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/clases/${id}/`);
+  }
+
   // --- Reportes y Métricas ---
   getReporteIngresos(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/deportistas/reporte_ingresos/`);

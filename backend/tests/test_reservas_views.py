@@ -104,3 +104,79 @@ class TestReservasViews:
         res = api_client.post('/api/reservas/', {'clase': clase_con_hueco.id})
         assert res.status_code == 400
         assert "ya tiene una reserva activa" in str(res.data)
+
+@pytest.mark.django_db
+class TestClaseBJJViews:
+    def test_si_se_envian_parametros_year_y_month_lista_se_filtra_correctamente(self, api_client, admin_user):
+        from reservas.models import ClaseBJJ
+        from django.utils import timezone
+        import datetime
+        
+        # Crear 3 clases, dos en mayo 2026 y una en junio 2026
+        dt_mayo1 = timezone.make_aware(datetime.datetime(2026, 5, 10, 10, 0))
+        dt_mayo2 = timezone.make_aware(datetime.datetime(2026, 5, 15, 10, 0))
+        dt_junio = timezone.make_aware(datetime.datetime(2026, 6, 10, 10, 0))
+        
+        ClaseBJJ.objects.create(titulo='BJJ Mayo 1', fecha_hora_inicio=dt_mayo1, fecha_hora_fin=dt_mayo1, capacidad_maxima=20, categoria_acceso='ADULTO')
+        ClaseBJJ.objects.create(titulo='BJJ Mayo 2', fecha_hora_inicio=dt_mayo2, fecha_hora_fin=dt_mayo2, capacidad_maxima=20, categoria_acceso='ADULTO')
+        ClaseBJJ.objects.create(titulo='BJJ Junio', fecha_hora_inicio=dt_junio, fecha_hora_fin=dt_junio, capacidad_maxima=20, categoria_acceso='ADULTO')
+        
+        api_client.force_authenticate(user=admin_user)
+        
+        # Filtrar por mayo
+        res_mayo = api_client.get('/api/clases/?year=2026&month=5')
+        assert res_mayo.status_code == 200
+        assert len(res_mayo.data) == 2
+        
+        # Filtrar por junio
+        res_junio = api_client.get('/api/clases/?year=2026&month=6')
+        assert len(res_junio.data) == 1
+        assert res_junio.data[0]['titulo'] == 'BJJ Junio'
+        
+        # Sin filtros debe devolver todo (3 clases)
+        res_todo = api_client.get('/api/clases/')
+        # Nota: res_todo puede devolver clases de otras fixtures, nos aseguramos que mínimo están las 3 que creamos
+        titulos = [c['titulo'] for c in res_todo.data]
+        assert 'BJJ Mayo 1' in titulos
+        assert 'BJJ Mayo 2' in titulos
+        assert 'BJJ Junio' in titulos
+
+    def test_si_se_intenta_crear_clase_duplicada_misma_hora_mismo_tipo_resultado_400(self, api_client, admin_user):
+        from reservas.models import ClaseBJJ
+        from django.utils import timezone
+        import datetime
+        
+        dt_inicio = timezone.make_aware(datetime.datetime(2026, 7, 10, 10, 0))
+        dt_fin = timezone.make_aware(datetime.datetime(2026, 7, 10, 11, 0))
+        
+        # Clase original
+        ClaseBJJ.objects.create(titulo='BJJ Competidor', fecha_hora_inicio=dt_inicio, fecha_hora_fin=dt_fin, capacidad_maxima=20, categoria_acceso='ADULTO')
+        
+        api_client.force_authenticate(user=admin_user)
+        
+        # Intentar crear otra clase con el mismo título en la misma fecha_hora_inicio
+        payload_duplicado = {
+            'titulo': 'BJJ Competidor',
+            'descripcion': '',
+            'icono': '🥋',
+            'categoria_acceso': 'ADULTO',
+            'fecha_hora_inicio': dt_inicio.isoformat(),
+            'fecha_hora_fin': dt_fin.isoformat(),
+            'capacidad_maxima': 20
+        }
+        res_ko = api_client.post('/api/clases/', payload_duplicado)
+        assert res_ko.status_code == 400
+        assert "Ya existe una clase de este tipo" in str(res_ko.data)
+
+        # Intentar crear una clase DIFERENTE a la misma hora (esto SI debe estar permitido)
+        payload_diferente = {
+            'titulo': 'NOGI Principiantes',
+            'descripcion': '',
+            'icono': '🤼',
+            'categoria_acceso': 'ADULTO',
+            'fecha_hora_inicio': dt_inicio.isoformat(),
+            'fecha_hora_fin': dt_fin.isoformat(),
+            'capacidad_maxima': 15
+        }
+        res_ok = api_client.post('/api/clases/', payload_diferente)
+        assert res_ok.status_code == 201

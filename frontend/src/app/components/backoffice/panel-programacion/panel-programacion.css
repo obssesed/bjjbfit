@@ -285,11 +285,39 @@ select option {
   opacity: 0.3;
 }
 
+.cell-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.2rem;
+}
+
 .date-number {
   font-size: 0.9rem;
   font-weight: 600;
   color: #94a3b8;
-  align-self: flex-end;
+}
+
+.btn-add-class {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.calendar-cell:hover .btn-add-class {
+  opacity: 1;
+}
+
+.btn-add-class:hover {
+  color: var(--accent-gold);
+  background: rgba(255,255,255,0.05);
 }
 
 .classes-list {
@@ -309,8 +337,14 @@ select option {
   font-size: 0.75rem;
   color: #bfdbfe;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.class-pill:hover {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: rgba(59, 130, 246, 0.5);
+  padding-right: 20px; /* Dejar espacio para el aspa */
 }
 
 .pill-icon {
@@ -320,10 +354,63 @@ select option {
 .pill-time {
   font-weight: 700;
   color: #fff;
+  white-space: nowrap;
 }
 
 .pill-title {
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
   opacity: 0.9;
+  flex-grow: 1;
+}
+
+.btn-del-class {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  font-size: 1.1rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.class-pill:hover .btn-del-class {
+  opacity: 1;
+}
+
+.btn-del-class:hover {
+  color: #f87171;
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Modal Eliminar */
+.delete-modal {
+  max-width: 400px;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.delete-icon-large {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.warning-text {
+  color: #fca5a5;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }

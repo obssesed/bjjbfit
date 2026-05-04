@@ -40,6 +40,14 @@ export class PanelProgramacion implements OnInit {
     ]
   };
 
+  // Formulario Clase Puntual
+  mostrarModalClasePuntual = false;
+  fechaSeleccionadaParaClase: Date | null = null;
+  configClasePuntual = {
+    plantilla_id: null as number | null,
+    hora_inicio: ''
+  };
+
   iconosSugeridos = ['🥋', '🤼', '🥊', '🔥', '⏲️', '🏆', '👨‍👩‍👧‍👦', '👶', '🦁'];
 
   constructor(private authService: AuthService, private cdr: ChangeDetectorRef) {}
@@ -229,5 +237,72 @@ export class PanelProgramacion implements OnInit {
   mesSiguiente() {
     this.fechaCalendario.setMonth(this.fechaCalendario.getMonth() + 1);
     this.cargarCalendario();
+  }
+
+  // --- Lógica Interaccional de Calendario ---
+  abrirModalClasePuntual(dia: any) {
+    if (!dia.isInMonth) return;
+    this.fechaSeleccionadaParaClase = dia.date;
+    this.configClasePuntual.plantilla_id = null;
+    this.configClasePuntual.hora_inicio = '';
+    this.mostrarModalClasePuntual = true;
+  }
+
+  guardarClasePuntual() {
+    if (!this.configClasePuntual.plantilla_id || !this.configClasePuntual.hora_inicio || !this.fechaSeleccionadaParaClase) return;
+
+    const plantilla = this.plantillas.find(p => p.id == this.configClasePuntual.plantilla_id);
+    if (!plantilla) return;
+
+    // Construir fechas
+    const year = this.fechaSeleccionadaParaClase.getFullYear();
+    const month = (this.fechaSeleccionadaParaClase.getMonth() + 1).toString().padStart(2, '0');
+    const day = this.fechaSeleccionadaParaClase.getDate().toString().padStart(2, '0');
+    const dtInicio = `${year}-${month}-${day}T${this.configClasePuntual.hora_inicio}:00`;
+    
+    // Asumimos un pequeño cálculo de la fecha_hora_fin añadiendo minutos (en frontend)
+    const dtInicioObj = new Date(dtInicio);
+    const dtFinObj = new Date(dtInicioObj.getTime() + plantilla.duracion_minutos * 60000);
+
+    const payload = {
+      titulo: plantilla.titulo,
+      descripcion: plantilla.descripcion || '',
+      icono: plantilla.icono,
+      categoria_acceso: plantilla.categoria_acceso,
+      fecha_hora_inicio: dtInicioObj.toISOString(),
+      fecha_hora_fin: dtFinObj.toISOString(),
+      capacidad_maxima: plantilla.capacidad_maxima
+    };
+
+    this.authService.createClase(payload).subscribe({
+      next: () => {
+        this.mostrarMensaje('Clase puntual añadida correctamente.');
+        this.mostrarModalClasePuntual = false;
+        this.cargarCalendario();
+      },
+      error: () => alert('Error al crear la clase puntual.')
+    });
+  }
+
+  mostrarModalEliminarClase = false;
+  claseAEliminar: any = null;
+
+  eliminarClase(clase: any, e: Event) {
+    e.stopPropagation(); // Evitar que clickee el día (si tuviera evento)
+    this.claseAEliminar = clase;
+    this.mostrarModalEliminarClase = true;
+  }
+
+  confirmarEliminarClase() {
+    if (!this.claseAEliminar) return;
+    this.authService.deleteClase(this.claseAEliminar.id).subscribe({
+      next: () => {
+        this.mostrarMensaje('Clase eliminada del calendario.');
+        this.mostrarModalEliminarClase = false;
+        this.claseAEliminar = null;
+        this.cargarCalendario();
+      },
+      error: () => alert('Error al eliminar la clase.')
+    });
   }
 }

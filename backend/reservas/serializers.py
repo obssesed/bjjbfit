@@ -24,6 +24,23 @@ class ClaseBJJSerializer(serializers.ModelSerializer):
     def get_en_espera(self, obj: ClaseBJJ) -> int:
         return obj.en_espera()
 
+    def validate(self, data):
+        # Validar que no se cree otra clase igual (mismo título) en la misma fecha_hora_inicio
+        titulo = data.get('titulo')
+        fecha_hora_inicio = data.get('fecha_hora_inicio')
+
+        if titulo and fecha_hora_inicio:
+            query = ClaseBJJ.objects.filter(titulo=titulo, fecha_hora_inicio=fecha_hora_inicio)
+            if self.instance:
+                query = query.exclude(pk=self.instance.pk)
+            
+            if query.exists():
+                raise serializers.ValidationError(
+                    "Ya existe una clase de este tipo programada exactamente a la misma hora."
+                )
+
+        return data
+
 class PlantillaClaseSerializer(serializers.ModelSerializer):
     categoria_acceso_display = serializers.CharField(source='get_categoria_acceso_display', read_only=True)
     class Meta:
