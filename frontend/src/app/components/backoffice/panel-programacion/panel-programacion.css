@@ -51,6 +51,12 @@
   border: 1px solid #e2e8f0;
 }
 
+.card-icon img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
 .card-info { flex: 1; }
 .card-info h3 { margin: 0 0 0.5rem 0; font-size: 1.3rem; color: #0f172a; font-weight: 800; }
 
