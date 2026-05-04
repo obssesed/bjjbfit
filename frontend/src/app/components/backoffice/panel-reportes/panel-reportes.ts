@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../services/auth.service';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-panel-reportes',
@@ -193,35 +194,47 @@ export class PanelReportesComponent implements OnInit {
     };
   }
 
-  exportarCSV() {
+  exportarExcel() {
     if (!this.reporte || !this.reporte[this.mesSeleccionado]) return;
     
     const datosMes = this.reporte[this.mesSeleccionado];
     const etiqueta = datosMes.etiqueta;
     
-    let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-    csvContent += "Reporte Económico BJJFIT\r\n";
-    csvContent += `Mes:,${etiqueta}\r\n`;
-    csvContent += `Ingresos Totales:,${datosMes.total} EUR\r\n`;
-    csvContent += `Usuarios Activos:,${datosMes.usuarios_activos}\r\n`;
-    csvContent += `Usuarios Familiares:,${datosMes.usuarios_familiares}\r\n\r\n`;
-    
-    csvContent += "Desglose por Plan\r\n";
-    csvContent += "Plan,Cantidad,Subtotal (EUR)\r\n";
+    // Crear la hoja de resumen
+    const resumenData = [
+      ["Reporte Económico BJJFIT"],
+      ["Mes", etiqueta],
+      ["Ingresos Totales", `${datosMes.total} EUR`],
+      ["Usuarios Activos", datosMes.usuarios_activos],
+      ["Usuarios Familiares", datosMes.usuarios_familiares],
+      ["Usuarios Fundadores", datosMes.usuarios_fundadores || 0],
+      [],
+      ["Desglose por Plan"],
+      ["Plan", "Cantidad", "Subtotal (EUR)"]
+    ];
+
     if (datosMes.desglose && datosMes.desglose.length > 0) {
       datosMes.desglose.forEach((d: any) => {
-        csvContent += `${d.plan},${d.cantidad},${d.ingresos}\r\n`;
+        resumenData.push([d.plan, d.cantidad, d.ingresos]);
       });
     } else {
-      csvContent += "Sin datos.,,\r\n";
+      resumenData.push(["Sin datos", "", ""]);
     }
 
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `reporte_ingresos_${etiqueta.replace(' ', '_')}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const ws: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(resumenData);
+
+    // Dar un poco de anchura a las columnas para que quede bonito
+    ws['!cols'] = [
+      { wch: 30 }, // Columna A
+      { wch: 20 }, // Columna B
+      { wch: 20 }, // Columna C
+    ];
+
+    // Crear libro de trabajo (workbook)
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Reporte Mensual");
+
+    // Generar archivo y descargarlo
+    XLSX.writeFile(wb, `reporte_ingresos_${etiqueta.replace(' ', '_')}.xlsx`);
   }
 }

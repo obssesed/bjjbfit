@@ -1,4 +1,5 @@
 from django.utils import timezone
+import datetime
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -184,15 +185,17 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
         
-        data_actual = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}, 'sexo': {}}
-        data_anterior = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}, 'sexo': {}}
-        data_hace_2 = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'desglose': {}, 'sexo': {}}
+        data_actual = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'fundadores': 0, 'desglose': {}, 'sexo': {}}
+        data_anterior = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'fundadores': 0, 'desglose': {}, 'sexo': {}}
+        data_hace_2 = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'fundadores': 0, 'desglose': {}, 'sexo': {}}
         
-        def registrar_ingreso(data_mes, plan_nombre, precio, es_fam, sexo_val):
+        def registrar_ingreso(data_mes, plan_nombre, precio, es_fam, sexo_val, es_fundador):
             data_mes['total'] += precio
             data_mes['activos'] += 1
             if es_fam:
                 data_mes['familiares'] += 1
+            if es_fundador:
+                data_mes['fundadores'] += 1
             
             if plan_nombre not in data_mes['desglose']:
                 data_mes['desglose'][plan_nombre] = {'cantidad': 0, 'ingresos': Decimal('0.00')}
@@ -205,25 +208,34 @@ class DeportistaViewSet(viewsets.ModelViewSet):
                 data_mes['sexo'][s_key] = 0
             data_mes['sexo'][s_key] += 1
 
+        fecha_limite_fundador = datetime.date(2025, 12, 31)
+
         for u in usuarios:
             precio = u.tipo_plan.precio_base
             plan_nombre = u.tipo_plan.nombre
             es_fam = u.es_familiar
             sexo_val = u.sexo
             
+            # Es fundador si se dio de alta antes o igual al 31/12/2025, o si su plan ya dice Fundador
+            es_fundador = u.date_joined.date() <= fecha_limite_fundador or 'Fundador' in plan_nombre
+            
+            # Si por algún motivo no tiene asignado el plan fundador pero cumple la fecha
+            # podríamos aplicar el descuento, pero asumimos que el precio de su plan ya es el correcto 
+            # (asignado por admin o por el script).
+            
             if es_fam:
                 precio = precio * Decimal('0.5')
                 
             # Siempre se cobra en el mes actual si están activos hoy
-            registrar_ingreso(data_actual, plan_nombre, precio, es_fam, sexo_val)
+            registrar_ingreso(data_actual, plan_nombre, precio, es_fam, sexo_val, es_fundador)
             
             # Si se dieron de alta antes del día 1 del mes actual, se asume que pagaron el mes anterior
             if u.date_joined.date() < mes_actual:
-                registrar_ingreso(data_anterior, plan_nombre, precio, es_fam, sexo_val)
+                registrar_ingreso(data_anterior, plan_nombre, precio, es_fam, sexo_val, es_fundador)
                 
             # Si se dieron de alta antes del día 1 del mes anterior, pagaron hace 2 meses
             if u.date_joined.date() < mes_anterior:
-                registrar_ingreso(data_hace_2, plan_nombre, precio, es_fam, sexo_val)
+                registrar_ingreso(data_hace_2, plan_nombre, precio, es_fam, sexo_val, es_fundador)
                 
         def format_response(data_mes, etiqueta):
             desglose = []
@@ -248,6 +260,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
                 'total': float(data_mes['total']),
                 'usuarios_activos': data_mes['activos'],
                 'usuarios_familiares': data_mes['familiares'],
+                'usuarios_fundadores': data_mes['fundadores'],
                 'desglose': desglose,
                 'desglose_sexo': desglose_sexo
             }
