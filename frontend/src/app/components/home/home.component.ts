@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService, PerfilDeportista } from '../../services/auth.service';
@@ -14,11 +14,27 @@ export class HomeComponent implements OnInit {
   perfil: PerfilDeportista | null = null;
   activeTab: string = 'nosotros';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.authService.me().subscribe(usuario => {
-      this.perfil = usuario;
+    this.authService.me().subscribe({
+      next: (usuario) => {
+        this.perfil = usuario;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error cargando perfil en Home:', err);
+        // Fallback: extraer username del token JWT
+        const token = this.authService.getToken();
+        if (token) {
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            this.perfil = { username: payload.username || payload.user_id || 'Usuario', id: payload.user_id } as any;
+          } catch (e) {
+            console.error('Error decodificando token:', e);
+          }
+        }
+      }
     });
   }
 
@@ -33,8 +49,8 @@ export class HomeComponent implements OnInit {
 
   /** Nombre formateado para el hero */
   get nombreUsuario(): string {
-    if (!this.perfil) return '';
-    return this.perfil.first_name || this.perfil.username;
+    if (!this.perfil) return 'Deportista';
+    return this.perfil.first_name?.trim() || this.perfil.username || 'Deportista';
   }
 
   /** Cinturón con primera letra en mayúscula */
@@ -42,5 +58,18 @@ export class HomeComponent implements OnInit {
     if (!this.perfil?.cinturon) return 'Blanco';
     const c = this.perfil.cinturon.toLowerCase();
     return c.charAt(0).toUpperCase() + c.slice(1);
+  }
+
+  /** Ampliar vídeo a pantalla completa */
+  videoFullscreen(event: Event) {
+    const video = (event.target as HTMLElement).closest('.about-video')?.querySelector('video');
+    if (video) {
+      if (video.requestFullscreen) {
+        video.requestFullscreen();
+      } else if ((video as any).webkitRequestFullscreen) {
+        (video as any).webkitRequestFullscreen();
+      }
+      video.muted = false;
+    }
   }
 }
