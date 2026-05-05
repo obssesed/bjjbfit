@@ -21,7 +21,7 @@ export class LoginComponent {
   login() {
     this.authService.login(this.username, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       },
       error: () => {
         this.errorMsg = 'Credenciales incorrectas';

@@ -22,6 +22,8 @@
   --blur-glass: blur(16px);
   --radius-md: 12px;
   --radius-lg: 20px;
+  --bg-hover: rgba(255, 255, 255, 0.05);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -95,3 +97,24 @@ a:hover {
   transform: translateY(-2px); /* Pequeña elevación 3D al pasar ratón */
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5); /* Crece la sombra */
 }
+
+/* Botón Dorado Academy */
+.btn-primary-gold {
+  background-color: var(--accent-gold);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 0.85rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(196, 134, 85, 0.3);
+}
+
+.btn-primary-gold:hover {
+  background-color: var(--accent-gold-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(196, 134, 85, 0.5);
+}
+

@@ -10,8 +10,12 @@ import { PanelPlanes } from './components/backoffice/panel-planes/panel-planes';
 import { PanelProgramacion } from './components/backoffice/panel-programacion/panel-programacion';
 import { PanelReportesComponent } from './components/backoffice/panel-reportes/panel-reportes';
 
+import { HomeComponent } from './components/home/home.component';
+
 export const routes: Routes = [
-  { path: '', component: ListaClasesComponent },
+  { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'clases', component: ListaClasesComponent },
+  { path: '', redirectTo: 'clases', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
   { path: 'mis-reservas', component: MiPerfilComponent, canActivate: [AuthGuard] },
@@ -27,5 +31,5 @@ export const routes: Routes = [
       { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
     ]
   },
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: 'clases' }
 ];
