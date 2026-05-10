@@ -45,6 +45,40 @@ npx ng serve
 La aplicación será accesible desde tu navegador web en `http://localhost:4200/`.
 
 ---
+
+## Guía de Ejecución con Docker (Recomendado para Producción)
+
+Para levantar todo el ecosistema (Base de Datos + Backend + Frontend) de forma automatizada y garantizada:
+
+### 1. Requisitos
+Tener instalado **Docker** y **Docker Compose**.
+
+### 2. Comandos rápidos con Makefile
+Si tienes `make` instalado, puedes usar:
+* `make up`: Levanta todo el proyecto en segundo plano.
+* `make down`: Detiene y borra los contenedores.
+* `make logs`: Visualiza los logs de todos los servicios.
+* `make build`: Reconstruye las imágenes (útil tras cambios en dependencias).
+* `make superuser`: Crea el usuario administrador inicial.
+
+### 3. Comandos manuales (sin Makefile)
+```bash
+# Levantar el proyecto
+docker-compose up --build -d
+
+# Ver el estado de los contenedores
+docker-compose ps
+
+# Detener el proyecto
+docker-compose down
+```
+
+La aplicación estará disponible en:
+* **Frontend**: `http://localhost` (Puerto 80)
+* **Backend API**: `http://localhost:8000/api/`
+* **Admin Django**: `http://localhost:8000/admin/`
+
+---
 ## Estándares de Código
 Para cumplir con los estándares `Project Phoenix`:
 * **Idiomas**: Modelos, variables, docstrings en Español. Todo lo técnico/librerías en Inglés.

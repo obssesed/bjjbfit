@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: bjjfit_db
+    environment:
+      POSTGRES_DB: bjjfit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: bjjfitpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: bjjfit_backend
+    environment:
+      - DEBUG=0
+      - SECRET_KEY=django-insecure-prod-key-change-me
+      - DB_NAME=bjjfit
+      - DB_USER=postgres
+      - DB_PASSWORD=bjjfitpassword
+      - DB_HOST=db
+      - DB_PORT=5432
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend
+    volumes:
+      - ./backend/media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    container_name: bjjfit_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

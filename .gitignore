@@ -14,3 +14,12 @@ dist/
 .vscode/
 .idea/
 .DS_Store
+
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.webm
+
+# Media uploads (User generated content)
+backend/media/*.mov

@@ -1,6 +1,22 @@
 from rest_framework import serializers
 from usuarios.models import Deportista
-from .models import ClaseBJJ, Reserva, PlantillaClase
+from .models import ClaseBJJ, Reserva, PlantillaClase, Actividad, Producto, VideoRepaso
+
+class VideoRepasoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = VideoRepaso
+        fields = '__all__'
+
+class ActividadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actividad
+        fields = '__all__'
+
+class ProductoSerializer(serializers.ModelSerializer):
+    estado_stock_display = serializers.CharField(source='get_estado_stock_display', read_only=True)
+    class Meta:
+        model = Producto
+        fields = '__all__'
 
 class ClaseBJJSerializer(serializers.ModelSerializer):
     """

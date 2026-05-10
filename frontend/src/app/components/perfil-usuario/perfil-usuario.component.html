@@ -1,0 +1,162 @@
+<div class="profile-container fade-in">
+  
+  <div class="profile-header">
+    <div class="back-link">
+      <a routerLink="/home">← Volver al inicio</a>
+    </div>
+    <h1 class="title">Configuración de Perfil</h1>
+    <p class="subtitle">Gestiona tu información personal y datos de contacto.</p>
+  </div>
+
+  <div *ngIf="cargando" class="loading-state">
+    <div class="loader"></div>
+    <p>Cargando tus datos...</p>
+  </div>
+
+  <div *ngIf="!cargando && perfil" class="profile-grid">
+    
+    <!-- LEFT: Read-only Identity Card -->
+    <aside class="identity-card">
+      <div class="avatar-large">
+        {{ (perfil.first_name?.[0] || perfil.username[0]) | uppercase }}
+      </div>
+      <div class="identity-info">
+        <h2>{{ perfil.first_name }} {{ perfil.last_name }}</h2>
+        <p class="username">@{{ perfil.username }}</p>
+        <div class="belt-badge belt-{{ perfil.cinturon | lowercase }}">
+          Cinturón {{ perfil.cinturon }}
+        </div>
+        <div class="id-interno" *ngIf="perfil.id_interno">
+          Socio Nº: <span>{{ perfil.id_interno }}</span>
+        </div>
+      </div>
+      
+      <div class="read-only-notice">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Los datos de identidad y grado son gestionados por la academia.
+      </div>
+    </aside>
+
+    <!-- RIGHT: Editable Form -->
+    <main class="form-card">
+      <form #profileForm="ngForm" (ngSubmit)="guardar()">
+        
+        <div class="form-section">
+          <h3>Información de Contacto</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Correo Electrónico</label>
+              <input type="email" name="email" [(ngModel)]="editData.email" placeholder="ejemplo@correo.com" required>
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="tel" name="telefono" [(ngModel)]="editData.telefono" placeholder="600 000 000">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Datos Personales</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>DNI / NIF</label>
+              <input type="text" name="nif" [(ngModel)]="editData.nif" placeholder="12345678X">
+            </div>
+            <div class="form-group">
+              <label>Fecha de Nacimiento</label>
+              <input type="date" name="fecha_nacimiento" [(ngModel)]="editData.fecha_nacimiento">
+            </div>
+            <div class="form-group">
+              <label>Sexo</label>
+              <select name="sexo" [(ngModel)]="editData.sexo">
+                <option value="">Seleccionar...</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Datos de Facturación</h3>
+          <div class="form-grid">
+            <div class="form-group full-width">
+              <label>Cuenta Bancaria (IBAN)</label>
+              <input type="text" name="cuenta_bancaria" [(ngModel)]="editData.cuenta_bancaria" placeholder="ES00 0000...">
+            </div>
+            <div class="form-group">
+              <label>Método de Pago Preferido</label>
+              <select name="metodo_pago" [(ngModel)]="editData.metodo_pago">
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="CUENTA">Domiciliación Bancaria</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-save" [disabled]="guardando">
+            {{ guardando ? 'Guardando cambios...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+
+      </form>
+    </main>
+
+    <!-- CHILDREN PROFILES SECTION -->
+    <div class="children-section full-width" *ngIf="hijosEditData.length > 0">
+      <div class="section-divider">
+        <span>Perfiles de Menores a Cargo</span>
+      </div>
+      
+      <div class="child-card" *ngFor="let hijo of hijosEditData">
+        <div class="child-header">
+          <div class="avatar-small">{{ hijo.first_name[0] }}</div>
+          <div class="child-title">
+            <h4>{{ hijo.first_name }} {{ hijo.last_name }}</h4>
+            <span class="belt-badge belt-{{ hijo.cinturon | lowercase }} mini">Cinturón {{ hijo.cinturon }}</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Correo Electrónico</label>
+            <input type="email" [(ngModel)]="hijo.edit_email" placeholder="email@niño.com">
+          </div>
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="hijo.edit_telefono" placeholder="600 000 000">
+          </div>
+          <div class="form-group">
+            <label>DNI / NIF</label>
+            <input type="text" [(ngModel)]="hijo.edit_nif" placeholder="12345678X">
+          </div>
+          <div class="form-group">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="hijo.edit_fecha_nacimiento">
+          </div>
+          <div class="form-group">
+            <label>Sexo</label>
+            <select [(ngModel)]="hijo.edit_sexo">
+              <option value="">Seleccionar...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+          <div class="form-actions-child">
+            <button type="button" class="btn-save small" (click)="guardarHijo(hijo)" [disabled]="hijo.guardando">
+              {{ hijo.guardando ? '...' : 'Guardar Datos de ' + hijo.first_name }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" *ngIf="mensajeResultado" [class.error]="mensajeError">
+    {{ mensajeResultado }}
+  </div>
+
+</div>

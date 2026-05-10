@@ -143,3 +143,190 @@ body {
     padding: 1.5rem 1rem;
   }
 }
+
+/* --- Notificaciones Premium y Bloqueantes --- */
+.notif-overlay-critical {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  z-index: 100000; /* Por encima de todo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.notif-modal-premium {
+  width: 100%;
+  max-width: 500px;
+  animation: slideScaleUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.notif-glass-container {
+  background: linear-gradient(145deg, rgba(25, 28, 35, 0.9), rgba(10, 12, 16, 0.95));
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 24px;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+              0 0 40px rgba(212, 175, 55, 0.1);
+}
+
+.notif-badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent-gold);
+  color: #000;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.4rem 1.2rem;
+  border-radius: 0 0 12px 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.notif-header-premium {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.notif-icon-glow {
+  width: 80px;
+  height: 80px;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.notif-icon-glow::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--accent-gold);
+  animation: ripple 2s infinite;
+}
+
+.notif-main-icon {
+  font-size: 2.5rem;
+}
+
+.notif-title-premium {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.notif-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+  margin-bottom: 2rem;
+}
+
+.notif-scroll-area {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 2.5rem;
+  padding-right: 0.5rem;
+}
+
+/* Scrollbar personalizado */
+.notif-scroll-area::-webkit-scrollbar {
+  width: 4px;
+}
+.notif-scroll-area::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.2);
+  border-radius: 10px;
+}
+
+.notif-content-premium {
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  margin: 0;
+  text-align: center;
+}
+
+.notif-footer-premium {
+  display: flex;
+  justify-content: center;
+}
+
+.btn-premium-notif {
+  width: 100%;
+  padding: 1.2rem;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-premium-notif:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  background: var(--accent-gold);
+}
+
+.btn-premium-notif:active {
+  transform: translateY(-1px);
+}
+
+.btn-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.6),
+    transparent
+  );
+  transition: all 0.6s;
+}
+
+.btn-premium-notif:hover .btn-shine {
+  left: 100%;
+  transition: all 0.6s;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideScaleUp {
+  from { transform: scale(0.9) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(1.5); opacity: 0; }
+}

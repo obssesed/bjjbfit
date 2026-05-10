@@ -4,8 +4,11 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from decimal import Decimal
-from .models import Deportista, Plan
-from .serializers import DeportistaSerializer, PlanSerializer
+from django.db import models
+from django.contrib.auth.hashers import make_password
+from django.utils.crypto import get_random_string
+from .models import Deportista, Plan, Notificacion, SolicitudReseteoPassword
+from .serializers import DeportistaSerializer, PlanSerializer, NotificacionSerializer, SolicitudReseteoPasswordSerializer
 
 class DeportistaViewSet(viewsets.ModelViewSet):
     """
@@ -18,22 +21,83 @@ class DeportistaViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """
         Asigna permisos dinámicos según la acción:
-        - 'create': Público (Registro).
+        - 'create', 'solicitar_reseteo': Público.
         - 'activos_backoffice': Solo administradores.
         - Otros: Solo usuarios autenticados.
         """
-        if self.action == 'create':
+        if self.action in ['create', 'solicitar_reseteo']:
             return [permissions.AllowAny()]
-        if self.action == 'activos_backoffice':
+        if self.action in ['activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan']:
             return [permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['post'])
+    def solicitar_reseteo(self, request):
+        username = request.data.get('username')
+        if not username:
+            return Response({"error": "Debes proporcionar un nombre de usuario."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = Deportista.objects.get(username=username)
+            # Solo crear si no hay una pendiente
+            if not SolicitudReseteoPassword.objects.filter(usuario=user, resuelta=False).exists():
+                SolicitudReseteoPassword.objects.create(usuario=user)
+            # Siempre devolvemos éxito por seguridad (para no revelar si el user existe o no si no queremos, aunque aquí sí lo verificamos)
+            return Response({"status": "Solicitud enviada correctamente."})
+        except Deportista.DoesNotExist:
+            # Fingimos éxito por seguridad
+            return Response({"status": "Solicitud enviada correctamente."})
+
+    @action(detail=False, methods=['post'])
+    def cambiar_password_obligatorio(self, request):
+        user = request.user
+        new_password = request.data.get('new_password')
+        
+        if not new_password or len(new_password) < 6:
+            return Response({"error": "La contraseña debe tener al menos 6 caracteres."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if not user.requiere_cambio_password:
+            return Response({"error": "No requieres un cambio de contraseña obligatorio."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user.password = make_password(new_password)
+        user.requiere_cambio_password = False
+        user.save()
+        return Response({"status": "Contraseña actualizada correctamente."})
+
+    @action(detail=False, methods=['get', 'patch', 'put'])
     def me(self, request):
         """
-        Devuelve el perfil del usuario actualmente logueado.
+        Devuelve o actualiza el perfil del usuario actualmente logueado.
         """
+        if request.method in ['PATCH', 'PUT']:
+            serializer = self.get_serializer(request.user, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data)
         serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+        
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
+    def actualizar_perfil_hijo(self, request, pk=None):
+        """
+        Permite a un padre/tutor actualizar los datos de su hijo si este es menor de 14 años.
+        """
+        hijo = self.get_object()
+        
+        # 1. Verificar que el usuario logueado es el tutor
+        if hijo.padre_tutor != request.user:
+            return Response({"error": "No tienes permiso para editar este perfil."}, status=status.HTTP_403_FORBIDDEN)
+        
+        # 2. Verificar que el hijo tiene < 14 años
+        if hijo.fecha_nacimiento:
+            hoy = datetime.date.today()
+            edad = hoy.year - hijo.fecha_nacimiento.year - ((hoy.month, hoy.day) < (hijo.fecha_nacimiento.month, hijo.fecha_nacimiento.day))
+            if edad >= 14:
+                return Response({"error": "El alumno ya tiene 14 años o más y debe gestionar su propio perfil."}, status=status.HTTP_403_FORBIDDEN)
+        
+        serializer = self.get_serializer(hijo, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
@@ -346,3 +410,94 @@ class PlanViewSet(viewsets.ModelViewSet):
         return [permissions.IsAuthenticated()]
 
 
+
+class NotificacionViewSet(viewsets.ModelViewSet):
+    queryset = Notificacion.objects.all()
+    serializer_class = NotificacionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff:
+            return Notificacion.objects.all()
+        return Notificacion.objects.filter(
+            models.Q(es_global=True) | models.Q(destinatario=user)
+        ).distinct()
+
+    def get_permissions(self):
+        if self.action in ['create', 'destroy', 'update', 'partial_update']:
+            return [permissions.IsAdminUser()]
+        return [permissions.IsAuthenticated()]
+
+    @action(detail=False, methods=['get'])
+    def pendientes(self, request):
+        user = request.user
+        
+        # Las notificaciones globales no se muestran al staff (admin) en el modal bloqueante,
+        # ya que suelen ser ellos quienes las generan.
+        if user.is_staff:
+            globales_pendientes = Notificacion.objects.none()
+        else:
+            globales_pendientes = Notificacion.objects.filter(es_global=True).exclude(leida_por=user)
+            
+        personales_pendientes = Notificacion.objects.filter(destinatario=user, leida=False)
+        
+        pendientes = (globales_pendientes | personales_pendientes).distinct().order_by('-fecha_creacion')
+        serializer = self.get_serializer(pendientes, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def leer(self, request, pk=None):
+        notificacion = self.get_object()
+        user = request.user
+        
+        if notificacion.es_global:
+            notificacion.leida_por.add(user)
+        else:
+            if notificacion.destinatario == user:
+                notificacion.leida = True
+                notificacion.save()
+            else:
+                return Response({"error": "No puedes leer esta notificación."}, status=403)
+        
+        return Response({"status": "leida"})
+
+class SolicitudReseteoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet exclusivo para administradores para gestionar las solicitudes de reseteo.
+    """
+    queryset = SolicitudReseteoPassword.objects.all()
+    serializer_class = SolicitudReseteoPasswordSerializer
+    permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        # Por defecto devolvemos solo las pendientes, a menos que se pida todo
+        if self.request.query_params.get('todas') == 'true':
+            return self.queryset
+        return self.queryset.filter(resuelta=False)
+
+    @action(detail=True, methods=['post'])
+    def aprobar(self, request, pk=None):
+        solicitud = self.get_object()
+        if solicitud.resuelta:
+            return Response({"error": "La solicitud ya ha sido resuelta."}, status=status.HTTP_400_BAD_REQUEST)
+            
+        usuario = solicitud.usuario
+        # Generar contraseña temporal segura
+        temp_password = get_random_string(8, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
+        
+        # Actualizar usuario
+        usuario.password = make_password(temp_password)
+        usuario.requiere_cambio_password = True
+        usuario.save()
+        
+        # Marcar solicitud como resuelta
+        solicitud.resuelta = True
+        solicitud.fecha_resolucion = timezone.now()
+        solicitud.save()
+        
+        return Response({
+            "status": "Solicitud aprobada.",
+            "temp_password": temp_password,
+            "username": usuario.username
+        })

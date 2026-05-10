@@ -23,7 +23,10 @@
       </div>
 
       <div class="input-group">
-        <label for="password">Contraseña</label>
+        <div class="label-row">
+          <label for="password">Contraseña</label>
+          <a class="forgot-link" (click)="mostrarModalOlvido = true">¿Has olvidado la contraseña?</a>
+        </div>
         <input 
           id="password"
           type="password" 
@@ -38,6 +41,47 @@
 
     <div class="auth-footer">
       <p>¿No tienes cuenta? <a routerLink="/registro" class="link-gold">Regístrate aquí</a></p>
+    </div>
+  </div>
+
+  <!-- Modal de Solicitud de Recuperación -->
+  <div class="modal-overlay" *ngIf="mostrarModalOlvido">
+    <div class="modal-card mini-modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Recuperar Acceso</h3>
+        <button class="btn-close" (click)="cerrarModalOlvido()">×</button>
+      </div>
+      <div class="modal-body text-center">
+        <div class="icon-circle">🔐</div>
+        
+        <div *ngIf="!solicitudEnviada">
+          <p>Introduce tu nombre de usuario. Enviaremos una solicitud al administrador, quien te contactará con tu nueva contraseña temporal.</p>
+          
+          <div class="input-group" style="margin-top: 1.5rem; text-align: left;">
+            <label for="resetUsername">Nombre de usuario</label>
+            <input 
+              id="resetUsername"
+              type="text" 
+              [(ngModel)]="resetUsername" 
+              placeholder="Tu nombre de usuario"
+              required>
+          </div>
+          
+          <p class="text-secondary small">Por seguridad, la entrega de la nueva clave se hará vía contacto oficial (WhatsApp o presencial).</p>
+        </div>
+
+        <div *ngIf="solicitudEnviada" class="success-message">
+          <h4 style="color: var(--accent-gold); margin-bottom: 0.5rem;">¡Solicitud Enviada!</h4>
+          <p>El administrador ha recibido tu petición. Pronto se pondrá en contacto contigo.</p>
+        </div>
+      </div>
+      
+      <div class="modal-actions full-width">
+        <button *ngIf="!solicitudEnviada" class="btn-confirm" (click)="enviarSolicitudReseteo()" [disabled]="!resetUsername || enviandoSolicitud">
+          {{ enviandoSolicitud ? 'Enviando...' : 'Solicitar Reseteo' }}
+        </button>
+        <button *ngIf="solicitudEnviada" class="btn-confirm" (click)="cerrarModalOlvido()">Entendido</button>
+      </div>
     </div>
   </div>
 </div>

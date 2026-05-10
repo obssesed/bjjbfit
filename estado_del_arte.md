@@ -31,11 +31,11 @@ Para que el Producto Mínimo Viable salga a colapsar el mercado, necesitamos enf
 
 ### Fase 1 (Cierre del MVP Core)
 - **Selector Infantil en UI de Reservas**: Actualmente, el Backend API permite que un padre reserve pasándole por JSON la `ID` del hijo. En el panel Angular, al pulsar "Reservar", debemos dar la opción visual (un desplegable o radio buttons) que pregunte: *"¿Reservas plaza para Ti o para [Nombre del Hijo]?"*.
-- **Lista de Asistencia "In Situ" del Profesor**: Una vista exclusiva donde el Profesor/Admin (logueado en Frontend) pase lista fácilmente a los apuntados el día y hora de la clase.
-- **Sistema de Reembolso/Penalizaciones (Opcional MVP)**: ¿Si la falta no está justificada y el profesor le marca como 'No asistió', penalizar su reserva futura o descontar pases limitados? 
+
 
 ### Fase 2 (Post-MVP y Features Adicionales)
 - **Panel Administrativo Nativo Angular**: Desvincular al gerente de tocar el *Django Admin* y ofrecerle un panel visual para aprobar Altas, Bajas, Activar mensualidades familiares y Subir grados/cinturones directamente observando fotos de los deportistas.
+-- **Lista de Asistencia "In Situ" del Profesor**: Una vista exclusiva donde el Profesor/Admin (logueado en Frontend) pase lista fácilmente a los apuntados el día y hora de la clase.
 - **Dashboard de Reporting Avanzado (Métricas)**: Generar un endpoint que analice el uso del tatami. Gráficas semanales de género, cinturón, aforos más pico y porcentaje de cancelaciones, lo cual ayuda en el negocio a prever picos horarios y altas del mes.
 - **Sistema de Notificaciones Push/Mail**: Automatizar un *Celery Task* o usar Firebase para enviar avisos reales cuando un usuario de lista de espera entra de forma sorpresiva en la ventana de participación.
 - **Bóveda de Video Semanal**: Un micro-portal dentro de BJJFIT que permita insertar un enlace privado de Youtube con técnicas repasadas esa semana, de acceso exclusivo a los que tienen `plan_activo=True`.

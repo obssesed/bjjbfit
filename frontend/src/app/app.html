@@ -2,9 +2,11 @@
   
   <nav class="navbar">
     <div class="nav-brand">
-      <span class="logo-text">
-        <span class="logo-white">BJJB</span><span class="logo-gold">FIT</span>
-      </span>
+      <a routerLink="/home" class="logo-link">
+        <span class="logo-text">
+          <span class="logo-white">BJJ</span><span class="black-b">B</span><span class="logo-gold">FIT</span>
+        </span>
+      </a>
     </div>
 
     <div class="nav-links">
@@ -25,6 +27,35 @@
 
   <div class="content-wrapper">
     <router-outlet></router-outlet>
+  </div>
+
+  <!-- Modal de Notificaciones (Bloqueante Total y Premium) -->
+  <div class="notif-overlay-critical" *ngIf="mostrarNotificacionModal">
+    <div class="notif-modal-premium">
+      <div class="notif-glass-container">
+        <div class="notif-badge">MENSAJE IMPORTANTE</div>
+        
+        <div class="notif-header-premium">
+          <div class="notif-icon-glow">
+            <span class="notif-main-icon">📢</span>
+          </div>
+          <h2 class="notif-title-premium">{{ notificacionActual?.titulo }}</h2>
+        </div>
+
+        <div class="notif-divider"></div>
+        
+        <div class="notif-scroll-area">
+          <p class="notif-content-premium">{{ notificacionActual?.mensaje }}</p>
+        </div>
+
+        <div class="notif-footer-premium">
+          <button class="btn-premium-notif" (click)="aceptarNotificacion()">
+            <span class="btn-text">HE LEÍDO Y ACEPTO EL MENSAJE</span>
+            <div class="btn-shine"></div>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
   
 </main>

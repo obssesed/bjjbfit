@@ -18,12 +18,45 @@ export interface ClaseBJJ {
   lista_asistencia?: any[];
 }
 
+export interface Actividad {
+  id?: number;
+  titulo: string;
+  descripcion: string;
+  badge: string;
+  imagen?: string | File;
+  orden?: number;
+}
+
+export interface Producto {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  tallas: string;
+  estado_stock: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  estado_stock_display?: string;
+  imagen?: string | File;
+  orden?: number;
+}
+
+export interface VideoRepaso {
+  id?: number;
+  titulo: string;
+  descripcion: string;
+  fecha_publicacion?: string;
+  archivo_video: string | File;
+  miniatura?: string | File;
+  orden?: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class ClasesService {
   private apiUrl = 'http://localhost:8000/api/clases/';
   private reservasUrl = 'http://localhost:8000/api/reservas/';
+  private actividadesUrl = 'http://localhost:8000/api/actividades/';
+  private productosUrl = 'http://localhost:8000/api/productos/';
+  private videosUrl = 'http://localhost:8000/api/videos-repaso/';
 
   constructor(private http: HttpClient) { }
 
@@ -63,5 +96,86 @@ export class ClasesService {
    */
   cancelarReserva(reservaId: number): Observable<any> {
     return this.http.delete(`${this.reservasUrl}${reservaId}/`);
+  }
+
+  // --- GESTIÓN DE ACTIVIDADES (Home) ---
+  
+  getActividades(): Observable<Actividad[]> {
+    return this.http.get<Actividad[]>(this.actividadesUrl);
+  }
+
+  guardarActividad(actividad: any): Observable<Actividad> {
+    const formData = new FormData();
+    Object.keys(actividad).forEach(key => {
+      if (key === 'imagen' && actividad[key] instanceof File) {
+        formData.append(key, actividad[key]);
+      } else if (actividad[key] !== null && actividad[key] !== undefined) {
+        formData.append(key, actividad[key]);
+      }
+    });
+
+    if (actividad.id) {
+      return this.http.patch<Actividad>(`${this.actividadesUrl}${actividad.id}/`, formData);
+    } else {
+      return this.http.post<Actividad>(this.actividadesUrl, formData);
+    }
+  }
+
+  eliminarActividad(id: number): Observable<any> {
+    return this.http.delete(`${this.actividadesUrl}${id}/`);
+  }
+
+  // --- GESTIÓN DE PRODUCTOS (Tienda) ---
+
+  getProductos(): Observable<Producto[]> {
+    return this.http.get<Producto[]>(this.productosUrl);
+  }
+
+  guardarProducto(producto: any): Observable<Producto> {
+    const formData = new FormData();
+    Object.keys(producto).forEach(key => {
+      if (key === 'imagen' && producto[key] instanceof File) {
+        formData.append(key, producto[key]);
+      } else if (producto[key] !== null && producto[key] !== undefined) {
+        formData.append(key, producto[key]);
+      }
+    });
+
+    if (producto.id) {
+      return this.http.patch<Producto>(`${this.productosUrl}${producto.id}/`, formData);
+    } else {
+      return this.http.post<Producto>(this.productosUrl, formData);
+    }
+  }
+
+  eliminarProducto(id: number): Observable<any> {
+    return this.http.delete(`${this.productosUrl}${id}/`);
+  }
+
+  // --- GESTIÓN DE VÍDEOS DE REPASO ---
+
+  getVideosRepaso(): Observable<VideoRepaso[]> {
+    return this.http.get<VideoRepaso[]>(this.videosUrl);
+  }
+
+  guardarVideoRepaso(video: any): Observable<VideoRepaso> {
+    const formData = new FormData();
+    Object.keys(video).forEach(key => {
+      if ((key === 'archivo_video' || key === 'miniatura') && video[key] instanceof File) {
+        formData.append(key, video[key]);
+      } else if (video[key] !== null && video[key] !== undefined) {
+        formData.append(key, video[key]);
+      }
+    });
+
+    if (video.id) {
+      return this.http.patch<VideoRepaso>(`${this.videosUrl}${video.id}/`, formData);
+    } else {
+      return this.http.post<VideoRepaso>(this.videosUrl, formData);
+    }
+  }
+
+  eliminarVideoRepaso(id: number): Observable<any> {
+    return this.http.delete(`${this.videosUrl}${id}/`);
   }
 }

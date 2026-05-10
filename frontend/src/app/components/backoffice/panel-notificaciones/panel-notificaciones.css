@@ -1,0 +1,113 @@
+.notif-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.notif-form-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  padding: 2rem;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  color: var(--accent-gold);
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.toggle-group {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0,0,0,0.2);
+  padding: 0.3rem;
+  border-radius: 8px;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 0.6rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn.active {
+  background: var(--accent-gold);
+  color: #0c111d;
+}
+
+.btn-send {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--accent-gold), #b8860b);
+  border: none;
+  border-radius: 12px;
+  color: #0c111d;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 1rem;
+}
+
+.btn-send:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.notif-tips {
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px dashed var(--accent-gold);
+  padding: 2rem;
+  border-radius: 16px;
+  height: fit-content;
+}
+
+.tips-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tips-list li {
+  margin-bottom: 1.2rem;
+  color: var(--text-primary);
+  position: relative;
+  padding-left: 1.5rem;
+  line-height: 1.5;
+}
+
+.tips-list li::before {
+  content: "📍";
+  position: absolute;
+  left: 0;
+}
+
+@media (max-width: 900px) {
+  .notif-grid {
+    grid-template-columns: 1fr;
+  }
+}

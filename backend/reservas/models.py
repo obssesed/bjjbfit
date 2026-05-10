@@ -137,3 +137,87 @@ class Reserva(models.Model):
         Representación en texto de la reserva.
         """
         return f"Reserva [{self.get_estado_display()}]: {self.deportista} -> {self.clase.titulo}"
+
+
+class Actividad(models.Model):
+    """
+    Modelo para gestionar las actividades/servicios que se muestran en la Home.
+    Permite al admin añadir, editar o eliminar servicios dinámicamente.
+    """
+    titulo = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    badge = models.CharField(max_length=50, help_text="Etiqueta superior (ej: TÉCNICA, INTENSO).")
+    imagen = models.FileField(
+        upload_to='actividades/',
+        null=True,
+        blank=True,
+        help_text="Imagen de fondo para la tarjeta."
+    )
+    orden = models.PositiveIntegerField(default=0, help_text="Orden de aparición en la web.")
+
+    class Meta:
+        verbose_name = "Actividad"
+        verbose_name_plural = "Actividades"
+        ordering = ['orden', 'id']
+
+    def __str__(self):
+        return self.titulo
+
+
+class Producto(models.Model):
+    """
+    Modelo para gestionar los productos de la tienda de la academia.
+    """
+    CHOICES_STOCK = [
+        ('IN_STOCK', 'En Stock'),
+        ('LOW_STOCK', 'Últimas tallas'),
+        ('OUT_OF_STOCK', 'Agotado'),
+    ]
+
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True, null=True)
+    tallas = models.CharField(max_length=100, help_text="Ej: A0, A1, A2 o S, M, L", blank=True, null=True)
+    estado_stock = models.CharField(max_length=20, choices=CHOICES_STOCK, default='IN_STOCK')
+    imagen = models.FileField(
+        upload_to='productos/',
+        null=True,
+        blank=True,
+        help_text="Imagen del producto."
+    )
+    orden = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Producto"
+        verbose_name_plural = "Productos"
+        ordering = ['orden', 'id']
+
+    def __str__(self):
+        return self.nombre
+
+
+class VideoRepaso(models.Model):
+    """
+    Modelo para los vídeos de repaso semanales.
+    """
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True, null=True)
+    fecha_publicacion = models.DateField(auto_now_add=True)
+    archivo_video = models.FileField(
+        upload_to='videos/',
+        help_text="Archivo de vídeo (mp4, webm, etc.)"
+    )
+    miniatura = models.ImageField(
+        upload_to='videos/thumbnails/',
+        null=True,
+        blank=True,
+        help_text="Imagen de previsualización para el vídeo."
+    )
+    orden = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        verbose_name = "Vídeo de Repaso"
+        verbose_name_plural = "Vídeos de Repaso"
+        ordering = ['-fecha_publicacion', 'orden', 'id']
+
+    def __str__(self):
+        return self.titulo

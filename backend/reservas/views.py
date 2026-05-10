@@ -1,13 +1,59 @@
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, parsers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.exceptions import ValidationError
-from .models import ClaseBJJ, Reserva, PlantillaClase
-from .serializers import ClaseBJJSerializer, ReservaSerializer, PlantillaClaseSerializer
+from .models import ClaseBJJ, Reserva, PlantillaClase, Actividad, Producto, VideoRepaso
+from .serializers import (
+    ClaseBJJSerializer, ReservaSerializer, PlantillaClaseSerializer, 
+    ActividadSerializer, ProductoSerializer, VideoRepasoSerializer
+)
 import datetime
+
+class VideoRepasoViewSet(viewsets.ModelViewSet):
+    """
+    Vista para gestionar los vídeos de repaso.
+    Lectura: Pública (requiere estar logueado para ver el contenido).
+    Escritura: Solo Staff.
+    """
+    queryset = VideoRepaso.objects.all()
+    serializer_class = VideoRepasoSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.IsAuthenticated()]
+        return [permissions.IsAdminUser()]
+
+class ActividadViewSet(viewsets.ModelViewSet):
+    """
+    Vista para gestionar las actividades de la Home.
+    Lectura: Pública.
+    Escritura: Solo Staff.
+    """
+    queryset = Actividad.objects.all().order_by('orden', 'id')
+    serializer_class = ActividadSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
+
+class ProductoViewSet(viewsets.ModelViewSet):
+    """
+    Vista para gestionar los productos de la tienda.
+    Lectura: Pública.
+    Escritura: Solo Staff.
+    """
+    queryset = Producto.objects.all().order_by('orden', 'id')
+    serializer_class = ProductoSerializer
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAdminUser()]
 
 class ClaseBJJViewSet(viewsets.ModelViewSet):
     """

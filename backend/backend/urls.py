@@ -19,8 +19,11 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from usuarios.views import DeportistaViewSet, PlanViewSet
-from reservas.views import ClaseBJJViewSet, ReservaViewSet, PlantillaClaseViewSet
+from usuarios.views import DeportistaViewSet, PlanViewSet, NotificacionViewSet, SolicitudReseteoViewSet
+from reservas.views import (
+    ClaseBJJViewSet, ReservaViewSet, PlantillaClaseViewSet, 
+    ActividadViewSet, ProductoViewSet, VideoRepasoViewSet
+)
 
 router = DefaultRouter()
 router.register(r'deportistas', DeportistaViewSet, basename='deportista')
@@ -28,6 +31,11 @@ router.register(r'clases', ClaseBJJViewSet, basename='clase')
 router.register(r'reservas', ReservaViewSet, basename='reserva')
 router.register(r'planes', PlanViewSet, basename='plan')
 router.register(r'programacion', PlantillaClaseViewSet, basename='programacion')
+router.register(r'actividades', ActividadViewSet, basename='actividad')
+router.register(r'productos', ProductoViewSet, basename='producto')
+router.register(r'videos-repaso', VideoRepasoViewSet, basename='video-repaso')
+router.register(r'notificaciones', NotificacionViewSet, basename='notificacion')
+router.register(r'solicitudes-reseteo', SolicitudReseteoViewSet, basename='solicitud-reseteo')
 
 from django.conf import settings
 from django.conf.urls.static import static

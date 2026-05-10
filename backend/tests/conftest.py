@@ -35,7 +35,8 @@ def deportista_hijo(db, deportista_padre):
         password="password_secreta",
         plan_activo=True,
         padre_tutor=deportista_padre,
-        nif="11111111A" # Misma id que el padre
+        nif="11111111A", # Misma id que el padre
+        fecha_nacimiento="2015-01-01"
     )
 
 @pytest.fixture

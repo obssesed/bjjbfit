@@ -1,0 +1,63 @@
+<div class="panel-header">
+  <h2 class="panel-title">Centro de Notificaciones</h2>
+  <p class="panel-subtitle">Envía mensajes a tus alumnos.</p>
+</div>
+
+<div class="notif-grid">
+  <!-- Formulario de Envío -->
+  <div class="notif-form-card">
+    <h3 class="card-title">Nueva Notificación</h3>
+
+    <div class="form-group">
+      <label>Título del Mensaje</label>
+      <input type="text" [(ngModel)]="nuevaNotificacion.titulo" placeholder="Ej: Festivo el Próximo Lunes"
+        class="input-premium">
+    </div>
+
+    <div class="form-group">
+      <label>Contenido del Mensaje</label>
+      <textarea [(ngModel)]="nuevaNotificacion.mensaje" rows="4" placeholder="Escribe aquí el mensaje detallado..."
+        class="input-premium"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Destinatarios</label>
+      <div class="toggle-group">
+        <button class="toggle-btn" [class.active]="nuevaNotificacion.es_global"
+          (click)="nuevaNotificacion.es_global = true">Global (Todos)</button>
+        <button class="toggle-btn" [class.active]="!nuevaNotificacion.es_global"
+          (click)="nuevaNotificacion.es_global = false">Individual</button>
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="!nuevaNotificacion.es_global">
+      <label>Seleccionar Usuario</label>
+      <select [(ngModel)]="nuevaNotificacion.destinatario" class="input-premium">
+        <option [ngValue]="undefined" disabled>-- Elige un alumno --</option>
+        <option *ngFor="let u of usuarios" [ngValue]="u.id">
+          {{ u.first_name }} {{ u.last_name }} (@{{ u.username }})
+        </option>
+      </select>
+    </div>
+
+    <div *ngIf="mensajeExito" class="alert-success">{{ mensajeExito }}</div>
+    <div *ngIf="mensajeError" class="alert-error">{{ mensajeError }}</div>
+
+    <button class="btn-send" (click)="enviar()" [disabled]="cargando">
+      {{ cargando ? 'Enviando...' : 'Enviar Notificación 🚀' }}
+    </button>
+  </div>
+
+  <!-- Guía de Uso / Tips -->
+  <div class="notif-tips">
+    <h3 class="card-title">Información Importante</h3>
+    <ul class="tips-list">
+      <li><strong>Bloqueo Visual:</strong> Las notificaciones aparecerán como un modal emergente en cuanto el usuario
+        inicie sesión.</li>
+      <li><strong>Aceptación Obligatoria:</strong> El usuario debe pulsar "Aceptar" para que el modal desaparezca y
+        pueda usar la app.</li>
+      <li><strong>Uso Responsable:</strong> Usa esta herramienta para avisos críticos (pagos pendientes, cambios de
+        horario, festivos).</li>
+    </ul>
+  </div>
+</div>

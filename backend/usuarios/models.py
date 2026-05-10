@@ -134,6 +134,12 @@ class Deportista(AbstractUser):
         related_name='hijos_a_cargo',
         help_text="Relación Adulto -> Niños. Determina quién administra el perfil de un menor."
     )
+    
+    # --- Seguridad ---
+    requiere_cambio_password = models.BooleanField(
+        default=False,
+        help_text="Fuerza al usuario a cambiar su contraseña al hacer login."
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -161,3 +167,59 @@ class Deportista(AbstractUser):
         Retorna la representación inicial del deportista.
         """
         return f"{self.username} - {self.cinturon or 'Cinturón blanco sin grados'}"
+
+class SolicitudReseteoPassword(models.Model):
+    """
+    Modelo para gestionar las solicitudes de reseteo de contraseña sin email.
+    """
+    usuario = models.ForeignKey(
+        'Deportista', 
+        on_delete=models.CASCADE,
+        related_name='solicitudes_reseteo'
+    )
+    fecha_solicitud = models.DateTimeField(auto_now_add=True)
+    resuelta = models.BooleanField(default=False)
+    fecha_resolucion = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = "Solicitud de Reseteo"
+        verbose_name_plural = "Solicitudes de Reseteo"
+        ordering = ['-fecha_solicitud']
+
+    def __str__(self):
+        estado = "Resuelta" if self.resuelta else "Pendiente"
+        return f"Solicitud de {self.usuario.username} - {estado}"
+
+class Notificacion(models.Model):
+    """
+    Modelo para notificaciones internas.
+    Pueden ser dirigidas a un usuario concreto o globales (para todos).
+    """
+    titulo = models.CharField(max_length=200)
+    mensaje = models.TextField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    es_global = models.BooleanField(default=False)
+    destinatario = models.ForeignKey(
+        'Deportista', 
+        on_delete=models.CASCADE, 
+        related_name='notificaciones_personales',
+        null=True, 
+        blank=True,
+        help_text="Si está vacío y es_global es True, llega a todos."
+    )
+    leida = models.BooleanField(default=False, help_text="Solo aplica para notificaciones personales.")
+    leida_por = models.ManyToManyField(
+        'Deportista', 
+        related_name='notificaciones_globales_leidas',
+        blank=True,
+        help_text="Track de quién ha leído la notificación global."
+    )
+
+    class Meta:
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+        ordering = ['-fecha_creacion']
+
+    def __str__(self):
+        tipo = "Global" if self.es_global else f"Para {self.destinatario.username if self.destinatario else '?'}"
+        return f"{tipo}: {self.titulo}"

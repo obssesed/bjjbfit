@@ -34,13 +34,16 @@ class TestAbonos:
         assert deportista.metodo_pago == 'CUENTA'
         assert deportista.cuenta_bancaria == 'ES2112345678901234567890'
 
+    @pytest.mark.django_db
     def test_si_deportista_no_admin_intenta_cambiar_metodo_resultado_200(self, api_client):
-        # El propio usuario puede editar su perfil por defecto en DRF ModelViewSet
+        # Crear deportista
+        from usuarios.models import Deportista
         deportista = Deportista.objects.create_user(
-            username='user1', email='u1@test.com', password='p1',
-            first_name='U', last_name='1', nif='1', sexo='M', fecha_nacimiento='1990-01-01'
+            username="test_metodo",
+            password="pwd",
+            metodo_pago="EFECTIVO"
         )
         api_client.force_authenticate(user=deportista)
-        
-        res = api_client.patch(f'/api/deportistas/{deportista.id}/', {'metodo_pago': 'CUENTA'})
+    
+        res = api_client.patch(f'/api/deportistas/{deportista.id}/', {'metodo_pago': 'CUENTA', 'cuenta_bancaria': 'ES1234567890'})
         assert res.status_code == 200

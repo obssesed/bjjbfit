@@ -6,15 +6,25 @@
 <header class="hero">
   <div class="hero-pattern"></div>
   <div class="hero-body">
+    <!-- Alertas Admin -->
+    <div class="admin-alert-banner" *ngIf="solicitudesPendientesCount > 0" routerLink="/backoffice/reseteos">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-text">
+        <strong>Atención Admin:</strong> Tienes {{ solicitudesPendientesCount }} solicitud(es) de reseteo de contraseña pendiente(s). Haz clic aquí para resolverlas.
+      </div>
+    </div>
+
     <div class="hero-text">
-      <p class="hero-label">BJJB<span class="gold">FIT</span> ACADEMY</p>
+      <a routerLink="/home" class="logo-link">
+        <p class="hero-label">BJJ<span class="black-b">B</span><span class="gold">FIT</span> ACADEMY</p>
+      </a>
       <h1 class="hero-title">
         Bienvenido, <span class="gold">{{ nombreUsuario }}</span>
       </h1>
       <p class="hero-sub">Tu camino en el tatami continúa. Entrena, evoluciona, compite.</p>
       <div class="hero-actions">
         <a routerLink="/clases" class="btn-gold">Reservar Clase</a>
-        <a routerLink="/mis-reservas" class="btn-outline">Mis Reservas</a>
+        <a routerLink="/mi-perfil" class="btn-outline">Mi Perfil</a>
       </div>
     </div>
     <div class="hero-logo" *ngIf="perfil">
@@ -45,6 +55,28 @@
   <!-- ──────── SOBRE NOSOTROS ──────── -->
   <section *ngIf="activeTab === 'nosotros'" class="section fade-in">
 
+    <!-- Próximas Clases (Quick Access) -->
+    <div class="upcoming-section" *ngIf="proximasClases.length > 0">
+      <div class="upcoming-header">
+        <h3 class="sub-heading">¡Próximas Sesiones!</h3>
+        <a routerLink="/clases" class="view-all">Ver calendario completo →</a>
+      </div>
+      <div class="upcoming-grid">
+        <div class="class-mini-card" *ngFor="let clase of proximasClases" [routerLink]="['/clases']">
+          <div class="class-mini-icon">{{ clase.icono || '🥋' }}</div>
+          <div class="class-mini-body">
+            <span class="class-mini-time">{{ clase.fecha_hora_inicio | date:'shortTime' }}</span>
+            <span class="class-mini-title">{{ clase.titulo }}</span>
+          </div>
+          <div class="class-mini-status">
+            <span class="spots" [class.full]="clase.plazas_disponibles === 0">
+              {{ clase.plazas_disponibles }} plazas
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Presentación + Vídeo -->
     <div class="about-hero-card">
       <div class="about-content">
@@ -56,18 +88,23 @@
         </p>
       </div>
       <div class="about-video">
-        <video
-          class="video-preview"
-          src="academia.mov"
-          muted
-          loop
-          autoplay
-          playsinline
-          (click)="videoFullscreen($event)"
-          title="Click para ampliar"
-        ></video>
+        <video #videoAcademia class="video-preview" src="academia.mov" [muted]="videoMuted" loop autoplay playsinline
+          (click)="videoFullscreen($event)" title="Click para ampliar"></video>
+        <button class="mute-btn" (click)="toggleMute()" [title]="videoMuted ? 'Activar sonido' : 'Silenciar'">
+          <!-- Icono sonido ON -->
+          <svg *ngIf="!videoMuted" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+          </svg>
+          <!-- Icono sonido OFF -->
+          <svg *ngIf="videoMuted" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
+          </svg>
+        </button>
         <button class="expand-btn" (click)="videoFullscreen($event)" title="Ver en grande">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
             <polyline points="15 3 21 3 21 9"></polyline>
             <polyline points="9 21 3 21 3 15"></polyline>
             <line x1="21" y1="3" x2="14" y2="10"></line>
@@ -79,33 +116,61 @@
 
     <!-- Info Cards -->
     <div class="info-grid">
-      <div class="info-card">
-        <div class="info-icon">📍</div>
-        <h3>Ubicación</h3>
-        <p>Calle Ejemplo 123, Ciudad Deportiva</p>
-        <p class="info-sub">Lunes a Viernes · 10:00 – 22:00<br>Sábados · 10:00 – 14:00</p>
+      <div class="info-card info-card--ubicacion">
+        <div class="ubicacion-info">
+          <div class="info-icon">📍</div>
+          <h3>Ubicación</h3>
+          <p>Plaça Jordi Dauder i Guardiola, 08917<br>Badalona, Barcelona</p>
+          <p class="info-sub">Lunes a Viernes · 10:00 – 21:30</p>
+          <a href="https://www.google.com/maps/search/BJJBFIT+BADALONA" target="_blank" rel="noopener"
+            class="maps-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            Abrir en Google Maps
+          </a>
+        </div>
+        <div class="ubicacion-mapa">
+          <iframe
+            src="https://maps.google.com/maps?q=BJJBFIT+BADALONA+Pla%C3%A7a+Jordi+Dauder+i+Guardiola+Badalona&t=&z=16&ie=UTF8&iwloc=&output=embed"
+            width="100%" height="100%" style="border:0; border-radius: 12px;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
       </div>
       <div class="info-card">
         <div class="info-icon">📱</div>
         <h3>Síguenos</h3>
         <div class="social-row">
-          <a href="#" class="social-chip">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          <a href="https://www.instagram.com/bjjbfit/" target="_blank" rel="noopener" class="social-chip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+            </svg>
             Instagram
           </a>
-          <a href="#" class="social-chip">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          <a href="https://www.facebook.com/p/BJJ-BFIT-100063743076026/?locale=es_ES" target="_blank" rel="noopener"
+            class="social-chip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
             Facebook
           </a>
-          <a href="#" class="social-chip">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          <a href="https://www.youtube.com/channel/UCleMIKs7JrIfDhX1ALrq3iw" target="_blank" rel="noopener"
+            class="social-chip">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+            </svg>
             YouTube
           </a>
         </div>
       </div>
     </div>
 
-    <!-- Profesores -->
     <h3 class="sub-heading">Nuestro Equipo</h3>
     <div class="teachers-row">
       <div class="teacher-card">
@@ -118,7 +183,28 @@
           <p>Cinturón Negro 2º Grado · Fundador</p>
         </div>
       </div>
+      <div class="teacher-card">
+        <div class="teacher-avatar">
+          <span class="avatar-letter">M</span>
+        </div>
+        <div class="teacher-body">
+          <h4>Marina Sola</h4>
+          <span class="teacher-belt belt-marron"></span>
+          <p>Cinturón Marrón · Head Coach Kids</p>
+        </div>
+      </div>
+      <div class="teacher-card">
+        <div class="teacher-avatar">
+          <span class="avatar-letter">A</span>
+        </div>
+        <div class="teacher-body">
+          <h4>Alex Torres</h4>
+          <span class="teacher-belt belt-negro"></span>
+          <p>Cinturón Negro · Instructor No-Gi</p>
+        </div>
+      </div>
     </div>
+
   </section>
 
   <!-- ──────── SERVICIOS ──────── -->
@@ -126,35 +212,38 @@
     <h2 class="section-title">Nuestras Actividades</h2>
     <p class="section-sub">Disciplinas y espacios diseñados para tu evolución.</p>
 
+    <div class="admin-toolbar" *ngIf="isAdmin">
+      <button class="btn-add-activity" (click)="abrirModalActividad()">
+        + Añadir Actividad
+      </button>
+    </div>
+
     <div class="services-grid">
-      <!-- Actividades principales -->
-      <div class="svc-card">
-        <div class="svc-visual gi"></div>
+      <div *ngFor="let act of actividades" class="svc-card">
+        <!-- Acciones Admin en la tarjeta -->
+        <div class="card-admin-actions" *ngIf="isAdmin">
+          <button class="btn-circle-admin" (click)="abrirModalActividad(act)" title="Editar">
+            ✏️
+          </button>
+          <button class="btn-circle-admin delete" (click)="eliminarActividad(act.id!, $event)" title="Eliminar">
+            🗑️
+          </button>
+        </div>
+
+        <div class="svc-visual" [style.backgroundImage]="act.imagen ? 'url(' + act.imagen + ')' : null" [ngClass]="{'no-img': !act.imagen}">
+          <div class="svc-overlay"></div>
+        </div>
         <div class="svc-body">
-          <h3>BJJ con Gi</h3>
-          <p>Clases técnicas con kimono. Control posicional, barridas y sumisiones.</p>
+          <div class="svc-badge">{{ act.badge }}</div>
+          <h3>{{ act.titulo }}</h3>
+          <p>{{ act.descripcion }}</p>
+          <div class="svc-footer">Explorar horarios →</div>
         </div>
       </div>
-      <div class="svc-card">
-        <div class="svc-visual nogi"></div>
-        <div class="svc-body">
-          <h3>No-Gi / Grappling</h3>
-          <p>Entrenamiento sin kimono. Velocidad, wrestling y transiciones.</p>
-        </div>
-      </div>
-      <div class="svc-card">
-        <div class="svc-visual kids"></div>
-        <div class="svc-body">
-          <h3>BJJ Infantil</h3>
-          <p>Valores, disciplina y desarrollo motor para los más pequeños del tatami.</p>
-        </div>
-      </div>
-      <div class="svc-card">
-        <div class="svc-visual fit4fight"></div>
-        <div class="svc-body">
-          <h3>Fit4Fight</h3>
-          <p>Acondicionamiento funcional de alta intensidad orientado a deportes de combate.</p>
-        </div>
+      
+      <!-- Placeholder si no hay actividades -->
+      <div *ngIf="actividades.length === 0 && !cargandoActividades" class="empty-state">
+        <p>No hay actividades configuradas actualmente.</p>
       </div>
     </div>
 
@@ -194,50 +283,49 @@
       <span class="store-banner-icon">🛒</span>
       <div>
         <strong>Compra presencial</strong>
-        <p>Para adquirir cualquier artículo, dirígete a la recepción de la academia. Aquí puedes consultar disponibilidad.</p>
+        <p>Para adquirir cualquier artículo, dirígete a la recepción de la academia. Aquí puedes consultar
+          disponibilidad.</p>
       </div>
     </div>
 
+    <div class="admin-toolbar" *ngIf="isAdmin">
+      <button class="btn-add-activity" (click)="abrirModalProducto()">
+        + Añadir Producto
+      </button>
+    </div>
+
     <div class="products-grid">
-      <div class="product-card">
-        <div class="product-visual kimono"></div>
+      <div *ngFor="let prod of productos" class="product-card">
+        <!-- Acciones Admin en la tarjeta -->
+        <div class="card-admin-actions" *ngIf="isAdmin">
+          <button class="btn-circle-admin" (click)="abrirModalProducto(prod)" title="Editar">
+            ✏️
+          </button>
+          <button class="btn-circle-admin delete" (click)="eliminarProducto(prod.id!, $event)" title="Eliminar">
+            🗑️
+          </button>
+        </div>
+
+        <div class="product-visual" [style.backgroundImage]="prod.imagen ? 'url(' + prod.imagen + ')' : null" [ngClass]="{'no-img': !prod.imagen}">
+          <div class="product-overlay"></div>
+        </div>
         <div class="product-body">
-          <h3>Kimono Oficial BJJ Fit</h3>
-          <div class="product-meta">
-            <span class="stock-badge available">En Stock</span>
-            <span class="sizes">A0 · A1 · A2 · A3 · A4</span>
-          </div>
+          <span class="stock-tag" [ngClass]="{
+            'available': prod.estado_stock === 'IN_STOCK',
+            'low': prod.estado_stock === 'LOW_STOCK',
+            'out': prod.estado_stock === 'OUT_OF_STOCK'
+          }">
+            {{ prod.estado_stock_display || (prod.estado_stock === 'IN_STOCK' ? 'En Stock' : prod.estado_stock === 'LOW_STOCK' ? 'Últimas tallas' : 'Agotado') }}
+          </span>
+          <h3>{{ prod.nombre }}</h3>
+          <p class="product-info">{{ prod.tallas }}</p>
+          <div class="product-action">Consultar en recepción</div>
         </div>
       </div>
-      <div class="product-card">
-        <div class="product-visual rashguard"></div>
-        <div class="product-body">
-          <h3>Rashguard Academy</h3>
-          <div class="product-meta">
-            <span class="stock-badge low">Pocas unidades</span>
-            <span class="sizes">S · M · L · XL</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-visual cinturon"></div>
-        <div class="product-body">
-          <h3>Cinturones</h3>
-          <div class="product-meta">
-            <span class="stock-badge available">En Stock</span>
-            <span class="sizes">Todos los colores y medidas</span>
-          </div>
-        </div>
-      </div>
-      <div class="product-card">
-        <div class="product-visual shorts"></div>
-        <div class="product-body">
-          <h3>Shorts de competición</h3>
-          <div class="product-meta">
-            <span class="stock-badge available">En Stock</span>
-            <span class="sizes">S · M · L · XL</span>
-          </div>
-        </div>
+
+      <!-- Placeholder si no hay productos -->
+      <div *ngIf="productos.length === 0 && !cargandoProductos" class="empty-state">
+        <p>No hay productos disponibles actualmente.</p>
       </div>
     </div>
   </section>
@@ -247,44 +335,222 @@
     <h2 class="section-title">Vídeos de Repaso</h2>
     <p class="section-sub">Revisa las técnicas trabajadas en clase. Actualización semanal.</p>
 
-    <div class="video-layout">
-      <div class="video-main">
+    <div class="admin-toolbar" *ngIf="isAdmin">
+      <button class="btn-add-activity" (click)="abrirModalVideo()">
+        + Añadir Vídeo de Repaso
+      </button>
+    </div>
+
+    <div class="video-layout" *ngIf="videosRepaso.length > 0; else noVideos">
+      <div class="video-main" *ngIf="videoActivo">
         <div class="video-player">
-          <div class="play-btn">▶</div>
-          <p>Próximamente: contenido de vídeo</p>
+          <video *ngIf="videoActivo.archivo_video" [src]="videoActivo.archivo_video" controls class="main-video-el" [poster]="videoActivo.miniatura || ''"></video>
+          <div *ngIf="!videoActivo.archivo_video" class="video-placeholder">
+             <p>Cargando vídeo...</p>
+          </div>
         </div>
         <div class="video-details">
-          <span class="video-date">05 Mayo 2026</span>
-          <h3>Técnica de la Semana: Omoplata desde la Guardia</h3>
-          <p>Repaso completo de la sesión del lunes. Detalles, variantes y errores comunes.</p>
+          <div class="details-header">
+            <span class="video-date">{{ videoActivo.fecha_publicacion | date:'dd MMM yyyy' }}</span>
+            <div class="video-admin-btns" *ngIf="isAdmin">
+              <button class="btn-circle-admin" (click)="abrirModalVideo(videoActivo)">✏️</button>
+              <button class="btn-circle-admin delete" (click)="eliminarVideo(videoActivo.id!, $event)">🗑️</button>
+            </div>
+          </div>
+          <h3>{{ videoActivo.titulo }}</h3>
+          <p>{{ videoActivo.descripcion }}</p>
         </div>
       </div>
 
       <aside class="video-sidebar">
-        <h4 class="sidebar-title">Sesiones anteriores</h4>
-        <div class="thumb-card">
-          <div class="thumb-img"></div>
-          <div class="thumb-text">
-            <span class="thumb-title">Paso de guardia trípode</span>
-            <span class="thumb-date">24 Abr 2026</span>
-          </div>
-        </div>
-        <div class="thumb-card">
-          <div class="thumb-img"></div>
-          <div class="thumb-text">
-            <span class="thumb-title">Finalizaciones desde espalda</span>
-            <span class="thumb-date">18 Abr 2026</span>
-          </div>
-        </div>
-        <div class="thumb-card">
-          <div class="thumb-img"></div>
-          <div class="thumb-text">
-            <span class="thumb-title">Half guard sweeps</span>
-            <span class="thumb-date">11 Abr 2026</span>
+        <h4 class="sidebar-title">Sesiones de Repaso</h4>
+        <div class="sidebar-scroll">
+          <div *ngFor="let vid of videosRepaso" 
+               class="thumb-card" 
+               [ngClass]="{'active': videoActivo?.id === vid.id}"
+               (click)="seleccionarVideo(vid)">
+            <div class="thumb-img" [style.backgroundImage]="vid.miniatura ? 'url(' + vid.miniatura + ')' : null">
+              <div class="thumb-overlay" *ngIf="videoActivo?.id === vid.id">
+                <span>REPRODUCIENDO</span>
+              </div>
+            </div>
+            <div class="thumb-text">
+              <span class="thumb-title">{{ vid.titulo }}</span>
+              <span class="thumb-date">{{ vid.fecha_publicacion | date:'dd MMM' }}</span>
+            </div>
           </div>
         </div>
       </aside>
     </div>
+
+    <ng-template #noVideos>
+      <div class="empty-state">
+        <p>No hay vídeos de repaso disponibles todavía. Vuelve pronto.</p>
+      </div>
+    </ng-template>
   </section>
+
+  <!-- MODAL EDICIÓN ACTIVIDAD (Solo Admin) -->
+  <div class="modal-overlay" *ngIf="mostrarModalActividad" (click)="cerrarModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ actividadEdicion.id ? 'Editar Actividad' : 'Nueva Actividad' }}</h2>
+        <button class="btn-close" (click)="cerrarModal()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título de la Actividad</label>
+          <input type="text" [(ngModel)]="actividadEdicion.titulo" class="form-control" placeholder="Ej: BJJ con Gi">
+        </div>
+
+        <div class="form-group">
+          <label>Badge (Etiqueta superior)</label>
+          <input type="text" [(ngModel)]="actividadEdicion.badge" class="form-control" placeholder="Ej: TÉCNICA">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="actividadEdicion.descripcion" class="form-control" rows="3" placeholder="Describe brevemente el servicio..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Imagen de fondo</label>
+          <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
+          <p class="section-sub" style="margin-top: 5px; font-size: 0.8rem;">
+            {{ actividadEdicion.imagen ? 'Ya tiene imagen. Sube otra para cambiarla.' : 'Sube una imagen impactante para la tarjeta.' }}
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>Orden de visualización</label>
+          <input type="number" [(ngModel)]="actividadEdicion.orden" class="form-control">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-save" (click)="guardarActividad()" [disabled]="guardandoActividad || !actividadEdicion.titulo || !actividadEdicion.descripcion">
+          {{ guardandoActividad ? 'Guardando...' : 'Guardar Actividad' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDICIÓN PRODUCTO (Solo Admin) -->
+  <div class="modal-overlay" *ngIf="mostrarModalProducto" (click)="cerrarModalProducto()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ productoEdicion.id ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+        <button class="btn-close" (click)="cerrarModalProducto()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nombre del Producto</label>
+          <input type="text" [(ngModel)]="productoEdicion.nombre" class="form-control" placeholder="Ej: Kimono Premium">
+        </div>
+
+        <div class="form-group">
+          <label>Estado de Stock</label>
+          <select [(ngModel)]="productoEdicion.estado_stock" class="form-control">
+            <option value="IN_STOCK">En Stock</option>
+            <option value="LOW_STOCK">Últimas tallas</option>
+            <option value="OUT_OF_STOCK">Agotado</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Tallas / Información</label>
+          <input type="text" [(ngModel)]="productoEdicion.tallas" class="form-control" placeholder="Ej: A0, A1, A2">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="productoEdicion.descripcion" class="form-control" rows="3" placeholder="Breve descripción del producto..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Imagen del Producto</label>
+          <input type="file" (change)="onFileSelectedProducto($event)" class="form-control" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <label>Orden</label>
+          <input type="number" [(ngModel)]="productoEdicion.orden" class="form-control">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarModalProducto()">Cancelar</button>
+        <button class="btn-save" (click)="guardarProducto()" [disabled]="guardandoProducto || !productoEdicion.nombre">
+          {{ guardandoProducto ? 'Guardando...' : 'Guardar Producto' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDICIÓN VÍDEO (Solo Admin) -->
+  <div class="modal-overlay" *ngIf="mostrarModalVideo" (click)="cerrarModalVideo()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ videoEdicion.id ? 'Editar Vídeo' : 'Nuevo Vídeo de Repaso' }}</h2>
+        <button class="btn-close" (click)="cerrarModalVideo()">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Título del Vídeo</label>
+          <input type="text" [(ngModel)]="videoEdicion.titulo" class="form-control" placeholder="Ej: Pasaje de guardia...">
+        </div>
+
+        <div class="form-group">
+          <label>Descripción</label>
+          <textarea [(ngModel)]="videoEdicion.descripcion" class="form-control" rows="3" placeholder="Explica la técnica o el enfoque..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Archivo de Vídeo</label>
+          <input type="file" (change)="onFileSelectedVideo($event, 'video')" class="form-control" accept="video/*">
+          <p class="section-sub" style="font-size: 0.75rem; margin-top: 4px;" *ngIf="videoEdicion.archivo_video">
+            Ya existe un vídeo cargado. Sube uno nuevo solo si deseas reemplazarlo.
+          </p>
+        </div>
+
+        <div class="form-group">
+          <label>Miniatura (Imagen de portada)</label>
+          <input type="file" (change)="onFileSelectedVideo($event, 'miniatura')" class="form-control" accept="image/*">
+        </div>
+
+        <div class="form-group">
+          <label>Orden</label>
+          <input type="number" [(ngModel)]="videoEdicion.orden" class="form-control">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarModalVideo()">Cancelar</button>
+        <button class="btn-save" (click)="guardarVideo()" [disabled]="guardandoVideo || !videoEdicion.titulo">
+          {{ guardandoVideo ? 'Subiendo vídeo...' : 'Guardar Vídeo' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMACIÓN (REUTILIZABLE) -->
+  <div class="modal-overlay" *ngIf="mostrarModalConfirmar" (click)="cerrarModalConfirmar()">
+    <div class="modal-content confirm-modal" (click)="$event.stopPropagation()">
+      <div class="confirm-icon">⚠️</div>
+      <h2 class="confirm-title">{{ tituloConfirmar }}</h2>
+      <p class="confirm-message">{{ mensajeConfirmar }}</p>
+      
+      <div class="modal-footer confirm-footer">
+        <button class="btn-cancel" (click)="cerrarModalConfirmar()">Cancelar</button>
+        <button class="btn-save btn-danger" (click)="ejecutarConfirmacion()">
+          Eliminar definitivamente
+        </button>
+      </div>
+    </div>
+  </div>
 
 </main>

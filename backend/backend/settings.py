@@ -79,14 +79,16 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bjjfit',
-        'USER': 'postgres',
-        'PASSWORD': 'bjjfitpassword',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ.get('DB_NAME', 'bjjfit'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'bjjfitpassword'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
@@ -126,6 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -161,3 +164,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Tiempo generoso para desarrollo local
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+# --- LÍMITES DE SUBIDA PARA VÍDEOS ---
+# 500MB (Ajustable según necesidad)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000

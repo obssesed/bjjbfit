@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -15,17 +16,61 @@ export class LoginComponent {
   username = '';
   password = '';
   errorMsg = '';
+  mostrarModalOlvido = false;
+  resetUsername = '';
+  enviandoSolicitud = false;
+  solicitudEnviada = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService, 
+    private router: Router,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   login() {
     this.authService.login(this.username, this.password).subscribe({
-      next: () => {
-        this.router.navigate(['/home']);
+      next: (res) => {
+        this.authService.userProfile$.pipe(take(1)).subscribe(perfil => {
+          if (perfil) {
+            if (perfil.requiere_cambio_password) {
+              this.router.navigate(['/cambio-password']);
+            } else {
+              this.router.navigate(['/home']);
+            }
+          }
+        });
       },
       error: () => {
         this.errorMsg = 'Credenciales incorrectas';
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  enviarSolicitudReseteo() {
+    if (!this.resetUsername) return;
+    this.enviandoSolicitud = true;
+    this.cdr.detectChanges();
+    
+    this.authService.solicitarReseteoPassword(this.resetUsername).subscribe({
+      next: () => {
+        this.enviandoSolicitud = false;
+        this.solicitudEnviada = true;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.enviandoSolicitud = false;
+        this.solicitudEnviada = true;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  cerrarModalOlvido() {
+    this.mostrarModalOlvido = false;
+    this.resetUsername = '';
+    this.solicitudEnviada = false;
+    this.enviandoSolicitud = false;
+    this.cdr.detectChanges();
   }
 }

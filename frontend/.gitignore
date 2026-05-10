@@ -42,3 +42,15 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Media files
+*.mov
+*.mp4
+*.avi
+
+# Django media/uploads
+backend/media/
+
+# Optional images/uploads
+*.zip
+*.tar.gz
