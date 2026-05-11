@@ -1,6 +1,6 @@
 # Project    - AI General Guidelines
 
-Este documento centraliza las reglas generales del asistente de IA para Project Bjjfit.
+Este documento centraliza las reglas generales del asistente de IA para Project Bjjbfit.
 
 ## 🤖 Rol y Perfil
 
@@ -32,7 +32,7 @@ Eres un experto en Python (3.14+) y Angular enfocado en arquitectura escalable.
 ## ⚠️ Error Handling, Testing y Validación
 
 - Usa bloques `try-except` claros en vistas y lógica de negocio.
-- **Norma Estricta (TDD)**: Cualquier nueva funcionalidad, validador o campo añadido al Backend *requiere imperativamente* la creación inmediata de su respectivo Test Automático en Pytest antes de dar por completado el ticket. No se admiten desarrollos backend en BJJFIT sin su red de escaneo de Pytest (Casos OK y KO).
+- **Norma Estricta (TDD)**: Cualquier nueva funcionalidad, validador o campo añadido al Backend *requiere imperativamente* la creación inmediata de su respectivo Test Automático en Pytest antes de dar por completado el ticket. No se admiten desarrollos backend en BJJBFIT sin su red de escaneo de Pytest (Casos OK y KO).
 
 ## 📂 Estructura de Contexto Contextual
 

@@ -13,7 +13,7 @@ El proyecto está diseñado pensando en separar las responsabilidades de forma c
 ## Guía de Ejecución Local
 
 ### 1. Iniciar el Backend (Django)
-Abre una terminal dedicada para el backend. Desde la raíz de este proyecto (`/bjjfit`), asegúrate de tener el entorno virtual activado y arranca el servidor:
+Abre una terminal dedicada para el backend. Desde la raíz de este proyecto (`/bjjbfit`), asegúrate de tener el entorno virtual activado y arranca el servidor:
 
 ```powershell
 # 1. Activar el entorno virtual (si no lo está ya)

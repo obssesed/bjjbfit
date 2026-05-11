@@ -136,3 +136,42 @@ class TestPerfilUsuario:
         response = client_ajeno.patch(url, {'email': 'hack@test.com'})
         
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_crear_perfil_hijo_exitoso(self, auth_client, deportista_padre):
+        from datetime import date
+        hoy = date.today()
+        nacimiento = date(hoy.year - 10, hoy.month, hoy.day).strftime('%Y-%m-%d')
+        
+        url = '/api/deportistas/crear_perfil_hijo/'
+        payload = {
+            "first_name": "Nuevo",
+            "last_name": "Hijo",
+            "fecha_nacimiento": nacimiento,
+            "sexo": "M"
+        }
+        
+        response = auth_client.post(url, payload)
+        assert response.status_code == status.HTTP_201_CREATED, response.json()
+        
+        # Verificar en base de datos
+        hijos_db = Deportista.objects.filter(padre_tutor=deportista_padre)
+        assert hijos_db.count() >= 1
+        nuevo_hijo = hijos_db.get(first_name="Nuevo")
+        assert nuevo_hijo.nif == deportista_padre.nif
+
+    def test_crear_perfil_hijo_mayor_de_14_falla(self, auth_client, deportista_padre):
+        from datetime import date
+        hoy = date.today()
+        nacimiento = date(hoy.year - 15, hoy.month, hoy.day).strftime('%Y-%m-%d')
+        
+        url = '/api/deportistas/crear_perfil_hijo/'
+        payload = {
+            "first_name": "Hijo",
+            "last_name": "Mayor",
+            "fecha_nacimiento": nacimiento,
+            "sexo": "M"
+        }
+        
+        response = auth_client.post(url, payload)
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "menores de 14 años" in response.json()['error']

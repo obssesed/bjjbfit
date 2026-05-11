@@ -202,7 +202,7 @@ export class PanelReportesComponent implements OnInit {
     
     // Crear la hoja de resumen
     const resumenData = [
-      ["Reporte Económico BJJFIT"],
+      ["Reporte Económico BJJBFIT"],
       ["Mes", etiqueta],
       ["Ingresos Totales", `${datosMes.total} EUR`],
       ["Usuarios Activos", datosMes.usuarios_activos],

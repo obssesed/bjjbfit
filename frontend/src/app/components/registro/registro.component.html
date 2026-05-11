@@ -2,12 +2,20 @@
   <div class="auth-card">
     <div class="auth-header">
       <h2 class="auth-title">Crear nueva cuenta</h2>
-      <p class="auth-subtitle">Únete a Bjjfit y asegura tu plaza en el tatami.</p>
+      <p class="auth-subtitle">Únete a Bjjbfit y asegura tu plaza en el tatami.</p>
     </div>
 
     <!-- Mensajes de Error -->
     <div *ngIf="errorMsg" class="alert-error">
       {{ errorMsg }}
+    </div>
+
+    <!-- Alerta Menor de Edad (< 14 años) -->
+    <div *ngIf="esMenorDeEdad" class="alert-warning" style="margin-bottom: 1.5rem;">
+      <strong>⚠️ Registro de Menores de 14 años</strong><br>
+      Por motivos legales, los niños menores de 14 años no pueden tener una cuenta principal. 
+      Rellena este formulario con los <strong>datos del Padre, Madre o Tutor</strong>.
+      Una vez registrado, podrás añadir el perfil del menor desde tu área privada.
     </div>
 
     <form (ngSubmit)="registrar()" class="auth-form" #registroForm="ngForm">
@@ -65,7 +73,7 @@
       <div class="form-grid">
         <div class="input-group">
           <label for="fecha_nacimiento">F. Nacimiento *</label>
-          <input id="fecha_nacimiento" type="date" [(ngModel)]="registroData.fecha_nacimiento" name="fecha_nacimiento" required>
+          <input id="fecha_nacimiento" type="date" [(ngModel)]="registroData.fecha_nacimiento" (ngModelChange)="onFechaChange()" name="fecha_nacimiento" required>
         </div>
         <div class="input-group">
           <label for="telefono">Teléfono *</label>

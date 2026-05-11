@@ -29,16 +29,16 @@ export class LoginComponent {
 
   login() {
     this.authService.login(this.username, this.password).subscribe({
-      next: (res) => {
-        this.authService.userProfile$.pipe(take(1)).subscribe(perfil => {
-          if (perfil) {
-            if (perfil.requiere_cambio_password) {
-              this.router.navigate(['/cambio-password']);
-            } else {
-              this.router.navigate(['/home']);
-            }
+      next: (perfil) => {
+        if (perfil) {
+          if (perfil.requiere_cambio_password) {
+            this.router.navigate(['/cambio-password']);
+          } else {
+            this.router.navigate(['/home']);
           }
-        });
+        } else {
+          this.router.navigate(['/home']);
+        }
       },
       error: () => {
         this.errorMsg = 'Credenciales incorrectas';

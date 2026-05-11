@@ -104,9 +104,56 @@
     </main>
 
     <!-- CHILDREN PROFILES SECTION -->
-    <div class="children-section full-width" *ngIf="hijosEditData.length > 0">
+    <div class="children-section full-width">
       <div class="section-divider">
         <span>Perfiles de Menores a Cargo</span>
+      </div>
+
+      <div class="add-child-action" style="margin-bottom: 2rem; text-align: right;">
+        <button type="button" class="btn-outline small" (click)="toggleFormNuevoHijo()">
+          + Añadir Nuevo Menor a Cargo
+        </button>
+      </div>
+
+      <div *ngIf="hijosEditData.length === 0 && !mostrarFormNuevoHijo" style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">
+        No tienes ningún perfil de menor asociado todavía.
+      </div>
+
+      <!-- Formulario para Nuevo Menor -->
+      <div class="child-card new-child" *ngIf="mostrarFormNuevoHijo" style="border: 1px dashed var(--accent-gold); margin-bottom: 2rem;">
+        <div class="child-header">
+          <div class="child-title">
+            <h4 style="color: var(--accent-gold);">Nuevo Perfil de Menor</h4>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="nuevoHijo.first_name" placeholder="Nombre">
+          </div>
+          <div class="form-group">
+            <label>Apellidos *</label>
+            <input type="text" [(ngModel)]="nuevoHijo.last_name" placeholder="Apellidos">
+          </div>
+          <div class="form-group">
+            <label>Fecha de Nacimiento *</label>
+            <input type="date" [(ngModel)]="nuevoHijo.fecha_nacimiento">
+          </div>
+          <div class="form-group">
+            <label>Sexo *</label>
+            <select [(ngModel)]="nuevoHijo.sexo">
+              <option value="">Seleccionar...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+          <div class="form-actions-child" style="grid-column: 1 / -1; display: flex; gap: 1rem; justify-content: flex-end;">
+            <button type="button" class="btn-outline small" (click)="toggleFormNuevoHijo()">Cancelar</button>
+            <button type="button" class="btn-save small" (click)="crearHijo()" [disabled]="nuevoHijo.guardando || !nuevoHijo.first_name || !nuevoHijo.last_name || !nuevoHijo.fecha_nacimiento || !nuevoHijo.sexo">
+              {{ nuevoHijo.guardando ? 'Creando...' : 'Crear Perfil' }}
+            </button>
+          </div>
+        </div>
       </div>
       
       <div class="child-card" *ngFor="let hijo of hijosEditData">

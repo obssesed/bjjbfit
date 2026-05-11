@@ -16,7 +16,7 @@ def reset_y_poblar():
     if not Deportista.objects.filter(username=admin_username).exists():
         Deportista.objects.create_superuser(
             username=admin_username,
-            email="admin@bjjfit.com",
+            email="admin@bjjbfit.com",
             password="admin1234"
         )
         print(f"Superusuario {admin_username} creado.")

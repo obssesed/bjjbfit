@@ -29,7 +29,7 @@ def limpiar_base_datos():
 def crear_usuarios_y_clase():
     print("--- Creando 31 usuarios con diferentes perfiles ---")
     
-    password_comun = "Bjjfit2026!"
+    password_comun = "Bjjbfit2026!"
     cinturones = ['Blanco', 'Azul', 'Morado', 'Marrón', 'Negro']
     metodos_pago = ['EFECTIVO', 'CUENTA']
     sexos = ['M', 'F']
@@ -47,7 +47,7 @@ def crear_usuarios_y_clase():
         username = f"juvenil_{i}"
         user = Deportista.objects.create_user(
             username=username,
-            email=f"{username}@bjjfit.com",
+            email=f"{username}@bjjbfit.com",
             password=password_comun,
             first_name=f"Juvenil",
             last_name=f"Numero {i}",
@@ -65,7 +65,7 @@ def crear_usuarios_y_clase():
         username = f"adulto_solo_{i}"
         user = Deportista.objects.create_user(
             username=username,
-            email=f"{username}@bjjfit.com",
+            email=f"{username}@bjjbfit.com",
             password=password_comun,
             first_name=f"Adulto",
             last_name=f"Solitario {i}",
@@ -85,7 +85,7 @@ def crear_usuarios_y_clase():
         username_padre = f"padre_nino_{i}"
         padre = Deportista.objects.create_user(
             username=username_padre,
-            email=f"{username_padre}@bjjfit.com",
+            email=f"{username_padre}@bjjbfit.com",
             password=password_comun,
             first_name=f"Padre",
             last_name=f"Nino {i}",
@@ -100,7 +100,7 @@ def crear_usuarios_y_clase():
         username_hijo = f"hijo_menor_{i}"
         hijo = Deportista.objects.create_user(
             username=username_hijo,
-            email=f"{username_hijo}@bjjfit.com",
+            email=f"{username_hijo}@bjjbfit.com",
             password=password_comun,
             first_name=f"Hijo",
             last_name=f"Menor {i}",
@@ -116,7 +116,7 @@ def crear_usuarios_y_clase():
         username_padre = f"padre_juvenil_{i}"
         padre = Deportista.objects.create_user(
             username=username_padre,
-            email=f"{username_padre}@bjjfit.com",
+            email=f"{username_padre}@bjjbfit.com",
             password=password_comun,
             first_name=f"Padre",
             last_name=f"Juvenil {i}",
@@ -131,7 +131,7 @@ def crear_usuarios_y_clase():
         username_hijo = f"hijo_mayor_{i}"
         hijo = Deportista.objects.create_user(
             username=username_hijo,
-            email=f"{username_hijo}@bjjfit.com",
+            email=f"{username_hijo}@bjjbfit.com",
             password=password_comun,
             first_name=f"Hijo",
             last_name=f"Mayor {i}",

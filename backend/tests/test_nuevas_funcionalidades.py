@@ -97,14 +97,16 @@ class TestReporteBackoffice:
 
     def test_api_activos_devuelve_campos_reporte(self, auth_client):
         """Verifica que el endpoint de activos devuelve todos los campos necesarios para exportar."""
+        from usuarios.models import Plan
         admin = Deportista.objects.create_superuser(
             username="admin_report", password="123", email="admin@report.com"
         )
+        plan_adulto = Plan.objects.create(nombre="Plan Adulto", precio_base=50.0)
         deportista = Deportista.objects.create_user(
             username="alumno_report", password="123", email="alumno@report.com",
             first_name="Ana", last_name="López", nif="87654321X",
             sexo="F", fecha_nacimiento="1995-06-15", telefono="611222333",
-            plan_activo=True, tipo_plan="ADULTO", cinturon="Azul", grados=2
+            plan_activo=True, tipo_plan=plan_adulto, cinturon="Azul", grados=2
         )
         deportista.id_interno = "BJJ-001"
         deportista.save()
@@ -135,16 +137,18 @@ class TestReporteBackoffice:
         assert alumno['sexo'] == "F"
         assert alumno['cinturon'] == "Azul"
         assert alumno['grados'] == 2
-        assert alumno['tipo_plan'] == "ADULTO"
+        assert alumno['tipo_plan'] == plan_adulto.id
 
     def test_api_filtra_correctamente_por_estado(self, auth_client):
         """Verifica que un deportista activo NO aparece en pendientes ni inactivos (integridad del reporte)."""
+        from usuarios.models import Plan
         admin = Deportista.objects.create_superuser(
             username="admin_filtro", password="123", email="admin@filtro.com"
         )
+        plan_juv = Plan.objects.create(nombre="Plan Juvenil", precio_base=30.0)
         Deportista.objects.create_user(
             username="activo_solo", password="123", email="activo@test.com",
-            plan_activo=True, tipo_plan="JUVENIL", first_name="Carlos"
+            plan_activo=True, tipo_plan=plan_juv, first_name="Carlos"
         )
 
         auth_client.force_authenticate(user=admin)

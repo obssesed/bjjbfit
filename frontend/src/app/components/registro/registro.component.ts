@@ -29,12 +29,21 @@ export class RegistroComponent {
   errorMsg: string | null = null;
   cargando: boolean = false;
   showExitoModal: boolean = false;
+  esMenorDeEdad: boolean = false;
 
   constructor(
     private authService: AuthService, 
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
+
+  onFechaChange() {
+    if (this.registroData.fecha_nacimiento) {
+      this.esMenorDeEdad = this.calcularEdad(this.registroData.fecha_nacimiento) < 14;
+    } else {
+      this.esMenorDeEdad = false;
+    }
+  }
 
   registrar() {
     this.errorMsg = null;
@@ -61,6 +70,12 @@ export class RegistroComponent {
     // 4. Validar Teléfono (exactamente 9 dígitos)
     if (!this.validarTelefono(d.telefono)) {
       this.errorMsg = 'El teléfono debe tener exactamente 9 dígitos numéricos.';
+      return;
+    }
+
+    // 5. Validar Edad (Menores de 14 no pueden ser titulares)
+    if (this.calcularEdad(d.fecha_nacimiento) < 14) {
+      this.errorMsg = 'Registro de Menores: El titular de la cuenta debe ser mayor de 14 años. Por favor, crea la cuenta con los datos del padre, madre o tutor legal. Una vez dentro de la app, el adulto podrá añadir el perfil del menor desde la sección "Mi Perfil".';
       return;
     }
 

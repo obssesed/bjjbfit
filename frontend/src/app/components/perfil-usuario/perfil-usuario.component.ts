@@ -32,6 +32,16 @@ export class PerfilUsuarioComponent implements OnInit {
     metodo_pago: ''
   };
 
+  // Nuevo hijo
+  mostrarFormNuevoHijo: boolean = false;
+  nuevoHijo = {
+    first_name: '',
+    last_name: '',
+    fecha_nacimiento: '',
+    sexo: '',
+    guardando: false
+  };
+
   constructor(private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
@@ -138,6 +148,50 @@ export class PerfilUsuarioComponent implements OnInit {
         console.error('Error al actualizar perfil del hijo', err);
         hijo.guardando = false;
         this.mensajeResultado = `❌ Error al actualizar datos de ${hijo.first_name}.`;
+        this.mensajeError = true;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  toggleFormNuevoHijo() {
+    this.mostrarFormNuevoHijo = !this.mostrarFormNuevoHijo;
+  }
+
+  crearHijo() {
+    this.nuevoHijo.guardando = true;
+    this.mensajeResultado = null;
+    this.cdr.detectChanges();
+
+    const payload = {
+      first_name: this.nuevoHijo.first_name,
+      last_name: this.nuevoHijo.last_name,
+      fecha_nacimiento: this.nuevoHijo.fecha_nacimiento,
+      sexo: this.nuevoHijo.sexo
+    };
+
+    this.authService.anadirHijo(payload).subscribe({
+      next: (res) => {
+        this.nuevoHijo.guardando = false;
+        this.mostrarFormNuevoHijo = false;
+        this.mensajeResultado = `✔️ Perfil del menor creado correctamente.`;
+        this.mensajeError = false;
+        // Reiniciamos el form
+        this.nuevoHijo = { first_name: '', last_name: '', fecha_nacimiento: '', sexo: '', guardando: false };
+        
+        // Recargamos el perfil para que aparezca en la lista
+        this.cargarDatos();
+        
+        setTimeout(() => {
+          this.mensajeResultado = null;
+          this.cdr.detectChanges();
+        }, 4000);
+      },
+      error: (err) => {
+        console.error('Error al crear perfil del hijo', err);
+        this.nuevoHijo.guardando = false;
+        const errMsg = err.error?.error || 'Error al añadir el perfil del menor.';
+        this.mensajeResultado = `❌ ${errMsg}`;
         this.mensajeError = true;
         this.cdr.detectChanges();
       }

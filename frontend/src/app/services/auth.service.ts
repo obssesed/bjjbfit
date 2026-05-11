@@ -160,6 +160,10 @@ export class AuthService {
     return this.http.patch<PerfilDeportista>(`${this.apiUrl}/deportistas/${hijoId}/actualizar_perfil_hijo/`, datos);
   }
 
+  anadirHijo(datos: any): Observable<PerfilDeportista> {
+    return this.http.post<PerfilDeportista>(`${this.apiUrl}/deportistas/crear_perfil_hijo/`, datos);
+  }
+
   logout() {
     localStorage.removeItem('access_token');
     localStorage.removeItem('user_profile');

@@ -25,10 +25,15 @@ class HijoSerializer(serializers.ModelSerializer):
     """
     Serializador para mostrar y permitir edición leve de hijos menores.
     """
-    categoria_plan = serializers.CharField(source='tipo_plan.categoria_edad', read_only=True)
+    categoria_plan = serializers.SerializerMethodField()
     class Meta:
         model = Deportista
         fields = ['id', 'username', 'first_name', 'last_name', 'plan_activo', 'cinturon', 'categoria_plan', 'fecha_nacimiento', 'email', 'telefono', 'nif', 'sexo']
+
+    def get_categoria_plan(self, obj):
+        if obj.tipo_plan:
+            return obj.tipo_plan.categoria_edad
+        return None
 
 class DeportistaSerializer(serializers.ModelSerializer):
     """
@@ -36,7 +41,7 @@ class DeportistaSerializer(serializers.ModelSerializer):
     Maneja la representación de datos y la creación segura de nuevos usuarios.
     """
     hijos_a_cargo = serializers.SerializerMethodField()
-    categoria_plan = serializers.CharField(source='tipo_plan.categoria_edad', read_only=True)
+    categoria_plan = serializers.SerializerMethodField()
 
     is_staff = serializers.BooleanField(read_only=True)
 
@@ -71,6 +76,11 @@ class DeportistaSerializer(serializers.ModelSerializer):
         
         return HijoSerializer(hijos_menores, many=True).data
 
+    def get_categoria_plan(self, obj):
+        if obj.tipo_plan:
+            return obj.tipo_plan.categoria_edad
+        return None
+
     def validate(self, attrs):
         """
         Validaciones personalizadas para proteger campos que solo el admin puede tocar.
@@ -78,8 +88,19 @@ class DeportistaSerializer(serializers.ModelSerializer):
         de modificar nombre, apellidos, etc., para que el save() no los procese.
         """
         request = self.context.get('request')
-        if request and not request.user.is_staff:
-            # Campos que el usuario común NO puede modificar nunca
+        
+        # Validación de campos obligatorios SOLO para registro (creación)
+        if not self.instance:
+            campos_obligatorios = ['first_name', 'last_name', 'nif', 'sexo', 'fecha_nacimiento']
+            errors = {}
+            for campo in campos_obligatorios:
+                if not attrs.get(campo):
+                    errors[campo] = "Este campo es obligatorio para el registro."
+            if errors:
+                raise serializers.ValidationError(errors)
+
+        if self.instance and request and not request.user.is_staff:
+            # Campos que el usuario común NO puede modificar nunca (solo en edición)
             attrs.pop('first_name', None)
             attrs.pop('last_name', None)
             attrs.pop('username', None)

@@ -129,8 +129,7 @@ a:hover {
 }
 
 .black-b {
-  color: #000000;
-  text-shadow: 0 0 1px rgba(255,255,255,0.2); /* Sutil relieve para que no se pierda del todo */
+  color: var(--accent-gold);
 }
 
 

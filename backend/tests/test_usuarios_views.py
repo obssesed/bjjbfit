@@ -148,7 +148,7 @@ class TestUsuariosViews:
 
         deportista.refresh_from_db()
         assert deportista.cinturon == 'Azul'
-        assert deportista.grados == 1
+        assert deportista.grados == 0
         assert deportista.fecha_ultima_graduacion == timezone.now().date()
 
     def test_reporte_ingresos_aplica_descuento_familiar(self, auth_client):

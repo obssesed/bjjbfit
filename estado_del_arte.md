@@ -1,4 +1,4 @@
-# ESTADO DEL ARTE - PROYECTO BJJFIT
+# ESTADO DEL ARTE - PROYECTO BJJBFIT
 **Fecha**: Abril 2026
 
 ## 1. Resumen Ejecutivo
@@ -38,4 +38,4 @@ Para que el Producto Mínimo Viable salga a colapsar el mercado, necesitamos enf
 -- **Lista de Asistencia "In Situ" del Profesor**: Una vista exclusiva donde el Profesor/Admin (logueado en Frontend) pase lista fácilmente a los apuntados el día y hora de la clase.
 - **Dashboard de Reporting Avanzado (Métricas)**: Generar un endpoint que analice el uso del tatami. Gráficas semanales de género, cinturón, aforos más pico y porcentaje de cancelaciones, lo cual ayuda en el negocio a prever picos horarios y altas del mes.
 - **Sistema de Notificaciones Push/Mail**: Automatizar un *Celery Task* o usar Firebase para enviar avisos reales cuando un usuario de lista de espera entra de forma sorpresiva en la ventana de participación.
-- **Bóveda de Video Semanal**: Un micro-portal dentro de BJJFIT que permita insertar un enlace privado de Youtube con técnicas repasadas esa semana, de acceso exclusivo a los que tienen `plan_activo=True`.
+- **Bóveda de Video Semanal**: Un micro-portal dentro de BJJBFIT que permita insertar un enlace privado de Youtube con técnicas repasadas esa semana, de acceso exclusivo a los que tienen `plan_activo=True`.

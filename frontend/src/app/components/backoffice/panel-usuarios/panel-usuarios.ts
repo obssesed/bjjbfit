@@ -502,7 +502,7 @@ export class PanelUsuarios implements OnInit {
     const enlace = document.createElement('a');
     const hoy = new Date().toISOString().split('T')[0];
     enlace.href = url;
-    enlace.download = `reporte_bjjfit_${hoy}.csv`;
+    enlace.download = `reporte_bjjbfit_${hoy}.csv`;
     enlace.click();
     window.URL.revokeObjectURL(url);
 

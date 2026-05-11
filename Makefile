@@ -1,4 +1,4 @@
-# Comandos de Docker para BJJFit
+# Comandos de Docker para BJJBFit
 
 .PHONY: up down restart build logs shell-backend migrate superuser clean
 

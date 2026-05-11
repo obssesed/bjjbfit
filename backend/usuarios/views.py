@@ -18,17 +18,35 @@ class DeportistaViewSet(viewsets.ModelViewSet):
     queryset = Deportista.objects.all()
     serializer_class = DeportistaSerializer
 
+    def get_queryset(self):
+        """
+        Administradores ven todo. Usuarios normales solo se ven a sí mismos y a sus hijos.
+        """
+        user = self.request.user
+        if not user or user.is_anonymous:
+            return Deportista.objects.none()
+            
+        if user.is_staff:
+            return Deportista.objects.all()
+            
+        hijos_ids = user.hijos_a_cargo.values_list('id', flat=True)
+        return Deportista.objects.filter(
+            models.Q(id=user.id) | models.Q(id__in=hijos_ids)
+        )
+
     def get_permissions(self):
         """
         Asigna permisos dinámicos según la acción:
         - 'create', 'solicitar_reseteo': Público.
-        - 'activos_backoffice': Solo administradores.
-        - Otros: Solo usuarios autenticados.
+        - 'list', 'activos_backoffice', etc: Solo administradores.
+        - Otros (retrieve, me, etc): Solo usuarios autenticados (get_queryset se encarga del resto).
         """
         if self.action in ['create', 'solicitar_reseteo']:
             return [permissions.AllowAny()]
-        if self.action in ['activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan']:
+            
+        if self.action in ['list', 'activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan']:
             return [permissions.IsAdminUser()]
+            
         return [permissions.IsAuthenticated()]
 
     @action(detail=False, methods=['post'])
@@ -99,6 +117,57 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def crear_perfil_hijo(self, request):
+        """
+        Permite a un padre/tutor registrar un nuevo perfil para un hijo menor de 14 años.
+        """
+        padre = request.user
+        data = request.data.copy()
+        
+        # Validación básica de edad
+        fecha_nacStr = data.get('fecha_nacimiento')
+        if not fecha_nacStr:
+            return Response({"error": "La fecha de nacimiento es obligatoria."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            import datetime
+            fecha_nac = datetime.datetime.strptime(fecha_nacStr, '%Y-%m-%d').date()
+            hoy = datetime.date.today()
+            edad = hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
+            if edad >= 14:
+                return Response({"error": "Solo puedes crear perfiles a tu cargo para menores de 14 años."}, status=status.HTTP_400_BAD_REQUEST)
+        except ValueError:
+            return Response({"error": "Fecha de nacimiento inválida."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Configurar datos del hijo
+        # Para que no choque, el username del hijo puede ser autogenerado o proporcionado.
+        username = data.get('username')
+        if not username:
+            # Autogenerar un username base si no lo envían
+            import uuid
+            username = f"menor_{uuid.uuid4().hex[:6]}"
+            data['username'] = username
+            
+        data['padre_tutor'] = padre.id
+        # Los menores usan el NIF/DNI del padre por regla de negocio
+        data['nif'] = padre.nif
+        
+        # El menor necesita un email único por reglas del modelo
+        if 'email' not in data or not data['email']:
+            data['email'] = f"{username}@dependiente.bjjbfit.com"
+        
+        # El serializer por defecto (DeportistaSerializer) puede fallar por falta de password
+        # si no se proporciona. Generamos un password aleatorio irrelevante ya que el padre lo gestiona.
+        if 'password' not in data:
+            data['password'] = uuid.uuid4().hex
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        hijo = serializer.save(padre_tutor=padre)
+        
+        return Response(self.get_serializer(hijo).data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
     def activos_backoffice(self, request):
@@ -204,7 +273,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
             # Si el cinturón cambia, asignamos el nuevo cinturón y los grados (o 0 por defecto)
             if nuevo_cinturon != deportista.cinturon:
                 deportista.cinturon = nuevo_cinturon
-                deportista.grados = nuevos_grados if nuevos_grados is not None else 0
+                deportista.grados = 0
             elif nuevos_grados is not None:
                 # Si es el mismo cinturón, solo actualizamos grados
                 deportista.grados = nuevos_grados
