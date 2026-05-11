@@ -34,7 +34,7 @@
     </div>
     <div class="card-actions">
       <button class="btn-propagate" (click)="abrirPropagar(p)">
-        🚀 Propagar...
+        🚀 Programar...
       </button>
       <div class="mini-actions">
         <button class="btn-icon" (click)="editar(p)" title="Editar">✏️</button>
@@ -103,13 +103,14 @@
           <label>Título de la Clase</label>
           <input type="text" [(ngModel)]="formPlantilla.titulo" placeholder="Ej: BJJ No-Gi Avanzado">
         </div>
-        
+
         <div class="form-group full">
           <label>Imagen de Icono (Requerido para mostrar icono)</label>
           <div class="upload-container">
             <div class="preview-box" *ngIf="vistaPreviaImagen">
               <img [src]="getImagenUrl(vistaPreviaImagen)" alt="Preview">
-              <button type="button" class="btn-remove-img" (click)="archivoSeleccionado = null; vistaPreviaImagen = null">×</button>
+              <button type="button" class="btn-remove-img"
+                (click)="archivoSeleccionado = null; vistaPreviaImagen = null">×</button>
             </div>
             <div class="upload-btn-wrapper" *ngIf="!vistaPreviaImagen">
               <button type="button" class="btn-upload">📸 Subir nueva imagen...</button>
@@ -180,9 +181,10 @@
             {{ d.nombre }}
           </label>
         </div>
-        
+
         <div class="propagate-summary" *ngIf="configPropagacion.fecha_inicio && configPropagacion.fecha_fin">
-           💡 Se crearán clases de <strong>{{ plantillaSeleccionada?.hora_inicio?.substring(0,5) }}</strong> en el rango seleccionado.
+          💡 Se crearán clases de <strong>{{ plantillaSeleccionada?.hora_inicio?.substring(0,5) }}</strong> en el rango
+          seleccionado.
         </div>
       </div>
     </div>
@@ -219,7 +221,8 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" (click)="mostrarModalClasePuntual = false">Cancelar</button>
-      <button class="btn-primary" (click)="guardarClasePuntual()" [disabled]="!configClasePuntual.plantilla_id || !configClasePuntual.hora_inicio">
+      <button class="btn-primary" (click)="guardarClasePuntual()"
+        [disabled]="!configClasePuntual.plantilla_id || !configClasePuntual.hora_inicio">
         Crear Clase
       </button>
     </div>
@@ -235,7 +238,9 @@
     <div class="modal-body text-center">
       <div class="delete-icon-large">🗑️</div>
       <h3>¿Estás seguro?</h3>
-      <p>Vas a eliminar la clase <strong>{{ claseAEliminar?.titulo }}</strong> del <strong>{{ claseAEliminar?.fecha_hora_inicio | date:'dd/MM/yyyy' }}</strong> a las <strong>{{ claseAEliminar?.fecha_hora_inicio | date:'HH:mm' }}</strong>.</p>
+      <p>Vas a eliminar la clase <strong>{{ claseAEliminar?.titulo }}</strong> del <strong>{{
+          claseAEliminar?.fecha_hora_inicio | date:'dd/MM/yyyy' }}</strong> a las <strong>{{
+          claseAEliminar?.fecha_hora_inicio | date:'HH:mm' }}</strong>.</p>
       <p class="warning-text">Esta acción no se puede deshacer y los alumnos perderán su reserva si la hubiera.</p>
     </div>
     <div class="modal-footer" style="justify-content: center;">
