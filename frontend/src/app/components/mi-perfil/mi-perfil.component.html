@@ -68,19 +68,27 @@
       </div>
     </div>
 
-    <!-- Historial Finalizadas -->
+    <!-- Historial Agrupado -->
     <div class="section-container mt-5">
       <h2 class="section-title text-muted">Historial del Tatami</h2>
       
-      <div *ngIf="reservasFinalizadas.length === 0" class="empty-state">
+      <div *ngIf="reservasFinalizadasAgrupadas.length === 0" class="empty-state">
         <p>Aún no has sudado el kimono. ¡Empieza a entrenar!</p>
       </div>
-
+  
       <div class="history-list">
-        <div *ngFor="let reserva of reservasFinalizadas" class="history-item">
-          <span class="check-icon">✔️</span>
-          <span class="history-title">{{ reserva.clase_detalle.titulo }}</span>
-          <span class="history-date">{{ reserva.clase_detalle.fecha_hora_inicio | date:'dd MMM yyyy' }}</span>
+        <div *ngFor="let grupo of reservasFinalizadasAgrupadas" class="history-item">
+          <div class="history-left">
+            <span class="check-icon">✔️</span>
+            <div class="history-info">
+              <span class="history-title">{{ grupo.titulo }}</span>
+              <span class="history-subtitle">Última sesión: {{ grupo.ultimaFecha | date:'dd MMM yyyy' }}</span>
+            </div>
+          </div>
+          <div class="history-count">
+            <span class="count-badge">{{ grupo.cantidad }}</span>
+            <span class="count-label">{{ grupo.cantidad === 1 ? 'Clase' : 'Clases' }}</span>
+          </div>
         </div>
       </div>
     </div>

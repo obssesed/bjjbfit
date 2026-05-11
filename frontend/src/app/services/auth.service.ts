@@ -219,8 +219,9 @@ export class AuthService {
     return this.http.post<Plan>(this.planesUrl, plan);
   }
 
-  updatePlan(id: number, plan: Plan): Observable<Plan> {
-    return this.http.put<Plan>(`${this.planesUrl}${id}/`, plan);
+  updatePlan(id: number, plan: any): Observable<Plan> {
+    // Usamos patch para evitar errores de unicidad si el nombre no cambia
+    return this.http.patch<Plan>(`${this.planesUrl}${id}/`, plan);
   }
 
   deletePlan(id: number): Observable<any> {

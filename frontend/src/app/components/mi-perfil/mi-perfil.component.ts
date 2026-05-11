@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 export class MiPerfilComponent implements OnInit {
   reservasFuturas: any[] = [];
   reservasFinalizadas: any[] = [];
+  reservasFinalizadasAgrupadas: any[] = [];
   cargando: boolean = true;
   perfilDeportista: any = null;
 
@@ -59,6 +60,27 @@ export class MiPerfilComponent implements OnInit {
             this.reservasFuturas.push(reserva);
           }
         });
+
+        // AGRUPACIÓN DEL HISTORIAL POR TIPO DE CLASE
+        const grupos: { [key: string]: any } = {};
+        this.reservasFinalizadas.forEach(reserva => {
+          const titulo = reserva.clase_detalle.titulo;
+          if (!grupos[titulo]) {
+            grupos[titulo] = {
+              titulo: titulo,
+              cantidad: 0,
+              ultimaFecha: reserva.clase_detalle.fecha_hora_inicio,
+              icono: reserva.clase_detalle.icono || '🥋'
+            };
+          }
+          grupos[titulo].cantidad++;
+          // Guardamos la fecha más reciente si es posterior
+          if (new Date(reserva.clase_detalle.fecha_hora_inicio) > new Date(grupos[titulo].ultimaFecha)) {
+            grupos[titulo].ultimaFecha = reserva.clase_detalle.fecha_hora_inicio;
+          }
+        });
+        
+        this.reservasFinalizadasAgrupadas = Object.values(grupos).sort((a, b) => b.cantidad - a.cantidad);
 
         // Ordenar futuras más inminentes primero
         this.reservasFuturas.sort((a, b) => new Date(a.clase_detalle.fecha_hora_inicio).getTime() - new Date(b.clase_detalle.fecha_hora_inicio).getTime());

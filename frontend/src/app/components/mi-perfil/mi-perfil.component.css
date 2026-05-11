@@ -216,10 +216,55 @@
   font-size: 1.2rem;
 }
 
+.history-info {
+  display: flex;
+  flex-direction: column;
+}
+
 .history-title {
-  flex-grow: 1;
   font-weight: 600;
-  color: #d1d5db;
+  color: #f8fafc;
+  font-size: 1.05rem;
+}
+
+.history-subtitle {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 2px;
+}
+
+.history-left {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.history-count {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(196, 134, 85, 0.1);
+  border: 1px solid rgba(196, 134, 85, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  min-width: 80px;
+}
+
+.count-badge {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+.count-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  margin-top: 4px;
+  letter-spacing: 1px;
 }
 
 .history-date {

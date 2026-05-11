@@ -110,6 +110,16 @@ class ReservaSerializer(serializers.ModelSerializer):
         # La regla dice "Plan debe estar activado por admin". 
         # Si envían un 'deportista' específico (ej. un hijo), miramos el plan_activo del deportista que recibe la clase.
         deportista_target = data.get('deportista', user)
+        
+        # 1. Validación de Seguridad (IDOR): Asegurar que el usuario no intente reservar en nombre de otro adulto
+        if not user.is_staff and deportista_target != user:
+            hijos_ids = user.hijos_a_cargo.values_list('id', flat=True)
+            if deportista_target.id not in hijos_ids:
+                raise serializers.ValidationError(
+                    "No tienes permiso para realizar una reserva en nombre de este usuario."
+                )
+
+        # 2. El usuario solicitante (Admin o normal) debe tener el plan activo
         if not deportista_target.plan_activo:
             raise serializers.ValidationError(
                 f"El deportista {deportista_target.username} no tiene un plan activo. Contacte con administración."

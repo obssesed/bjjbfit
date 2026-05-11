@@ -130,3 +130,20 @@
     </div>
   </div>
 </div>
+<!-- MODAL DE AVISO (SUSTITUTO DE ALERT) -->
+<div class="modal-overlay" *ngIf="mostrarModalAviso" (click)="cerrarAviso()">
+  <div class="modal-content aviso-modal" [class]="tipoAviso" (click)="$event.stopPropagation()">
+    <div class="aviso-icon">
+      <span *ngIf="tipoAviso === 'error'">❌</span>
+      <span *ngIf="tipoAviso === 'success'">✅</span>
+      <span *ngIf="tipoAviso === 'warning'">⚠️</span>
+    </div>
+    <div class="aviso-body">
+      <h2>{{ tituloAviso }}</h2>
+      <p>{{ mensajeAviso }}</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-save" (click)="cerrarAviso()">Entendido</button>
+    </div>
+  </div>
+</div>

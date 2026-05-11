@@ -13,7 +13,7 @@ class Plan(models.Model):
 
     nombre = models.CharField(max_length=100, unique=True)
     precio_base = models.DecimalField(max_digits=6, decimal_places=2, help_text="Precio mensual normal")
-    beneficios = models.TextField(help_text="Lista de beneficios separados por comas o saltos de línea")
+    beneficios = models.TextField(blank=True, help_text="Lista de beneficios separados por comas o saltos de línea")
     categoria_edad = models.CharField(max_length=20, choices=CATEGORIAS_EDAD, default='ADULTO')
     activo = models.BooleanField(default=True)
 

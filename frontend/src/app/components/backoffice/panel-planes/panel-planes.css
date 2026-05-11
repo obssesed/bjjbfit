@@ -362,3 +362,56 @@
   background: rgba(255, 255, 255, 0.05);
   color: white;
 }
+/* Modal de Aviso (Feedback General) */
+.aviso-modal {
+  max-width: 400px;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  border-radius: 28px;
+  animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.aviso-modal.error { border-top: 4px solid #ef4444; }
+.aviso-modal.success { border-top: 4px solid #10b981; }
+.aviso-modal.warning { border-top: 4px solid var(--accent-gold); }
+
+.aviso-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.1));
+}
+
+.aviso-body h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #fff;
+}
+
+.aviso-body p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.aviso-modal .modal-footer {
+  background: transparent;
+  padding: 0;
+  justify-content: center;
+}
+
+.aviso-modal .btn-save {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 14px;
+  font-size: 1rem;
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+
+.aviso-modal .btn-save:hover {
+  background: var(--accent-gold);
+  color: #000;
+  border-color: var(--accent-gold);
+}

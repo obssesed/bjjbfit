@@ -31,6 +31,12 @@ export class PanelPlanes implements OnInit {
   mostrarConfirmarEliminar = false;
   planAEliminar: Plan | null = null;
 
+  // Modal de Aviso (Sustituye a alert)
+  mostrarModalAviso = false;
+  tituloAviso = '';
+  mensajeAviso = '';
+  tipoAviso: 'success' | 'error' | 'warning' = 'warning';
+
   constructor(
     private authService: AuthService,
     private cdr: ChangeDetectorRef
@@ -84,21 +90,36 @@ export class PanelPlanes implements OnInit {
 
     console.log('Guardando plan...', this.planForm);
 
-    const request = this.editando && this.planForm.id
-      ? this.authService.updatePlan(this.planForm.id, this.planForm)
-      : this.authService.createPlan(this.planForm);
+    if (this.editando && this.planForm.id) {
+      const id = this.planForm.id;
+      // Clonamos para no modificar el formulario de la UI
+      const datosAEnviar = { ...this.planForm };
+      delete datosAEnviar.id; // El ID ya va en la URL, no debe ir en el cuerpo de un PATCH
 
-    request.subscribe({
-      next: () => {
-        this.mostrarMensaje(`Plan ${this.editando ? 'actualizado' : 'creado'} con éxito.`);
-        this.cerrarModal();
-        this.cargarPlanes();
-      },
-      error: (err) => {
-        console.error('Error guardando plan:', err);
-        alert('Error al guardar el plan. Revisa los datos.');
-      }
-    });
+      this.authService.updatePlan(id, datosAEnviar).subscribe({
+        next: () => {
+          this.mostrarMensaje('Plan actualizado con éxito.');
+          this.cerrarModal();
+          this.cargarPlanes();
+        },
+        error: (err) => {
+          console.error('Error guardando plan:', err);
+          this.abrirAviso('Error al guardar', 'No se han podido guardar los cambios. Revisa que el nombre no esté duplicado.', 'error');
+        }
+      });
+    } else {
+      this.authService.createPlan(this.planForm).subscribe({
+        next: () => {
+          this.mostrarMensaje('Plan creado con éxito.');
+          this.cerrarModal();
+          this.cargarPlanes();
+        },
+        error: (err) => {
+          console.error('Error creando plan:', err);
+          this.abrirAviso('Error al guardar', 'No se ha podido crear el plan. Revisa los datos.', 'error');
+        }
+      });
+    }
   }
 
   abrirConfirmarEliminar(plan: Plan) {
@@ -122,7 +143,7 @@ export class PanelPlanes implements OnInit {
       },
       error: (err) => {
         console.error('Error eliminando plan:', err);
-        alert('No se pudo eliminar el plan.');
+        this.abrirAviso('Error de eliminación', 'No se ha podido eliminar el plan seleccionado.', 'error');
         this.cerrarConfirmarEliminar();
       }
     });
@@ -139,6 +160,19 @@ export class PanelPlanes implements OnInit {
       this.mensajeExito = null;
       this.cdr.detectChanges();
     }, 4000);
+  }
+
+  abrirAviso(titulo: string, mensaje: string, tipo: 'success' | 'error' | 'warning' = 'warning') {
+    this.tituloAviso = titulo;
+    this.mensajeAviso = mensaje;
+    this.tipoAviso = tipo;
+    this.mostrarModalAviso = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarAviso() {
+    this.mostrarModalAviso = false;
+    this.cdr.detectChanges();
   }
 
   getBeneficiosList(beneficios: string): string[] {
