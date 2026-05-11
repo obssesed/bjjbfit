@@ -22,6 +22,10 @@ export class PanelUsuarios implements OnInit {
   activandoId: number | null = null;
   mensajeExito: string | null = null;
 
+  // Paginación para Activos
+  paginaActualActivos: number = 1;
+  usuariosPorPagina: number = 10;
+
   // Estado de modales y edición
   showBajaModal: boolean = false;
   showCambioPlanModal: boolean = false;
@@ -382,6 +386,25 @@ export class PanelUsuarios implements OnInit {
 
   get usuariosInactivosFiltrados(): PerfilDeportista[] {
     return this.aplicarFiltro(this.usuariosInactivos);
+  }
+
+  // Getters para Paginación de Activos
+  get totalPaginasActivos(): number {
+    return Math.ceil(this.usuariosActivosFiltrados.length / this.usuariosPorPagina);
+  }
+
+  get usuariosActivosPaginados(): PerfilDeportista[] {
+    const inicio = (this.paginaActualActivos - 1) * this.usuariosPorPagina;
+    const fin = inicio + this.usuariosPorPagina;
+    return this.usuariosActivosFiltrados.slice(inicio, fin);
+  }
+
+  cambiarPaginaActivos(nuevaPagina: number) {
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginasActivos) {
+      this.paginaActualActivos = nuevaPagina;
+      this.cdr.detectChanges();
+      // Scroll suave hacia arriba de la lista si fuera necesario
+    }
   }
 
   private aplicarFiltro(lista: PerfilDeportista[]): PerfilDeportista[] {

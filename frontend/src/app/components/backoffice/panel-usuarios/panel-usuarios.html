@@ -102,7 +102,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of usuariosActivosFiltrados">
+      <tr *ngFor="let u of usuariosActivosPaginados">
         <td>
           <div class="user-meta">
             <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
@@ -200,6 +200,20 @@
 
   <div class="empty-state" *ngIf="usuariosActivos.length === 0">
     No hay usuarios con plan activo.
+  </div>
+
+  <!-- Controles de Paginación para Activos -->
+  <div class="pagination-container" *ngIf="totalPaginasActivos > 1">
+    <button class="btn-pagination" [disabled]="paginaActualActivos === 1" (click)="cambiarPaginaActivos(paginaActualActivos - 1)">
+      Anterior
+    </button>
+    <div class="pagination-info">
+      Página <strong>{{ paginaActualActivos }}</strong> de <strong>{{ totalPaginasActivos }}</strong>
+      <span class="total-count">({{ usuariosActivosFiltrados.length }} alumnos)</span>
+    </div>
+    <button class="btn-pagination" [disabled]="paginaActualActivos === totalPaginasActivos" (click)="cambiarPaginaActivos(paginaActualActivos + 1)">
+      Siguiente
+    </button>
   </div>
 </div>
 
