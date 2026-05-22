@@ -5,6 +5,7 @@ import { RegistroComponent } from './components/registro/registro.component';
 import { PerfilUsuarioComponent } from './components/perfil-usuario/perfil-usuario.component';
 import { MiPerfilComponent } from './components/mi-perfil/mi-perfil.component';
 import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 import { Backoffice } from './components/backoffice/backoffice/backoffice';
 import { PanelUsuarios } from './components/backoffice/panel-usuarios/panel-usuarios';
 import { PanelPlanes } from './components/backoffice/panel-planes/panel-planes';
@@ -14,13 +15,14 @@ import { PanelNotificacionesComponent } from './components/backoffice/panel-noti
 import { PanelReseteoPasswordComponent } from './components/backoffice/panel-reseteo-password/panel-reseteo-password';
 
 import { HomeComponent } from './components/home/home.component';
+import { LandingComponent } from './components/landing/landing.component';
 import { CambioPasswordComponent } from './components/cambio-password/cambio-password';
 
 export const routes: Routes = [
   { path: 'cambio-password', component: CambioPasswordComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'clases', component: ListaClasesComponent },
-  { path: '', redirectTo: 'clases', pathMatch: 'full' },
+  { path: '', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegistroComponent },
   { path: 'mi-perfil', component: PerfilUsuarioComponent, canActivate: [AuthGuard] },
@@ -28,7 +30,7 @@ export const routes: Routes = [
   { 
     path: 'backoffice', 
     component: Backoffice, 
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, AdminGuard],
     children: [
       { path: 'usuarios', component: PanelUsuarios },
       { path: 'planes', component: PanelPlanes },

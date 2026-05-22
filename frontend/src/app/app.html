@@ -2,7 +2,7 @@
   
   <nav class="navbar">
     <div class="nav-brand">
-      <a routerLink="/home" class="logo-link">
+      <a [routerLink]="(authService.loggedIn$ | async) ? '/home' : '/'" class="logo-link">
         <span class="logo-text">
           <span class="logo-white">BJJ</span><span class="black-b">B</span><span class="logo-gold">FIT</span>
         </span>
@@ -10,18 +10,22 @@
     </div>
 
     <div class="nav-links">
-      <a routerLink="/home" class="nav-item" routerLinkActive="active">Home</a>
-      <a routerLink="/clases" class="nav-item" routerLinkActive="active">Clases</a>
-      <a *ngIf="authService.loggedIn$ | async" routerLink="/mis-reservas" class="nav-item" routerLinkActive="active">Mis Reservas</a>
-      <a *ngIf="authService.isStaff$ | async" routerLink="/backoffice/usuarios" class="nav-item backoffice-tab" routerLinkActive="active">🗄️ Backoffice</a>
-      
-      <button *ngIf="!(authService.loggedIn$ | async)" routerLink="/login" class="auth-btn">
-        Entrar
-      </button>
-      
-      <button *ngIf="authService.loggedIn$ | async" (click)="logout()" class="auth-btn" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary);">
-        Salir
-      </button>
+      <ng-container *ngIf="authService.loggedIn$ | async; else guestNav">
+        <a routerLink="/home" class="nav-item" routerLinkActive="active">Home</a>
+        <a routerLink="/clases" class="nav-item" routerLinkActive="active">Clases</a>
+        <a routerLink="/mis-reservas" class="nav-item" routerLinkActive="active">Mis Reservas</a>
+        <a *ngIf="authService.isStaff$ | async" routerLink="/backoffice/usuarios" class="nav-item backoffice-tab" routerLinkActive="active">🗄️ Backoffice</a>
+        
+        <button (click)="logout()" class="auth-btn" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary);">
+          Salir
+        </button>
+      </ng-container>
+
+      <ng-template #guestNav>
+        <button routerLink="/login" class="auth-btn">
+          Únete a nosotros
+        </button>
+      </ng-template>
     </div>
   </nav>
 

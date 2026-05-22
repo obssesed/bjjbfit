@@ -26,6 +26,9 @@ export class PanelUsuarios implements OnInit {
   paginaActualActivos: number = 1;
   usuariosPorPagina: number = 10;
 
+  // Paginación para Inactivos
+  paginaActualInactivos: number = 1;
+
   // Estado de modales y edición
   showBajaModal: boolean = false;
   showCambioPlanModal: boolean = false;
@@ -403,7 +406,24 @@ export class PanelUsuarios implements OnInit {
     if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginasActivos) {
       this.paginaActualActivos = nuevaPagina;
       this.cdr.detectChanges();
-      // Scroll suave hacia arriba de la lista si fuera necesario
+    }
+  }
+
+  // Getters para Paginación de Inactivos
+  get totalPaginasInactivos(): number {
+    return Math.ceil(this.usuariosInactivosFiltrados.length / this.usuariosPorPagina);
+  }
+
+  get usuariosInactivosPaginados(): PerfilDeportista[] {
+    const inicio = (this.paginaActualInactivos - 1) * this.usuariosPorPagina;
+    const fin = inicio + this.usuariosPorPagina;
+    return this.usuariosInactivosFiltrados.slice(inicio, fin);
+  }
+
+  cambiarPaginaInactivos(nuevaPagina: number) {
+    if (nuevaPagina >= 1 && nuevaPagina <= this.totalPaginasInactivos) {
+      this.paginaActualInactivos = nuevaPagina;
+      this.cdr.detectChanges();
     }
   }
 
@@ -428,8 +448,8 @@ export class PanelUsuarios implements OnInit {
       let cumpleCategoria = true;
       if (this.filtros.categoria && u.fecha_nacimiento) {
         const edad = this.calcularEdad(u.fecha_nacimiento);
-        if (this.filtros.categoria === 'INFANTIL') cumpleCategoria = edad < 14;
-        else if (this.filtros.categoria === 'JUVENIL') cumpleCategoria = edad >= 14 && edad < 18;
+        if (this.filtros.categoria === 'INFANTIL') cumpleCategoria = edad >= 4 && edad <= 9;
+        else if (this.filtros.categoria === 'JUVENIL') cumpleCategoria = edad >= 10 && edad <= 17;
         else if (this.filtros.categoria === 'ADULTO') cumpleCategoria = edad >= 18;
       }
 
@@ -494,9 +514,9 @@ export class PanelUsuarios implements OnInit {
       let categoria = '';
       if (u.fecha_nacimiento) {
         const edad = this.calcularEdad(u.fecha_nacimiento);
-        if (edad < 14) categoria = 'Infantil';
-        else if (edad < 18) categoria = 'Juvenil';
-        else categoria = 'Adulto';
+        if (edad >= 4 && edad <= 9) categoria = 'Infantil';
+        else if (edad >= 10 && edad <= 17) categoria = 'Juvenil';
+        else if (edad >= 18) categoria = 'Adulto';
       }
       const planLabel = this.getPlanLabel(u);
       const familiarLabel = u.es_familiar ? 'Sí' : 'No';
@@ -543,18 +563,10 @@ export class PanelUsuarios implements OnInit {
     return label;
   }
 
-  getPlanesPermitidos(u: PerfilDeportista): { value: number, label: string }[] {
-    if (!u.fecha_nacimiento || this.planes.length === 0) return [];
-    
-    const edad = this.calcularEdad(u.fecha_nacimiento);
-    let categoria: 'ADULTO' | 'JUVENIL' | 'INFANTIL';
-
-    if (edad < 14) categoria = 'INFANTIL';
-    else if (edad < 18) categoria = 'JUVENIL';
-    else categoria = 'ADULTO';
-
+  getPlanesPermitidos(u: PerfilDeportista | null | undefined): { value: number, label: string }[] {
+    if (!u || this.planes.length === 0) return [];
     return this.planes
-      .filter(p => p.categoria_edad === categoria && p.activo)
+      .filter(p => p.activo)
       .map(p => ({ value: p.id!, label: p.nombre }));
   }
 

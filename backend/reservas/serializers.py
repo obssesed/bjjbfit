@@ -115,7 +115,8 @@ class ReservaSerializer(serializers.ModelSerializer):
         if not user.is_staff and deportista_target != user:
             hijos_ids = user.hijos_a_cargo.values_list('id', flat=True)
             if deportista_target.id not in hijos_ids:
-                raise serializers.ValidationError(
+                from rest_framework.exceptions import PermissionDenied
+                raise PermissionDenied(
                     "No tienes permiso para realizar una reserva en nombre de este usuario."
                 )
 

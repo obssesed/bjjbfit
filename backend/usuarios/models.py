@@ -6,9 +6,9 @@ class Plan(models.Model):
     Modelo para gestionar los planes mensuales dinámicamente.
     """
     CATEGORIAS_EDAD = [
-        ('ADULTO', 'Adulto (18+)'),
-        ('JUVENIL', 'Juvenil (14-17)'),
-        ('INFANTIL', 'Infantil (<14)'),
+        ('ADULTO', 'Adulto (+18)'),
+        ('JUVENIL', 'Juvenil (10-17)'),
+        ('INFANTIL', 'Infantil (4-9)'),
     ]
 
     nombre = models.CharField(max_length=100, unique=True)

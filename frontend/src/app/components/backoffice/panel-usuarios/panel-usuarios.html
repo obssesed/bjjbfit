@@ -293,7 +293,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let u of usuariosInactivosFiltrados">
+      <tr *ngFor="let u of usuariosInactivosPaginados">
         <td>
           <div class="user-meta">
             <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
@@ -337,6 +337,20 @@
       </tr>
     </tbody>
   </table>
+
+  <!-- Controles de Paginación para Inactivos -->
+  <div class="pagination-container" *ngIf="totalPaginasInactivos > 1">
+    <button class="btn-pagination" [disabled]="paginaActualInactivos === 1" (click)="cambiarPaginaInactivos(paginaActualInactivos - 1)">
+      Anterior
+    </button>
+    <div class="pagination-info">
+      Página <strong>{{ paginaActualInactivos }}</strong> de <strong>{{ totalPaginasInactivos }}</strong>
+      <span class="total-count">({{ usuariosInactivosFiltrados.length }} alumnos)</span>
+    </div>
+    <button class="btn-pagination" [disabled]="paginaActualInactivos === totalPaginasInactivos" (click)="cambiarPaginaInactivos(paginaActualInactivos + 1)">
+      Siguiente
+    </button>
+  </div>
 
   <div class="empty-state" *ngIf="usuariosInactivos.length === 0">
     No hay usuarios inactivos registrados.

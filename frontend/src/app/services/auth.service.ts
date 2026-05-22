@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, BehaviorSubject, switchMap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Plan {
   id?: number;
@@ -77,11 +78,11 @@ export interface PerfilDeportista {
   providedIn: 'root'
 })
 export class AuthService {
-  private tokenUrl = 'http://127.0.0.1:8000/api/token/';
-  private registerUrl = 'http://127.0.0.1:8000/api/deportistas/';
-  private meUrl = 'http://127.0.0.1:8000/api/deportistas/me/';
-  private apiUrl = 'http://127.0.0.1:8000/api';
-  private planesUrl = 'http://127.0.0.1:8000/api/planes/';
+  private apiUrl = environment.apiUrl;
+  private tokenUrl = `${environment.apiUrl}/token/`;
+  private registerUrl = `${environment.apiUrl}/deportistas/`;
+  private meUrl = `${environment.apiUrl}/deportistas/me/`;
+  private planesUrl = `${environment.apiUrl}/planes/`;
 
   public loggedIn$ = new BehaviorSubject<boolean>(this.checkToken());
   public isStaff$ = new BehaviorSubject<boolean>(this.getCachedStaff());
@@ -107,7 +108,7 @@ export class AuthService {
             localStorage.setItem('user_profile', JSON.stringify(perfil));
           }
         },
-        error: () => this.isStaff$.next(false)
+        error: () => this.logout()
       })
     );
   }

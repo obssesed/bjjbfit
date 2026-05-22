@@ -27,12 +27,15 @@ class DeportistaViewSet(viewsets.ModelViewSet):
             return Deportista.objects.none()
             
         if user.is_staff:
-            return Deportista.objects.all()
+            return Deportista.objects.all().select_related('tipo_plan', 'padre_tutor').prefetch_related('hijos_a_cargo')
             
+        if self.action == 'actualizar_perfil_hijo':
+            return Deportista.objects.all().select_related('tipo_plan', 'padre_tutor').prefetch_related('hijos_a_cargo')
+
         hijos_ids = user.hijos_a_cargo.values_list('id', flat=True)
         return Deportista.objects.filter(
             models.Q(id=user.id) | models.Q(id__in=hijos_ids)
-        )
+        ).select_related('tipo_plan', 'padre_tutor').prefetch_related('hijos_a_cargo')
 
     def get_permissions(self):
         """
@@ -175,7 +178,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         Endpoint exclusivo para el Backoffice. Devuelve todos los usuarios 
         con plan_activo=True, ordenados alfabéticamente por nombre.
         """
-        activos = Deportista.objects.filter(plan_activo=True).order_by('first_name', 'last_name')
+        activos = Deportista.objects.filter(plan_activo=True).select_related('tipo_plan', 'padre_tutor').prefetch_related('hijos_a_cargo').order_by('first_name', 'last_name')
         serializer = self.get_serializer(activos, many=True)
         return Response(serializer.data)
 
@@ -185,7 +188,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         Endpoint exclusivo para el Backoffice. Devuelve todos los usuarios 
         con plan_activo=False y que ya tengan un tipo_plan asignado (bajas).
         """
-        inactivos = Deportista.objects.filter(plan_activo=False, tipo_plan__isnull=False).order_by('first_name', 'last_name')
+        inactivos = Deportista.objects.filter(plan_activo=False, tipo_plan__isnull=False).select_related('tipo_plan', 'padre_tutor').prefetch_related('hijos_a_cargo').order_by('first_name', 'last_name')
         serializer = self.get_serializer(inactivos, many=True)
         return Response(serializer.data)
 
@@ -195,7 +198,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         Endpoint exclusivo para el Backoffice. Devuelve todos los usuarios 
         con plan_activo=False y que nunca han tenido un tipo_plan asignado (nuevos).
         """
-        pendientes = Deportista.objects.filter(plan_activo=False, tipo_plan__isnull=True, is_staff=False).order_by('-date_joined')
+        pendientes = Deportista.objects.filter(plan_activo=False, tipo_plan__isnull=True, is_staff=False).select_related('tipo_plan', 'padre_tutor').prefetch_related('hijos_a_cargo').order_by('-date_joined')
         serializer = self.get_serializer(pendientes, many=True)
         return Response(serializer.data)
 
@@ -316,7 +319,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         MESES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
         
-        usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
+        usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True).select_related('tipo_plan')
         
         data_actual = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'fundadores': 0, 'desglose': {}, 'sexo': {}}
         data_anterior = {'total': Decimal('0.00'), 'activos': 0, 'familiares': 0, 'fundadores': 0, 'desglose': {}, 'sexo': {}}
@@ -426,7 +429,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
             ultimo_dia_mes_ant = fecha_iter - timezone.timedelta(days=1)
             fecha_iter = ultimo_dia_mes_ant.replace(day=1)
             
-        usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True)
+        usuarios = Deportista.objects.filter(is_staff=False, plan_activo=True).exclude(tipo_plan__isnull=True).select_related('tipo_plan')
         
         for u in usuarios:
             precio = u.tipo_plan.precio_base

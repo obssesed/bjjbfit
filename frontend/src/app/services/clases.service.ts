@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ClaseBJJ {
   id: number;
@@ -52,11 +53,11 @@ export interface VideoRepaso {
   providedIn: 'root'
 })
 export class ClasesService {
-  private apiUrl = 'http://localhost:8000/api/clases/';
-  private reservasUrl = 'http://localhost:8000/api/reservas/';
-  private actividadesUrl = 'http://localhost:8000/api/actividades/';
-  private productosUrl = 'http://localhost:8000/api/productos/';
-  private videosUrl = 'http://localhost:8000/api/videos-repaso/';
+  private apiUrl = `${environment.apiUrl}/clases/`;
+  private reservasUrl = `${environment.apiUrl}/reservas/`;
+  private actividadesUrl = `${environment.apiUrl}/actividades/`;
+  private productosUrl = `${environment.apiUrl}/productos/`;
+  private videosUrl = `${environment.apiUrl}/videos-repaso/`;
 
   constructor(private http: HttpClient) { }
 

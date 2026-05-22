@@ -119,3 +119,42 @@ class TestReglasNegocioV2:
         
         assert res.status_code == 201
         assert res.data['estado'] == 'CONFIRMADA'
+
+    def test_menor_con_plan_adulto_puede_reservar_adultos_y_no_infantiles(self, api_client, plan_adulto, plan_infantil):
+        # 1. Creamos una clase de ADULTOS y una de INFANTILES
+        inicio = timezone.now() + timezone.timedelta(hours=2)
+        clase_adultos = ClaseBJJ.objects.create(
+            titulo="BJJ Adultos Especial",
+            fecha_hora_inicio=inicio,
+            categoria_acceso='ADULTO',
+            capacidad_maxima=10
+        )
+        clase_infantiles = ClaseBJJ.objects.create(
+            titulo="BJJ Niños Especial",
+            fecha_hora_inicio=inicio,
+            categoria_acceso='INFANTIL',
+            capacidad_maxima=10
+        )
+
+        # 2. Creamos un deportista físicamente menor (15 años) pero asignado con plan ADULTO
+        fecha_nac = timezone.now().date() - timezone.timedelta(days=15*365)
+        menor_con_plan_adulto = Deportista.objects.create_user(
+            username="menor_adulto_test",
+            email="menor_adulto@test.com",
+            password="pass",
+            plan_activo=True,
+            tipo_plan=plan_adulto,
+            fecha_nacimiento=fecha_nac
+        )
+
+        # 3. Intentamos reservar clase de adultos con el menor (debería permitirlo porque tiene plan ADULTO)
+        api_client.force_authenticate(user=menor_con_plan_adulto)
+        res_adulto = api_client.post('/api/reservas/', {'clase': clase_adultos.id})
+        assert res_adulto.status_code == 201
+        assert res_adulto.data['estado'] == 'CONFIRMADA'
+
+        # 4. Intentamos reservar clase infantil con el menor (debería denegarlo porque su plan es ADULTO, no INFANTIL)
+        res_infantil = api_client.post('/api/reservas/', {'clase': clase_infantiles.id})
+        assert res_infantil.status_code == 400
+        assert "Esta clase es para la categoría" in str(res_infantil.data)
+

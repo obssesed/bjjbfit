@@ -26,12 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-g27zv%f-=)bq_l&%3q@4g%yesm=2jvq2ltz^mtwd%2b_h_kjy5')
+SECRET_KEY = os.environ.get('SECRET_KEY', os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-g27zv%f-=)bq_l&%3q@4g%yesm=2jvq2ltz^mtwd%2b_h_kjy5'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DEBUG', os.environ.get('DJANGO_DEBUG', 'True')) == 'True'
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')).split(',')
 
 
 # Application definition
@@ -172,6 +172,6 @@ SIMPLE_JWT = {
 }
 
 # --- LÍMITES DE SUBIDA PARA VÍDEOS ---
-# 500MB (Ajustable según necesidad)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000
+# 50MB (Ajustable según necesidad)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800 
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800
