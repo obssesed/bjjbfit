@@ -1,33 +1,23 @@
 <!-- ═══════════════════════════════════════════════════════════
-     HOME — BJJ Fit Academy
+     LANDING PAGE (GUEST) — BJJ Fit Academy
      ═══════════════════════════════════════════════════════════ -->
 
 <!-- HERO -->
 <header class="hero">
   <div class="hero-pattern"></div>
   <div class="hero-body">
-    <!-- Alertas Admin -->
-    <div class="admin-alert-banner" *ngIf="solicitudesPendientesCount > 0" routerLink="/backoffice/reseteos">
-      <div class="alert-icon">⚠️</div>
-      <div class="alert-text">
-        <strong>Atención Admin:</strong> Tienes {{ solicitudesPendientesCount }} solicitud(es) de reseteo de contraseña pendiente(s). Haz clic aquí para resolverlas.
-      </div>
-    </div>
-
     <div class="hero-text">
-      <a routerLink="/home" class="logo-link">
-        <p class="hero-label">BJJ<span class="black-b">B</span><span class="gold">FIT</span> ACADEMY</p>
-      </a>
+      <p class="hero-label">BJJ<span class="black-b">B</span><span class="gold">FIT</span> ACADEMY</p>
       <h1 class="hero-title">
-        Bienvenido, <span class="gold">{{ nombreUsuario }}</span>
+        Entrena en <span class="gold">BJJBFIT</span>
       </h1>
-      <p class="hero-sub">Tu camino en el tatami continúa. Entrena, evoluciona, compite.</p>
+      <p class="hero-sub">Tu camino en el tatami comienza hoy. Entrena, evoluciona, compite.</p>
       <div class="hero-actions">
-        <a routerLink="/clases" class="btn-gold">Reservar Clase</a>
-        <a routerLink="/mi-perfil" class="btn-outline">Mi Perfil</a>
+        <a routerLink="/login" class="btn-gold">Únete a nosotros</a>
+        <button (click)="setTab('servicios')" class="btn-outline">Ver Servicios</button>
       </div>
     </div>
-    <div class="hero-logo" *ngIf="perfil">
+    <div class="hero-logo">
       <img src="logo-academia.png" alt="BJJ Fit Academy" class="logo-img" />
     </div>
   </div>
@@ -45,7 +35,7 @@
     <span class="tab-icon">🛍️</span> Tienda
   </button>
   <button class="tab" [class.active]="activeTab === 'videos'" (click)="setTab('videos')">
-    <span class="tab-icon">🎥</span> Vídeos
+    <span class="tab-icon">🔒</span> Vídeos de Repaso
   </button>
 </nav>
 
@@ -54,29 +44,6 @@
 
   <!-- ──────── SOBRE NOSOTROS ──────── -->
   <section *ngIf="activeTab === 'nosotros'" class="section fade-in">
-
-    <!-- Próximas Clases (Quick Access) -->
-    <div class="upcoming-section" *ngIf="proximasClases.length > 0">
-      <div class="upcoming-header">
-        <h3 class="sub-heading">¡Próximas Sesiones!</h3>
-        <a routerLink="/clases" class="view-all">Ver calendario completo →</a>
-      </div>
-      <div class="upcoming-grid">
-        <div class="class-mini-card" *ngFor="let clase of proximasClases" [routerLink]="['/clases']">
-          <div class="class-mini-icon">{{ clase.icono || '🥋' }}</div>
-          <div class="class-mini-body">
-            <span class="class-mini-time">{{ clase.fecha_hora_inicio | date:'shortTime' }}</span>
-            <span class="class-mini-title">{{ clase.titulo }}</span>
-          </div>
-          <div class="class-mini-status">
-            <span class="spots" [class.full]="clase.plazas_disponibles === 0">
-              {{ clase.plazas_disponibles }} plazas
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Presentación + Vídeo -->
     <div class="about-hero-card">
       <div class="about-content">
@@ -218,7 +185,6 @@
         </div>
       </div>
     </div>
-
   </section>
 
   <!-- ──────── SERVICIOS ──────── -->
@@ -226,24 +192,8 @@
     <h2 class="section-title">Nuestras Actividades</h2>
     <p class="section-sub">Disciplinas y espacios diseñados para tu evolución.</p>
 
-    <div class="admin-toolbar" *ngIf="isAdmin">
-      <button class="btn-add-activity" (click)="abrirModalActividad()">
-        + Añadir Actividad
-      </button>
-    </div>
-
     <div class="services-grid">
       <div *ngFor="let act of actividades" class="svc-card">
-        <!-- Acciones Admin en la tarjeta -->
-        <div class="card-admin-actions" *ngIf="isAdmin">
-          <button class="btn-circle-admin" (click)="abrirModalActividad(act)" title="Editar">
-            ✏️
-          </button>
-          <button class="btn-circle-admin delete" (click)="eliminarActividad(act.id!, $event)" title="Eliminar">
-            🗑️
-          </button>
-        </div>
-
         <div class="svc-visual" [style.backgroundImage]="act.imagen ? 'url(' + act.imagen + ')' : null" [ngClass]="{'no-img': !act.imagen}">
           <div class="svc-overlay"></div>
         </div>
@@ -251,7 +201,7 @@
           <div class="svc-badge">{{ act.badge }}</div>
           <h3>{{ act.titulo }}</h3>
           <p>{{ act.descripcion }}</p>
-          <div class="svc-footer">Explorar horarios →</div>
+          <div class="svc-footer" routerLink="/login">Explorar horarios y reservar →</div>
         </div>
       </div>
       
@@ -297,29 +247,12 @@
       <span class="store-banner-icon">🛒</span>
       <div>
         <strong>Compra presencial</strong>
-        <p>Para adquirir cualquier artículo, dirígete a la recepción de la academia. Aquí puedes consultar
-          disponibilidad.</p>
+        <p>Para adquirir cualquier artículo, dirígete a la recepción de la academia. Aquí puedes consultar disponibilidad.</p>
       </div>
-    </div>
-
-    <div class="admin-toolbar" *ngIf="isAdmin">
-      <button class="btn-add-activity" (click)="abrirModalProducto()">
-        + Añadir Producto
-      </button>
     </div>
 
     <div class="products-grid">
       <div *ngFor="let prod of productos" class="product-card">
-        <!-- Acciones Admin en la tarjeta -->
-        <div class="card-admin-actions" *ngIf="isAdmin">
-          <button class="btn-circle-admin" (click)="abrirModalProducto(prod)" title="Editar">
-            ✏️
-          </button>
-          <button class="btn-circle-admin delete" (click)="eliminarProducto(prod.id!, $event)" title="Eliminar">
-            🗑️
-          </button>
-        </div>
-
         <div class="product-visual" [style.backgroundImage]="prod.imagen ? 'url(' + prod.imagen + ')' : null" [ngClass]="{'no-img': !prod.imagen}">
           <div class="product-overlay"></div>
         </div>
@@ -349,222 +282,16 @@
     <h2 class="section-title">Vídeos de Repaso</h2>
     <p class="section-sub">Revisa las técnicas trabajadas en clase. Actualización semanal.</p>
 
-    <div class="admin-toolbar" *ngIf="isAdmin">
-      <button class="btn-add-activity" (click)="abrirModalVideo()">
-        + Añadir Vídeo de Repaso
-      </button>
-    </div>
-
-    <div class="video-layout" *ngIf="videosRepaso.length > 0; else noVideos">
-      <div class="video-main" *ngIf="videoActivo">
-        <div class="video-player">
-          <video *ngIf="videoActivo.archivo_video" [src]="videoActivo.archivo_video" controls class="main-video-el" [poster]="videoActivo.miniatura || ''"></video>
-          <div *ngIf="!videoActivo.archivo_video" class="video-placeholder">
-             <p>Cargando vídeo...</p>
-          </div>
+    <div class="videos-locked-container">
+      <div class="lock-card">
+        <div class="lock-icon-wrapper">
+          <span class="lock-icon">🔒</span>
         </div>
-        <div class="video-details">
-          <div class="details-header">
-            <span class="video-date">{{ videoActivo.fecha_publicacion | date:'dd MMM yyyy' }}</span>
-            <div class="video-admin-btns" *ngIf="isAdmin">
-              <button class="btn-circle-admin" (click)="abrirModalVideo(videoActivo)">✏️</button>
-              <button class="btn-circle-admin delete" (click)="eliminarVideo(videoActivo.id!, $event)">🗑️</button>
-            </div>
-          </div>
-          <h3>{{ videoActivo.titulo }}</h3>
-          <p>{{ videoActivo.descripcion }}</p>
-        </div>
+        <h3>Contenido Exclusivo para Alumnos</h3>
+        <p>Los vídeos semanales de repaso de técnicas son exclusivos para los alumnos de la academia.</p>
+        <a routerLink="/login" class="btn-gold lock-btn">Iniciar Sesión para Acceder</a>
       </div>
-
-      <aside class="video-sidebar">
-        <h4 class="sidebar-title">Sesiones de Repaso</h4>
-        <div class="sidebar-scroll">
-          <div *ngFor="let vid of videosRepaso" 
-               class="thumb-card" 
-               [ngClass]="{'active': videoActivo?.id === vid.id}"
-               (click)="seleccionarVideo(vid)">
-            <div class="thumb-img" [style.backgroundImage]="vid.miniatura ? 'url(' + vid.miniatura + ')' : null">
-              <div class="thumb-overlay" *ngIf="videoActivo?.id === vid.id">
-                <span>REPRODUCIENDO</span>
-              </div>
-            </div>
-            <div class="thumb-text">
-              <span class="thumb-title">{{ vid.titulo }}</span>
-              <span class="thumb-date">{{ vid.fecha_publicacion | date:'dd MMM' }}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
     </div>
-
-    <ng-template #noVideos>
-      <div class="empty-state">
-        <p>No hay vídeos de repaso disponibles todavía. Vuelve pronto.</p>
-      </div>
-    </ng-template>
   </section>
-
-  <!-- MODAL EDICIÓN ACTIVIDAD (Solo Admin) -->
-  <div class="modal-overlay" *ngIf="mostrarModalActividad" (click)="cerrarModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ actividadEdicion.id ? 'Editar Actividad' : 'Nueva Actividad' }}</h2>
-        <button class="btn-close" (click)="cerrarModal()">×</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Título de la Actividad</label>
-          <input type="text" [(ngModel)]="actividadEdicion.titulo" class="form-control" placeholder="Ej: BJJ con Gi">
-        </div>
-
-        <div class="form-group">
-          <label>Badge (Etiqueta superior)</label>
-          <input type="text" [(ngModel)]="actividadEdicion.badge" class="form-control" placeholder="Ej: TÉCNICA">
-        </div>
-
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea [(ngModel)]="actividadEdicion.descripcion" class="form-control" rows="3" placeholder="Describe brevemente el servicio..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Imagen de fondo</label>
-          <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
-          <p class="section-sub" style="margin-top: 5px; font-size: 0.8rem;">
-            {{ actividadEdicion.imagen ? 'Ya tiene imagen. Sube otra para cambiarla.' : 'Sube una imagen impactante para la tarjeta.' }}
-          </p>
-        </div>
-
-        <div class="form-group">
-          <label>Orden de visualización</label>
-          <input type="number" [(ngModel)]="actividadEdicion.orden" class="form-control">
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-save" (click)="guardarActividad()" [disabled]="guardandoActividad || !actividadEdicion.titulo || !actividadEdicion.descripcion">
-          {{ guardandoActividad ? 'Guardando...' : 'Guardar Actividad' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL EDICIÓN PRODUCTO (Solo Admin) -->
-  <div class="modal-overlay" *ngIf="mostrarModalProducto" (click)="cerrarModalProducto()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ productoEdicion.id ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
-        <button class="btn-close" (click)="cerrarModalProducto()">×</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Nombre del Producto</label>
-          <input type="text" [(ngModel)]="productoEdicion.nombre" class="form-control" placeholder="Ej: Kimono Premium">
-        </div>
-
-        <div class="form-group">
-          <label>Estado de Stock</label>
-          <select [(ngModel)]="productoEdicion.estado_stock" class="form-control">
-            <option value="IN_STOCK">En Stock</option>
-            <option value="LOW_STOCK">Últimas tallas</option>
-            <option value="OUT_OF_STOCK">Agotado</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>Tallas / Información</label>
-          <input type="text" [(ngModel)]="productoEdicion.tallas" class="form-control" placeholder="Ej: A0, A1, A2">
-        </div>
-
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea [(ngModel)]="productoEdicion.descripcion" class="form-control" rows="3" placeholder="Breve descripción del producto..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Imagen del Producto</label>
-          <input type="file" (change)="onFileSelectedProducto($event)" class="form-control" accept="image/*">
-        </div>
-
-        <div class="form-group">
-          <label>Orden</label>
-          <input type="number" [(ngModel)]="productoEdicion.orden" class="form-control">
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="cerrarModalProducto()">Cancelar</button>
-        <button class="btn-save" (click)="guardarProducto()" [disabled]="guardandoProducto || !productoEdicion.nombre">
-          {{ guardandoProducto ? 'Guardando...' : 'Guardar Producto' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL EDICIÓN VÍDEO (Solo Admin) -->
-  <div class="modal-overlay" *ngIf="mostrarModalVideo" (click)="cerrarModalVideo()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{ videoEdicion.id ? 'Editar Vídeo' : 'Nuevo Vídeo de Repaso' }}</h2>
-        <button class="btn-close" (click)="cerrarModalVideo()">×</button>
-      </div>
-
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Título del Vídeo</label>
-          <input type="text" [(ngModel)]="videoEdicion.titulo" class="form-control" placeholder="Ej: Pasaje de guardia...">
-        </div>
-
-        <div class="form-group">
-          <label>Descripción</label>
-          <textarea [(ngModel)]="videoEdicion.descripcion" class="form-control" rows="3" placeholder="Explica la técnica o el enfoque..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Archivo de Vídeo</label>
-          <input type="file" (change)="onFileSelectedVideo($event, 'video')" class="form-control" accept="video/*">
-          <p class="section-sub" style="font-size: 0.75rem; margin-top: 4px;" *ngIf="videoEdicion.archivo_video">
-            Ya existe un vídeo cargado. Sube uno nuevo solo si deseas reemplazarlo.
-          </p>
-        </div>
-
-        <div class="form-group">
-          <label>Miniatura (Imagen de portada)</label>
-          <input type="file" (change)="onFileSelectedVideo($event, 'miniatura')" class="form-control" accept="image/*">
-        </div>
-
-        <div class="form-group">
-          <label>Orden</label>
-          <input type="number" [(ngModel)]="videoEdicion.orden" class="form-control">
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="cerrarModalVideo()">Cancelar</button>
-        <button class="btn-save" (click)="guardarVideo()" [disabled]="guardandoVideo || !videoEdicion.titulo">
-          {{ guardandoVideo ? 'Subiendo vídeo...' : 'Guardar Vídeo' }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL CONFIRMACIÓN (REUTILIZABLE) -->
-  <div class="modal-overlay" *ngIf="mostrarModalConfirmar" (click)="cerrarModalConfirmar()">
-    <div class="modal-content confirm-modal" (click)="$event.stopPropagation()">
-      <div class="confirm-icon">⚠️</div>
-      <h2 class="confirm-title">{{ tituloConfirmar }}</h2>
-      <p class="confirm-message">{{ mensajeConfirmar }}</p>
-      
-      <div class="modal-footer confirm-footer">
-        <button class="btn-cancel" (click)="cerrarModalConfirmar()">Cancelar</button>
-        <button class="btn-save btn-danger" (click)="ejecutarConfirmacion()">
-          Eliminar definitivamente
-        </button>
-      </div>
-    </div>
-  </div>
 
 </main>

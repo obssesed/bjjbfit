@@ -624,6 +624,53 @@
   transform: translateY(-3px);
 }
 
+/* Premium teacher card with photo */
+.teacher-card--premium {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.6) 100%);
+  border: 1px solid rgba(196, 134, 85, 0.15);
+}
+
+.teacher-card--premium:hover {
+  border-color: rgba(196, 134, 85, 0.45);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(196, 134, 85, 0.08);
+}
+
+.teacher-photo {
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  position: relative;
+}
+
+.teacher-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.7) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.teacher-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.teacher-card--premium:hover .teacher-photo img {
+  transform: scale(1.05);
+}
+
+.teacher-card--premium .teacher-body {
+  padding: 1.5rem 2rem 2rem;
+}
+
 .teacher-avatar {
   width: 64px;
   height: 64px;
@@ -643,7 +690,7 @@
 
 .teacher-body h4 {
   margin: 0 0 0.3rem;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -653,13 +700,43 @@
   width: 40px;
   height: 6px;
   border-radius: 3px;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 
 .teacher-body p {
   margin: 0;
   font-size: 0.85rem;
   color: var(--text-secondary);
+}
+
+.teacher-credentials {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.teacher-credentials li {
+  position: relative;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.teacher-credentials li::before {
+  content: '›';
+  position: absolute;
+  left: 0;
+  color: var(--accent-gold);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.teacher-pending {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  opacity: 0.6;
 }
 
 /* Belt colors (reusable) */
