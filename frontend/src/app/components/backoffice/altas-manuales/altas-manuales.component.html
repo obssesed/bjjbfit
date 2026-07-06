@@ -1,0 +1,116 @@
+<div class="panel-container">
+  <div class="panel-header">
+    <div class="title-section">
+      <h2>Alta Manual de Deportista</h2>
+      <p class="subtitle">Añade usuarios rápidamente asignando su plan y forzando cambio de clave al entrar.</p>
+    </div>
+  </div>
+
+  <div class="panel-content">
+    
+    <div class="message-banner" *ngIf="mensajeResultado" [ngClass]="{'error': mensajeError, 'success': !mensajeError}">
+      {{ mensajeResultado }}
+    </div>
+
+    <form class="alta-form" (ngSubmit)="crearAlta()" #altaForm="ngForm">
+      
+      <div class="form-section">
+        <h3>Datos Personales</h3>
+        <div class="form-grid">
+          
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input type="text" [(ngModel)]="nuevoUsuario.first_name" name="first_name" required placeholder="Nombre del deportista">
+          </div>
+
+          <div class="form-group">
+            <label>Apellidos *</label>
+            <input type="text" [(ngModel)]="nuevoUsuario.last_name" name="last_name" required placeholder="Apellidos">
+          </div>
+
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="nuevoUsuario.email" name="email" required placeholder="correo@ejemplo.com">
+          </div>
+
+          <div class="form-group">
+            <label>NIF / DNI *</label>
+            <input type="text" [(ngModel)]="nuevoUsuario.nif" name="nif" required placeholder="12345678X">
+          </div>
+
+          <div class="form-group">
+            <label>Fecha de Nacimiento *</label>
+            <input type="date" [(ngModel)]="nuevoUsuario.fecha_nacimiento" name="fecha_nacimiento" required>
+          </div>
+
+          <div class="form-group">
+            <label>Sexo *</label>
+            <select [(ngModel)]="nuevoUsuario.sexo" name="sexo" required>
+              <option value="">Seleccionar...</option>
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="nuevoUsuario.telefono" name="telefono" placeholder="Opcional">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h3>Datos Deportivos y Plan</h3>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>Cinturón</label>
+            <select [(ngModel)]="nuevoUsuario.cinturon" name="cinturon">
+              <option *ngFor="let c of opcionesCinturon" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Nº Socio (Interno)</label>
+            <input type="text" [(ngModel)]="nuevoUsuario.id_interno" name="id_interno" placeholder="Opcional">
+          </div>
+
+          <div class="form-group">
+            <label>Plan a Asignar</label>
+            <select [(ngModel)]="nuevoUsuario.tipo_plan" name="tipo_plan">
+              <option [ngValue]="null">Sin plan</option>
+              <option *ngFor="let p of planes" [value]="p.id">{{ p.nombre }} ({{ p.precio_base }}€)</option>
+            </select>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="nuevoUsuario.plan_activo" name="plan_activo">
+              Marcar como activo (permite reservar)
+            </label>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="nuevoUsuario.es_familiar" name="es_familiar">
+              Aplicar descuento familiar (50%)
+            </label>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="form-info-box">
+        <span class="info-icon">ℹ️</span>
+        <p>Al crear al usuario, se le asignará la contraseña <strong>Bjjbfit2026!</strong>. En su primer inicio de sesión, el sistema le forzará a cambiarla.</p>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-primary" [disabled]="!altaForm.valid || guardando">
+          {{ guardando ? 'Creando Usuario...' : 'Crear Usuario' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

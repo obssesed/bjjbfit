@@ -18,6 +18,8 @@ import { HomeComponent } from './components/home/home.component';
 import { LandingComponent } from './components/landing/landing.component';
 import { CambioPasswordComponent } from './components/cambio-password/cambio-password';
 
+import { AltasManualesComponent } from './components/backoffice/altas-manuales/altas-manuales.component';
+
 export const routes: Routes = [
   { path: 'cambio-password', component: CambioPasswordComponent, canActivate: [AuthGuard] },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
@@ -38,8 +40,10 @@ export const routes: Routes = [
       { path: 'reportes', component: PanelReportesComponent },
       { path: 'notificaciones', component: PanelNotificacionesComponent },
       { path: 'reseteos', component: PanelReseteoPasswordComponent },
+      { path: 'altas-manuales', component: AltasManualesComponent },
       { path: '', redirectTo: 'usuarios', pathMatch: 'full' }
     ]
   },
   { path: '**', redirectTo: 'clases' }
 ];
+

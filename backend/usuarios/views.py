@@ -47,7 +47,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'solicitar_reseteo']:
             return [permissions.AllowAny()]
             
-        if self.action in ['list', 'activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan']:
+        if self.action in ['list', 'activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan', 'crear_alta_manual']:
             return [permissions.IsAdminUser()]
             
         return [permissions.IsAuthenticated()]
@@ -171,6 +171,56 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         hijo = serializer.save(padre_tutor=padre)
         
         return Response(self.get_serializer(hijo).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def crear_alta_manual(self, request):
+        """
+        Endpoint exclusivo para el Backoffice. Permite a los administradores
+        dar de alta usuarios manualmente, asignándoles un plan activo y
+        forzándoles a cambiar su contraseña por defecto al primer login.
+        """
+        data = request.data.copy()
+        
+        # Generar un username si no se envía o si se quiere autogenerar
+        import uuid
+        if not data.get('username'):
+            data['username'] = f"user_{uuid.uuid4().hex[:6]}"
+            
+        # Asignar contraseña por defecto si no se ha enviado una
+        if 'password' not in data:
+            data['password'] = 'Bjjbfit2026!'
+        
+        # Validar y guardar con el serializer (ignora campos read_only)
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        nuevo_usuario = serializer.save()
+        
+        # Asignar campos read_only que el admin sí puede setear aquí
+        nuevo_usuario.set_password(data['password'])
+        nuevo_usuario.requiere_cambio_password = True
+        
+        if 'plan_activo' in request.data:
+            nuevo_usuario.plan_activo = str(request.data['plan_activo']).lower() == 'true'
+            
+        if 'es_familiar' in request.data:
+            nuevo_usuario.es_familiar = str(request.data['es_familiar']).lower() == 'true'
+            
+        if 'cinturon' in request.data:
+            nuevo_usuario.cinturon = request.data['cinturon']
+            
+        if 'tipo_plan' in request.data and request.data['tipo_plan']:
+            try:
+                plan = Plan.objects.get(id=request.data['tipo_plan'])
+                nuevo_usuario.tipo_plan = plan
+            except Plan.DoesNotExist:
+                pass
+                
+        nuevo_usuario.save()
+        
+        return Response({
+            'success': f'Usuario {nuevo_usuario.first_name} creado con éxito.',
+            'usuario': self.get_serializer(nuevo_usuario).data
+        }, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
     def activos_backoffice(self, request):

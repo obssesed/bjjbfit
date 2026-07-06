@@ -213,6 +213,10 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_nombre/`, { first_name: firstName, last_name: lastName });
   }
 
+  crearAltaManual(datos: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/crear_alta_manual/`, datos);
+  }
+
   actualizarDatosPago(deportistaId: number, metodoPago: string, cuentaBancaria: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/deportistas/${deportistaId}/`, {
       metodo_pago: metodoPago,
