@@ -262,7 +262,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         return Response({'success': f'Plan {plan.nombre} activado correctamente para {deportista.first_name or deportista.username}.'})
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def actualizar_graduacion(self, request, pk=None):
         """
         Permite al profesor subir de grado o cambiar el cinturón de un atleta.
@@ -298,6 +298,42 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         deportista.id_interno = nuevo_id
         deportista.save()
         return Response({'success': f'Nº Socio de {deportista.first_name} actualizado a {nuevo_id}.'})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def actualizar_nif(self, request, pk=None):
+        """
+        Permite al administrador actualizar el DNI/NIF de un deportista.
+        """
+        deportista = self.get_object()
+        nuevo_nif = request.data.get('nif', '').strip()
+
+        if not nuevo_nif:
+            return Response({'error': 'El DNI/NIF no puede estar vacío.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        deportista.nif = nuevo_nif
+        deportista.save()
+        return Response({'success': f'DNI de {deportista.first_name} actualizado a {nuevo_nif}.'})
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAdminUser])
+    def actualizar_nombre(self, request, pk=None):
+        """
+        Permite al administrador corregir el nombre y/o apellidos de un deportista.
+        """
+        deportista = self.get_object()
+        nuevo_nombre = request.data.get('first_name', '').strip()
+        nuevo_apellido = request.data.get('last_name', '').strip()
+
+        if not nuevo_nombre and not nuevo_apellido:
+            return Response(
+                {'error': 'Debes proporcionar al menos un nombre o apellido.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        deportista.first_name = nuevo_nombre
+        deportista.last_name = nuevo_apellido
+        deportista.save()
+        nombre_completo = f'{nuevo_nombre} {nuevo_apellido}'.strip()
+        return Response({'success': f'Nombre actualizado a {nombre_completo}.'})
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAdminUser])
     def reporte_ingresos(self, request):

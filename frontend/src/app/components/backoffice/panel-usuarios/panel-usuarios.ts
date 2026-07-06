@@ -36,6 +36,8 @@ export class PanelUsuarios implements OnInit {
   showCuentaModal: boolean = false;
   deportistaSeleccionado: PerfilDeportista | null = null;
   editandoIdSocio: number | null = null; // Para edición inline del Nº Socio
+  editandoDni: number | null = null; // Para edición inline del DNI/NIF
+  editandoNombre: number | null = null; // Para edición inline del nombre
 
   // Filtros
   filtrosExpandidos: boolean = false;
@@ -312,6 +314,67 @@ export class PanelUsuarios implements OnInit {
         this.activandoId = null;
         this.editandoIdSocio = null;
         this.mensajeExito = '❌ Error al actualizar Nº Socio.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
+
+  guardarDni(deportista: PerfilDeportista) {
+    const nif = (deportista.nif || '').trim();
+    if (!nif) {
+      this.mensajeExito = '⚠️ El DNI/NIF no puede estar vacío.';
+      this.cdr.detectChanges();
+      setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      return;
+    }
+
+    this.activandoId = deportista.id;
+    this.cdr.detectChanges();
+
+    this.authService.actualizarNif(deportista.id, nif).subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.editandoDni = null;
+        this.mensajeExito = res.success || 'DNI actualizado.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        this.editandoDni = null;
+        this.mensajeExito = '❌ Error al actualizar DNI.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
+
+  guardarNombre(deportista: PerfilDeportista) {
+    const nombre = (deportista.first_name || '').trim();
+    const apellido = (deportista.last_name || '').trim();
+    if (!nombre && !apellido) {
+      this.mensajeExito = '⚠️ Debes proporcionar al menos un nombre o apellido.';
+      this.cdr.detectChanges();
+      setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      return;
+    }
+
+    this.activandoId = deportista.id;
+    this.cdr.detectChanges();
+
+    this.authService.actualizarNombre(deportista.id, nombre, apellido).subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.editandoNombre = null;
+        this.mensajeExito = res.success || 'Nombre actualizado.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        this.editandoNombre = null;
+        this.mensajeExito = '❌ Error al actualizar nombre.';
         this.cdr.detectChanges();
         setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       }

@@ -26,14 +26,12 @@
         <div class="belt-badge belt-{{ perfil.cinturon | lowercase }}">
           Cinturón {{ perfil.cinturon }}
         </div>
+        <div class="belt-actions" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">
+          <button class="btn-outline small" style="padding: 0.4rem 1rem; font-size: 0.8rem; border-color: rgba(255,255,255,0.2); color: var(--text-secondary);" (click)="abrirGraduacionModal()">Modificar cinturón y grados</button>
+        </div>
         <div class="id-interno" *ngIf="perfil.id_interno">
           Socio Nº: <span>{{ perfil.id_interno }}</span>
         </div>
-      </div>
-      
-      <div class="read-only-notice">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        Los datos de identidad y grado son gestionados por la academia.
       </div>
     </aside>
 
@@ -161,7 +159,9 @@
           <div class="avatar-small">{{ hijo.first_name[0] }}</div>
           <div class="child-title">
             <h4>{{ hijo.first_name }} {{ hijo.last_name }}</h4>
-            <span class="belt-badge belt-{{ hijo.cinturon | lowercase }} mini">Cinturón {{ hijo.cinturon }}</span>
+            <span class="belt-badge belt-{{ hijo.cinturon | lowercase }} mini" style="cursor: pointer; transition: transform 0.2s;" (click)="abrirGraduacionModal(hijo)" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+              Cinturón {{ hijo.cinturon }} ✏️
+            </span>
           </div>
         </div>
 
@@ -204,6 +204,58 @@
   <!-- Toast notification -->
   <div class="toast" *ngIf="mensajeResultado" [class.error]="mensajeError">
     {{ mensajeResultado }}
+  </div>
+
+  <!-- ====== MODAL: Graduación (Cinturón/Grados) ====== -->
+  <div class="modal-overlay" *ngIf="showGraduacionModal && perfil">
+    <div class="modal-card graduacion-card">
+      <h3 class="modal-title">Graduación</h3>
+      <p class="modal-subtitle">
+        Actualiza tu rango
+      </p>
+
+      <!-- Visualización previa -->
+      <div class="graduacion-preview">
+        <div class="mini-belt belt-color-{{ cinturonTemp | lowercase }} large-belt">
+          <div class="mini-belt-body"></div>
+          <div class="mini-belt-tip" [ngClass]="{'tip-roja': cinturonTemp === 'Negro', 'tip-negra': cinturonTemp !== 'Negro'}">
+            <div class="mini-stripe" *ngFor="let _ of [].constructor(gradosTemp)"></div>
+          </div>
+        </div>
+        <div class="graduacion-label">
+          {{ cinturonTemp }} - {{ gradosTemp }} Grados
+        </div>
+      </div>
+
+      <div class="modal-plan-form">
+        <label class="modal-form-label">Seleccionar Cinturón</label>
+        <div class="belt-selector-grid">
+          <button *ngFor="let color of opcionesCinturon" 
+                  class="belt-option color-{{ color | lowercase }}"
+                  [class.active]="cinturonTemp === color"
+                  (click)="cambiarColorCinturon(color)">
+            {{ color }}
+          </button>
+        </div>
+
+        <label class="modal-form-label" style="margin-top: 1.5rem;">Gestionar Grados</label>
+        <div class="grados-control">
+          <button class="btn-grado-minus" (click)="bajarGrado()" [disabled]="gradosTemp <= 0">-</button>
+          <div class="grados-display">
+            <span class="grados-number">{{ gradosTemp }}</span>
+            <span class="grados-text">Rayas</span>
+          </div>
+          <button class="btn-grado-plus" (click)="subirGrado()" [disabled]="gradosTemp >= 4">+</button>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cerrarGraduacionModal()">Cancelar</button>
+        <button class="btn-confirm" [disabled]="guardando" (click)="confirmarGraduacion()">
+          {{ guardando ? 'Guardando...' : 'Confirmar Graduación' }}
+        </button>
+      </div>
+    </div>
   </div>
 
 </div>

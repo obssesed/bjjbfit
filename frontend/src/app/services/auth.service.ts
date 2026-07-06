@@ -205,6 +205,14 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_id_interno/`, { id_interno: idInterno });
   }
 
+  actualizarNif(deportistaId: number, nif: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_nif/`, { nif });
+  }
+
+  actualizarNombre(deportistaId: number, firstName: string, lastName: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deportistas/${deportistaId}/actualizar_nombre/`, { first_name: firstName, last_name: lastName });
+  }
+
   actualizarDatosPago(deportistaId: number, metodoPago: string, cuentaBancaria: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/deportistas/${deportistaId}/`, {
       metodo_pago: metodoPago,

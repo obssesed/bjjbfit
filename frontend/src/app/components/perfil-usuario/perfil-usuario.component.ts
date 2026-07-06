@@ -197,4 +197,68 @@ export class PerfilUsuarioComponent implements OnInit {
       }
     });
   }
+
+  // === Modal de Graduación ===
+  showGraduacionModal: boolean = false;
+  opcionesCinturon: string[] = ['Blanco', 'Azul', 'Morado', 'Marrón', 'Negro', 'Gris', 'Amarillo', 'Naranja', 'Verde'];
+  cinturonTemp: string = '';
+  gradosTemp: number = 0;
+  perfilEditandoGraduacion: any = null; // Puede ser el perfil principal o un hijo
+
+  abrirGraduacionModal(perfilTarget?: any) {
+    this.perfilEditandoGraduacion = perfilTarget || this.perfil;
+    if (!this.perfilEditandoGraduacion) return;
+    
+    this.cinturonTemp = this.perfilEditandoGraduacion.cinturon || 'Blanco';
+    this.gradosTemp = this.perfilEditandoGraduacion.grados || 0;
+    this.showGraduacionModal = true;
+  }
+
+  cerrarGraduacionModal() {
+    this.showGraduacionModal = false;
+    this.perfilEditandoGraduacion = null;
+  }
+
+  cambiarColorCinturon(color: string) {
+    if (this.cinturonTemp !== color) {
+      this.cinturonTemp = color;
+      this.gradosTemp = 0; // Resetear grados si cambia el color
+    }
+  }
+
+  subirGrado() {
+    if (this.gradosTemp < 4) this.gradosTemp++;
+  }
+
+  bajarGrado() {
+    if (this.gradosTemp > 0) this.gradosTemp--;
+  }
+
+  confirmarGraduacion() {
+    if (!this.perfilEditandoGraduacion) return;
+    this.guardando = true;
+    this.authService.actualizarGraduacion(this.perfilEditandoGraduacion.id, this.cinturonTemp, this.gradosTemp).subscribe({
+      next: (res) => {
+        this.guardando = false;
+        this.showGraduacionModal = false;
+        this.mensajeResultado = '✔️ Graduación actualizada correctamente.';
+        this.mensajeError = false;
+        
+        // Actualizar visualmente
+        this.perfilEditandoGraduacion.cinturon = this.cinturonTemp;
+        this.perfilEditandoGraduacion.grados = this.gradosTemp;
+        
+        this.perfilEditandoGraduacion = null;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeResultado = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.guardando = false;
+        this.mensajeResultado = '❌ Error al actualizar graduación.';
+        this.mensajeError = true;
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeResultado = null; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
 }

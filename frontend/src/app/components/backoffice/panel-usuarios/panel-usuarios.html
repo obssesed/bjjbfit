@@ -105,8 +105,38 @@
       <tr *ngFor="let u of usuariosActivosPaginados">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
-            <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+            <div class="nombre-inline-cell">
+              <div *ngIf="editandoNombre !== u.id" class="nombre-display" (click)="editandoNombre = u.id">
+                <span class="user-name">{{ u.first_name }} {{ u.last_name }}</span>
+                <span class="edit-hint">✏️</span>
+              </div>
+              <div *ngIf="editandoNombre === u.id" class="nombre-edit">
+                <input type="text" [(ngModel)]="u.first_name"
+                       (keyup.enter)="guardarNombre(u)"
+                       class="control-input small-input nombre-input"
+                       placeholder="Nombre..." autofocus>
+                <input type="text" [(ngModel)]="u.last_name"
+                       (keyup.enter)="guardarNombre(u)"
+                       class="control-input small-input nombre-input"
+                       placeholder="Apellidos...">
+                <button class="btn-save-inline" (click)="guardarNombre(u)">✔️</button>
+                <button class="btn-cancel-inline" (click)="editandoNombre = null">✕</button>
+              </div>
+            </div>
+            <div class="dni-inline-cell">
+              <div *ngIf="editandoDni !== u.id" class="dni-display" [class.sin-dni]="!u.nif" (click)="editandoDni = u.id">
+                <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+                <span class="edit-hint">✏️</span>
+              </div>
+              <div *ngIf="editandoDni === u.id" class="id-edit">
+                <input type="text" [(ngModel)]="u.nif"
+                       (keyup.enter)="guardarDni(u)"
+                       class="control-input small-input dni-input"
+                       placeholder="DNI/NIF..." autofocus>
+                <button class="btn-save-inline" (click)="guardarDni(u)">✔️</button>
+                <button class="btn-cancel-inline" (click)="editandoDni = null">✕</button>
+              </div>
+            </div>
           </div>
         </td>
         <td>
@@ -237,8 +267,38 @@
       <tr *ngFor="let u of usuariosPendientesFiltrados">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
-            <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+            <div class="nombre-inline-cell">
+              <div *ngIf="editandoNombre !== u.id" class="nombre-display" (click)="editandoNombre = u.id">
+                <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+                <span class="edit-hint">✏️</span>
+              </div>
+              <div *ngIf="editandoNombre === u.id" class="nombre-edit">
+                <input type="text" [(ngModel)]="u.first_name"
+                       (keyup.enter)="guardarNombre(u)"
+                       class="control-input small-input nombre-input"
+                       placeholder="Nombre..." autofocus>
+                <input type="text" [(ngModel)]="u.last_name"
+                       (keyup.enter)="guardarNombre(u)"
+                       class="control-input small-input nombre-input"
+                       placeholder="Apellidos...">
+                <button class="btn-save-inline" (click)="guardarNombre(u)">✔️</button>
+                <button class="btn-cancel-inline" (click)="editandoNombre = null">✕</button>
+              </div>
+            </div>
+            <div class="dni-inline-cell">
+              <div *ngIf="editandoDni !== u.id" class="dni-display" [class.sin-dni]="!u.nif" (click)="editandoDni = u.id">
+                <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+                <span class="edit-hint">✏️</span>
+              </div>
+              <div *ngIf="editandoDni === u.id" class="id-edit">
+                <input type="text" [(ngModel)]="u.nif"
+                       (keyup.enter)="guardarDni(u)"
+                       class="control-input small-input dni-input"
+                       placeholder="DNI/NIF..." autofocus>
+                <button class="btn-save-inline" (click)="guardarDni(u)">✔️</button>
+                <button class="btn-cancel-inline" (click)="editandoDni = null">✕</button>
+              </div>
+            </div>
           </div>
         </td>
         <td>
@@ -296,8 +356,38 @@
       <tr *ngFor="let u of usuariosInactivosPaginados">
         <td>
           <div class="user-meta">
-            <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
-            <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+            <div class="nombre-inline-cell">
+              <div *ngIf="editandoNombre !== u.id" class="nombre-display" (click)="editandoNombre = u.id">
+                <span class="user-name">{{ (u.first_name || u.last_name) ? (u.first_name + ' ' + u.last_name) : 'Nueva alta' }}</span>
+                <span class="edit-hint">✏️</span>
+              </div>
+              <div *ngIf="editandoNombre === u.id" class="nombre-edit">
+                <input type="text" [(ngModel)]="u.first_name"
+                       (keyup.enter)="guardarNombre(u)"
+                       class="control-input small-input nombre-input"
+                       placeholder="Nombre..." autofocus>
+                <input type="text" [(ngModel)]="u.last_name"
+                       (keyup.enter)="guardarNombre(u)"
+                       class="control-input small-input nombre-input"
+                       placeholder="Apellidos...">
+                <button class="btn-save-inline" (click)="guardarNombre(u)">✔️</button>
+                <button class="btn-cancel-inline" (click)="editandoNombre = null">✕</button>
+              </div>
+            </div>
+            <div class="dni-inline-cell">
+              <div *ngIf="editandoDni !== u.id" class="dni-display" [class.sin-dni]="!u.nif" (click)="editandoDni = u.id">
+                <span class="user-alias">{{ u.nif || 'Sin DNI' }}</span>
+                <span class="edit-hint">✏️</span>
+              </div>
+              <div *ngIf="editandoDni === u.id" class="id-edit">
+                <input type="text" [(ngModel)]="u.nif"
+                       (keyup.enter)="guardarDni(u)"
+                       class="control-input small-input dni-input"
+                       placeholder="DNI/NIF..." autofocus>
+                <button class="btn-save-inline" (click)="guardarDni(u)">✔️</button>
+                <button class="btn-cancel-inline" (click)="editandoDni = null">✕</button>
+              </div>
+            </div>
           </div>
         </td>
         <td>

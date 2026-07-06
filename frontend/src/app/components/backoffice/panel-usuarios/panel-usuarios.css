@@ -748,6 +748,112 @@
   transform: scale(0.9);
 }
 
+/* === DNI Inline Edit === */
+.dni-inline-cell {
+  margin-top: 2px;
+}
+
+.dni-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.dni-display:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dni-display.sin-dni {
+  border: 1px dashed rgba(234, 179, 8, 0.4);
+}
+
+.dni-display.sin-dni:hover {
+  background: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.6);
+}
+
+.dni-display .edit-hint {
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.dni-display:hover .edit-hint {
+  opacity: 0.6;
+}
+
+.dni-input {
+  width: 110px;
+}
+
+.btn-cancel-inline {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel-inline:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+}
+
+/* === Nombre Inline Edit === */
+.nombre-inline-cell {
+  margin-bottom: 2px;
+}
+
+.nombre-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1px solid transparent;
+}
+
+.nombre-display:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.nombre-display .edit-hint {
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.nombre-display:hover .edit-hint {
+  opacity: 0.6;
+}
+
+.nombre-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.nombre-input {
+  width: 110px;
+}
+
 /* ====== BARRA DE FILTROS AVANZADA ====== */
 .filter-toolbar {
   background: rgba(255, 255, 255, 0.03);
