@@ -19,6 +19,10 @@ services:
   backend:
     build: ./backend
     container_name: bjjfit_backend
+    networks:
+      default:
+        aliases:
+          - cswca4g8b874icl8xht8uj5f
     environment:
       - DEBUG=0
       - SECRET_KEY=django-insecure-prod-key-change-me
