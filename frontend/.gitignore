@@ -54,3 +54,5 @@ backend/media/
 # Optional images/uploads
 *.zip
 *.tar.gz
+
+!academia.mp4
