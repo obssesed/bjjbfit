@@ -277,6 +277,27 @@
   .stat-number {
     font-size: 3.5rem;
   }
+
+  .belt-card {
+    min-height: 130px; /* Cinturón más fino en móvil */
+  }
+
+  .belt-tip {
+    width: 90px; /* Punta negra más estrecha */
+  }
+
+  .stripes-container {
+    padding-left: 8px;
+    gap: 6px;
+  }
+
+  .stripe {
+    width: 12px; /* Grados más estrechos */
+  }
+
+  .stripe-date {
+    font-size: 0.45rem;
+  }
   
   .history-item {
     flex-wrap: wrap;
