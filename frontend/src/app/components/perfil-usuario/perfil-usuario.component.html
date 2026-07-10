@@ -23,13 +23,15 @@
       <div class="identity-info">
         <h2>{{ perfil.first_name }} {{ perfil.last_name }}</h2>
         <p class="username">@{{ perfil.username }}</p>
-        <div class="belt-badge belt-{{ perfil.cinturon | lowercase }}">
-          Cinturón {{ perfil.cinturon }}
+        <div class="belt-actions" style="margin-bottom: 1.2rem;">
+          <button class="btn-graduacion" (click)="abrirGraduacionModal()">
+            Modificar cinturón y grados
+          </button>
         </div>
-        <div class="belt-actions" style="margin-top: 0.5rem; margin-bottom: 1.5rem;">
-          <button class="btn-outline small" style="padding: 0.4rem 1rem; font-size: 0.8rem; border-color: rgba(255,255,255,0.2); color: var(--text-secondary);" (click)="abrirGraduacionModal()">Modificar cinturón y grados</button>
+        <div class="belt-badge belt-rectangular belt-{{ perfil.cinturon | lowercase }}">
+          CINTURÓN {{ perfil.cinturon }}
         </div>
-        <div class="id-interno" *ngIf="perfil.id_interno">
+        <div class="id-interno" *ngIf="perfil.id_interno" style="margin-top: 1.5rem;">
           Socio Nº: <span>{{ perfil.id_interno }}</span>
         </div>
       </div>
@@ -159,7 +161,7 @@
           <div class="avatar-small">{{ hijo.first_name[0] }}</div>
           <div class="child-title">
             <h4>{{ hijo.first_name }} {{ hijo.last_name }}</h4>
-            <span class="belt-badge belt-{{ hijo.cinturon | lowercase }} mini" style="cursor: pointer; transition: transform 0.2s;" (click)="abrirGraduacionModal(hijo)" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <span class="belt-badge belt-rectangular belt-{{ hijo.cinturon | lowercase }} mini" style="cursor: pointer; transition: transform 0.2s;" (click)="abrirGraduacionModal(hijo)" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
               Cinturón {{ hijo.cinturon }} ✏️
             </span>
           </div>
