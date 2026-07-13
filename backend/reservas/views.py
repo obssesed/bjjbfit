@@ -35,6 +35,7 @@ class ActividadViewSet(viewsets.ModelViewSet):
     """
     queryset = Actividad.objects.all().order_by('orden', 'id')
     serializer_class = ActividadSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
@@ -49,6 +50,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
     """
     queryset = Producto.objects.all().order_by('orden', 'id')
     serializer_class = ProductoSerializer
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
