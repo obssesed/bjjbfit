@@ -987,10 +987,10 @@
 .product-visual {
   height: 220px;
   position: relative;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(15, 23, 42, 0.4);
 }
 
 .product-visual.no-img {
