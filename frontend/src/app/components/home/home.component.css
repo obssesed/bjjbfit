@@ -823,10 +823,10 @@
   height: 180px;
   position: relative;
   overflow: hidden;
-  background-size: cover;
+  background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: rgba(255, 255, 255, 0.05); /* Fondo por defecto */
+  background-color: rgba(15, 23, 42, 0.4);
 }
 
 .svc-visual.no-img {
