@@ -268,6 +268,40 @@
       </div>
     </div>
 
+    <!-- ──────── PLANES DISPONIBLES ──────── -->
+    <h2 class="section-title" style="margin-top: 3rem;">Planes Disponibles</h2>
+    <p class="section-sub">Elige la membresía que mejor se adapte a tus necesidades y nivel.</p>
+    
+    <div class="planes-grid" *ngIf="!cargandoPlanes && planes.length > 0">
+      <div class="plan-card" *ngFor="let plan of planes">
+        <div class="plan-badge" [ngClass]="plan.categoria_edad">
+          {{ plan.categoria_edad }}
+        </div>
+        
+        <div class="plan-info">
+          <h3>{{ plan.nombre }}</h3>
+          <div class="plan-price">
+            <span class="currency">€</span>
+            <span class="amount">{{ plan.precio_base }}</span>
+            <span class="period">/mes</span>
+          </div>
+
+          <div class="plan-beneficios">
+            <h4>Beneficios:</h4>
+            <ul>
+              <li *ngFor="let b of getBeneficiosList(plan.beneficios)">
+                <span class="check">✓</span> {{ b }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="planes.length === 0 && !cargandoPlanes" class="empty-state">
+      <p>No hay planes configurados actualmente.</p>
+    </div>
+
     <!-- Servicios Extra -->
     <h3 class="sub-heading" style="margin-top: 3rem;">Instalaciones</h3>
     <div class="extras-row">

@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { AuthService, Plan } from '../../services/auth.service';
 import { ClasesService, Actividad, Producto } from '../../services/clases.service';
 import { FormsModule } from '@angular/forms';
 
@@ -19,6 +19,8 @@ export class LandingComponent implements OnInit {
   cargandoActividades: boolean = true;
   productos: Producto[] = [];
   cargandoProductos: boolean = true;
+  planes: Plan[] = [];
+  cargandoPlanes: boolean = true;
 
   @ViewChild('videoAcademia') videoRef!: ElementRef<HTMLVideoElement>;
 
@@ -38,6 +40,7 @@ export class LandingComponent implements OnInit {
 
     this.cargarActividades();
     this.cargarProductos();
+    this.cargarPlanes();
   }
 
   setTab(tab: string) {
@@ -96,5 +99,26 @@ export class LandingComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  cargarPlanes() {
+    this.cargandoPlanes = true;
+    this.authService.getPlanes().subscribe({
+      next: (res: Plan[]) => {
+        this.planes = res.filter(p => p.activo);
+        this.cargandoPlanes = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al cargar planes:', err);
+        this.cargandoPlanes = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getBeneficiosList(beneficios: string): string[] {
+    if (!beneficios) return [];
+    return beneficios.split('\n').filter(b => b.trim() !== '');
   }
 }

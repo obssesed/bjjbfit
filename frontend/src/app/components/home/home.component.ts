@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService, PerfilDeportista } from '../../services/auth.service';
+import { AuthService, PerfilDeportista, Plan } from '../../services/auth.service';
 import { ClasesService, ClaseBJJ, Actividad, Producto, VideoRepaso } from '../../services/clases.service';
 import { FormsModule } from '@angular/forms';
 
@@ -22,6 +22,8 @@ export class HomeComponent implements OnInit {
   // Actividades dinámicas
   actividades: Actividad[] = [];
   cargandoActividades: boolean = true;
+  planes: Plan[] = [];
+  cargandoPlanes: boolean = true;
   
   // Modal edición actividad
   mostrarModalActividad: boolean = false;
@@ -84,6 +86,7 @@ export class HomeComponent implements OnInit {
     this.cargarActividades();
     this.cargarProductos();
     this.cargarVideosRepaso();
+    this.cargarPlanes();
   }
 
   solicitudesPendientesCount: number = 0;
@@ -309,6 +312,28 @@ export class HomeComponent implements OnInit {
     if (this.callbackConfirmar) {
       this.callbackConfirmar();
     }
+    this.cerrarModalConfirmar();
+  }
+
+  cargarPlanes() {
+    this.cargandoPlanes = true;
+    this.authService.getPlanes().subscribe({
+      next: (res: Plan[]) => {
+        this.planes = res.filter(p => p.activo);
+        this.cargandoPlanes = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al cargar planes:', err);
+        this.cargandoPlanes = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  getBeneficiosList(beneficios: string): string[] {
+    if (!beneficios) return [];
+    return beneficios.split('\n').filter(b => b.trim() !== '');
   }
 
   // --- MÉTODOS ADMIN PRODUCTOS ---

@@ -562,10 +562,10 @@ class PlanViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_permissions(self):
-        # Solo admin puede crear/editar/borrar. Todos pueden ver (para el registro).
+        # Solo admin puede crear/editar/borrar. Todos pueden ver (para el registro y la landing).
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAdminUser()]
-        return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
 
 
 

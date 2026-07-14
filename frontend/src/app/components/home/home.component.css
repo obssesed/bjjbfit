@@ -1539,3 +1539,94 @@
   box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
 }
 
+/* ──────── PLANES DISPONIBLES ──────── */
+.planes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.plan-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.plan-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--accent-gold);
+  transform: translateY(-5px);
+}
+
+.plan-badge {
+  position: absolute;
+  top: 1rem;
+  right: -2rem;
+  transform: rotate(45deg);
+  width: 100px;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.3rem 0;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.plan-badge.ADULTO { background: #3b82f6; }
+.plan-badge.JUVENIL { background: #f59e0b; }
+.plan-badge.INFANTIL { background: #10b981; }
+
+.plan-info h3 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem 0;
+  color: #fff;
+}
+
+.plan-price {
+  display: flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.plan-price .currency { color: var(--accent-gold); font-weight: 700; }
+.plan-price .amount { font-size: 2.5rem; font-weight: 800; color: #fff; }
+.plan-price .period { color: var(--text-secondary); font-size: 0.9rem; }
+
+.plan-beneficios {
+  flex: 1;
+  margin-bottom: 2rem;
+}
+
+.plan-beneficios h4 {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.plan-beneficios ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.plan-beneficios li {
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.plan-beneficios .check {
+  color: var(--accent-gold);
+  font-weight: bold;
+}
