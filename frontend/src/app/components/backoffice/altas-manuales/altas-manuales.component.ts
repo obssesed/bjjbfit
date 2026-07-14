@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
 import { AuthService, Plan } from '../../../services/auth.service';
 
 @Component({
@@ -36,7 +37,7 @@ export class AltasManualesComponent implements OnInit {
     'Gris', 'Amarillo', 'Naranja', 'Verde'
   ];
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.cargarPlanes();
@@ -59,18 +60,35 @@ export class AltasManualesComponent implements OnInit {
     this.mensajeResultado = null;
     this.mensajeError = false;
 
-    this.authService.crearAltaManual(this.nuevoUsuario).subscribe({
+    this.authService.crearAltaManual(this.nuevoUsuario)
+      .pipe(
+        finalize(() => {
+          this.guardando = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
       next: (res) => {
-        this.guardando = false;
         this.mensajeResultado = res.success || 'Usuario creado con éxito. Contraseña: Bjjbfit2026!';
         this.resetearFormulario();
-        setTimeout(() => { this.mensajeResultado = null; }, 5000);
+        setTimeout(() => { this.mensajeResultado = null; this.cdr.detectChanges(); }, 5000);
       },
       error: (err) => {
-        this.guardando = false;
         this.mensajeError = true;
-        this.mensajeResultado = err.error?.email ? 'El email ya está en uso o es inválido.' : 'Error al crear el alta manual. Revisa los datos requeridos.';
-        setTimeout(() => { this.mensajeResultado = null; }, 5000);
+        
+        let errorMessage = 'Error al crear el alta manual. Revisa los datos requeridos.';
+        if (err.error?.email) {
+          errorMessage = 'El email ya está en uso o es inválido.';
+        } else if (err.error && typeof err.error === 'object') {
+          // Extraer primer error de validación de DRF si existe
+          const firstKey = Object.keys(err.error)[0];
+          if (firstKey && Array.isArray(err.error[firstKey])) {
+            errorMessage = `${firstKey}: ${err.error[firstKey][0]}`;
+          }
+        }
+        
+        this.mensajeResultado = errorMessage;
+        setTimeout(() => { this.mensajeResultado = null; this.cdr.detectChanges(); }, 8000);
       }
     });
   }

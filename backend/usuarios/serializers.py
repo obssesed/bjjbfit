@@ -111,11 +111,11 @@ class DeportistaSerializer(serializers.ModelSerializer):
         
         # Si metodo_pago viene en la peticion y es CUENTA, validamos cuenta_bancaria
         # Si no viene metodo_pago pero el usuario ya lo tiene como CUENTA en DB, también validamos si intenta vaciar cuenta_bancaria
-        actual_metodo = getattr(request.user if request else None, 'metodo_pago', 'EFECTIVO')
+        actual_metodo = getattr(self.instance, 'metodo_pago', 'EFECTIVO') if self.instance else 'EFECTIVO'
         final_metodo = metodo_pago or actual_metodo
         
         if final_metodo == 'CUENTA':
-            final_cuenta = cuenta_bancaria if cuenta_bancaria is not None else getattr(request.user if request else None, 'cuenta_bancaria', None)
+            final_cuenta = cuenta_bancaria if cuenta_bancaria is not None else getattr(self.instance, 'cuenta_bancaria', None) if self.instance else None
             if not final_cuenta:
                 raise serializers.ValidationError({"cuenta_bancaria": "Es obligatorio indicar una cuenta bancaria para el método de pago por cuenta."})
 
