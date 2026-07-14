@@ -188,6 +188,36 @@
       </div>
 
       <div class="asistencia-body">
+        <!-- BUSCADOR INTELIGENTE (Manual) -->
+        <div class="autocomplete-container admin-search-add">
+          <label class="search-label">Inscribir manualmente:</label>
+          <div class="search-flex">
+            <input type="text" 
+                   class="input-premium search-input" 
+                   [(ngModel)]="searchTerm" 
+                   (input)="filtrarUsuarios()" 
+                   (focus)="filtrarUsuarios()"
+                   (blur)="ocultarDropdown()"
+                   placeholder="Buscar por nombre o @usuario...">
+            <button class="btn-confirm btn-sm" 
+                    [disabled]="!usuarioManualSeleccionado || inscribiendoManual"
+                    (click)="inscribirManual()">
+              {{ inscribiendoManual ? 'Añadiendo...' : 'Añadir' }}
+            </button>
+          </div>
+               
+          <ul class="autocomplete-list" *ngIf="mostrarDropdown && usuariosFiltrados.length > 0">
+            <li *ngFor="let u of usuariosFiltrados" (mousedown)="seleccionarUsuarioManual(u)">
+              <div class="user-name">{{ u.first_name }} {{ u.last_name }}</div>
+              <div class="user-username">@{{ u.username }}</div>
+            </li>
+          </ul>
+          <div class="autocomplete-empty" *ngIf="mostrarDropdown && usuariosFiltrados.length === 0">
+            No se encontraron alumnos con ese nombre.
+          </div>
+        </div>
+        <hr class="divider">
+
         <div class="asistencia-empty" *ngIf="!claseAsistencia?.lista_asistencia?.length">
           <div class="empty-icon">📭</div>
           <p>No hay alumnos apuntados aún en esta clase.</p>

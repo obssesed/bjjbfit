@@ -53,6 +53,14 @@ export class ListaClasesComponent implements OnInit {
   showAdminConfirmModal: boolean = false;
   reservaParaEliminar: any = null;
 
+  // Autocomplete Admin
+  usuarios: PerfilDeportista[] = [];
+  usuariosFiltrados: PerfilDeportista[] = [];
+  searchTerm: string = '';
+  mostrarDropdown: boolean = false;
+  usuarioManualSeleccionado: PerfilDeportista | null = null;
+  inscribiendoManual: boolean = false;
+
   constructor(
     private clasesService: ClasesService, 
     private authService: AuthService,
@@ -66,12 +74,25 @@ export class ListaClasesComponent implements OnInit {
       this.authService.me().subscribe({
         next: (data) => {
           this.perfilDeportista = data;
+          if (this.perfilDeportista.is_staff) {
+            this.cargarUsuariosActivos();
+          }
           this.cdr.detectChanges();
         },
         error: (err) => console.error('Error cargando perfil', err)
       });
       this.cargarMisReservas();
     }
+  }
+
+  cargarUsuariosActivos() {
+    this.authService.getUsuariosActivos().subscribe({
+      next: (data) => {
+        this.usuarios = data;
+        this.usuariosFiltrados = data;
+      },
+      error: (err) => console.error('Error cargando usuarios', err)
+    });
   }
 
   esImagen(icono: string | null | undefined): boolean {
@@ -439,6 +460,60 @@ export class ListaClasesComponent implements OnInit {
         this.mensajeErrorModal = errorMsg;
         this.showErrorModal = true;
         this.cdr.detectChanges();
+      }
+    });
+  }
+
+  // --- Lógica Autocomplete Admin ---
+  filtrarUsuarios() {
+    this.mostrarDropdown = true;
+    if (!this.searchTerm) {
+      this.usuariosFiltrados = this.usuarios;
+      this.usuarioManualSeleccionado = null;
+      return;
+    }
+    const term = this.searchTerm.toLowerCase();
+    this.usuariosFiltrados = this.usuarios.filter(u => 
+      `${u.first_name} ${u.last_name} ${u.username}`.toLowerCase().includes(term)
+    );
+  }
+
+  seleccionarUsuarioManual(u: PerfilDeportista) {
+    this.usuarioManualSeleccionado = u;
+    this.searchTerm = `${u.first_name} ${u.last_name} (@${u.username})`;
+    this.mostrarDropdown = false;
+  }
+
+  ocultarDropdown() {
+    setTimeout(() => {
+      this.mostrarDropdown = false;
+    }, 200);
+  }
+
+  inscribirManual() {
+    if (!this.claseAsistencia || !this.usuarioManualSeleccionado) return;
+    
+    this.inscribiendoManual = true;
+    this.clasesService.reservarPlaza(this.claseAsistencia.id, this.usuarioManualSeleccionado.id).subscribe({
+      next: (res) => {
+        this.inscribiendoManual = false;
+        this.mensajeExito = `Se ha inscrito a ${this.usuarioManualSeleccionado?.first_name} correctamente.`;
+        this.searchTerm = '';
+        this.usuarioManualSeleccionado = null;
+        this.cargarClases(); // Recargar datos
+        
+        // Cerramos el modal por simplicidad para que el admin vea la alerta
+        this.cerrarAsistenciaModal();
+        
+        setTimeout(() => {
+          this.mensajeExito = null;
+        }, 4000);
+      },
+      error: (err) => {
+        this.inscribiendoManual = false;
+        this.cerrarAsistenciaModal();
+        this.showErrorModal = true;
+        this.mensajeErrorModal = err.error?.error || err.error?.detail || 'Error al inscribir manualmente.';
       }
     });
   }

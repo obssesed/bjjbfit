@@ -144,14 +144,14 @@ class ReservaViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         # Protegiendo creación: Verificamos si mandó deportista. 
-        # Si mandó otro ID, tiene que ser su hijo.
+        # Si mandó otro ID, tiene que ser su hijo o el usuario autenticado tiene que ser admin.
         deportista_provisto = serializer.validated_data.get('deportista', None)
         user = self.request.user
         
         if deportista_provisto is None:
             serializer.save(deportista=user)
         else:
-            if deportista_provisto != user and deportista_provisto not in user.hijos_a_cargo.all():
+            if not user.is_staff and deportista_provisto != user and deportista_provisto not in user.hijos_a_cargo.all():
                 from rest_framework.exceptions import PermissionDenied
                 raise PermissionDenied("No tienes permiso para reservar en nombre de este usuario.")
             serializer.save()
