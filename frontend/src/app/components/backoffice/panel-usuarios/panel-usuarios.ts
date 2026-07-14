@@ -49,7 +49,8 @@ export class PanelUsuarios implements OnInit {
     categoria: '',
     plan: '',
     fechaAlta: '',
-    fechaGraduacion: ''
+    fechaGraduacion: '',
+    metodoPago: ''
   };
 
   opcionesCinturon: string[] = ['Blanco', 'Azul', 'Morado', 'Marrón', 'Negro', 'Gris', 'Amarillo', 'Naranja', 'Verde'];
@@ -532,7 +533,10 @@ export class PanelUsuarios implements OnInit {
         cumpleFechaGraduacion = false;
       }
 
-      return cumpleTexto && cumpleCinturon && cumpleSexo && cumplePlan && cumpleCategoria && cumpleFecha && cumpleFechaGraduacion;
+      // 6. Método de pago
+      const cumpleMetodoPago = !this.filtros.metodoPago || u.metodo_pago === this.filtros.metodoPago;
+
+      return cumpleTexto && cumpleCinturon && cumpleSexo && cumplePlan && cumpleCategoria && cumpleFecha && cumpleFechaGraduacion && cumpleMetodoPago;
     });
   }
 
@@ -544,7 +548,8 @@ export class PanelUsuarios implements OnInit {
       categoria: '',
       plan: '',
       fechaAlta: '',
-      fechaGraduacion: ''
+      fechaGraduacion: '',
+      metodoPago: ''
     };
     this.cdr.detectChanges();
   }

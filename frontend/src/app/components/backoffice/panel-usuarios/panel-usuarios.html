@@ -66,6 +66,15 @@
     </div>
 
     <div class="filter-item">
+      <label>Método de Pago</label>
+      <select [(ngModel)]="filtros.metodoPago">
+        <option value="">Todos</option>
+        <option value="EFECTIVO">Efectivo</option>
+        <option value="CUENTA">Cuenta Corriente</option>
+      </select>
+    </div>
+
+    <div class="filter-item">
       <label>Fecha Alta</label>
       <input type="date" [(ngModel)]="filtros.fechaAlta">
     </div>
