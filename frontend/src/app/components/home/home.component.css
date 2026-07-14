@@ -826,7 +826,7 @@
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
-  background-color: rgba(15, 23, 42, 0.4);
+  background-color: #2a4365; /* Azul más claro para que resalten los logos oscuros */
 }
 
 .svc-visual.no-img {
