@@ -319,7 +319,10 @@ export class HomeComponent implements OnInit {
     this.cargandoPlanes = true;
     this.authService.getPlanes().subscribe({
       next: (res: Plan[]) => {
-        this.planes = res.filter(p => p.activo);
+        // Mostrar solo planes activos y ocultar explícitamente el plan "Plan adulto fundador"
+        this.planes = res.filter(p => 
+          p.activo && p.nombre.toLowerCase() !== 'plan adulto fundador'
+        );
         this.cargandoPlanes = false;
         this.cdr.detectChanges();
       },
