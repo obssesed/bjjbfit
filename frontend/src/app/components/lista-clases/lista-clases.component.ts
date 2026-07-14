@@ -494,8 +494,8 @@ export class ListaClasesComponent implements OnInit {
     if (!this.claseAsistencia || !this.usuarioManualSeleccionado) return;
     
     this.inscribiendoManual = true;
-    this.clasesService.reservarPlaza(this.claseAsistencia.id, this.usuarioManualSeleccionado.id).subscribe({
-      next: (res) => {
+    this.clasesService.hacerReserva(this.claseAsistencia.id, this.usuarioManualSeleccionado.id).subscribe({
+      next: (res: any) => {
         this.inscribiendoManual = false;
         this.mensajeExito = `Se ha inscrito a ${this.usuarioManualSeleccionado?.first_name} correctamente.`;
         this.searchTerm = '';
@@ -509,7 +509,7 @@ export class ListaClasesComponent implements OnInit {
           this.mensajeExito = null;
         }, 4000);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.inscribiendoManual = false;
         this.cerrarAsistenciaModal();
         this.showErrorModal = true;
