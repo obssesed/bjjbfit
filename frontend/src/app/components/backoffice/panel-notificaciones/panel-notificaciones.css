@@ -111,3 +111,84 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Autocomplete / Búsqueda de Usuario */
+.autocomplete-container {
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #fff;
+  outline: none;
+  font-size: 0.95rem;
+}
+
+.search-input:focus {
+  border-color: var(--accent-gold);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-top: 5px;
+  max-height: 250px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.autocomplete-list li {
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+}
+
+.autocomplete-list li:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-list li:hover {
+  background: rgba(212, 175, 55, 0.15);
+}
+
+.user-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.user-username {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+}
+
+.autocomplete-empty {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-top: 5px;
+  padding: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  text-align: center;
+  z-index: 1000;
+}

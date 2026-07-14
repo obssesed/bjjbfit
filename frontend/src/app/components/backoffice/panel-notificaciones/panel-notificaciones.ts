@@ -25,6 +25,12 @@ export class PanelNotificacionesComponent implements OnInit {
   
   notificacionesRecientes: Notificacion[] = [];
 
+  // Variables para la búsqueda de usuario
+  searchTerm: string = '';
+  usuariosFiltrados: PerfilDeportista[] = [];
+  mostrarDropdown: boolean = false;
+  usuarioSeleccionado: PerfilDeportista | null = null;
+
   constructor(private authService: AuthService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {
@@ -34,9 +40,39 @@ export class PanelNotificacionesComponent implements OnInit {
 
   cargarUsuarios() {
     this.authService.getUsuariosActivos().subscribe({
-      next: (data) => this.usuarios = data,
+      next: (data) => {
+        this.usuarios = data;
+        this.usuariosFiltrados = data;
+      },
       error: (err) => console.error('Error cargando usuarios', err)
     });
+  }
+
+  filtrarUsuarios() {
+    this.mostrarDropdown = true;
+    if (!this.searchTerm) {
+      this.usuariosFiltrados = this.usuarios;
+      this.nuevaNotificacion.destinatario = undefined;
+      this.usuarioSeleccionado = null;
+      return;
+    }
+    const term = this.searchTerm.toLowerCase();
+    this.usuariosFiltrados = this.usuarios.filter(u => 
+      `${u.first_name} ${u.last_name} ${u.username}`.toLowerCase().includes(term)
+    );
+  }
+
+  seleccionarUsuario(u: PerfilDeportista) {
+    this.usuarioSeleccionado = u;
+    this.nuevaNotificacion.destinatario = u.id;
+    this.searchTerm = `${u.first_name} ${u.last_name} (@${u.username})`;
+    this.mostrarDropdown = false;
+  }
+
+  ocultarDropdown() {
+    setTimeout(() => {
+      this.mostrarDropdown = false;
+    }, 200);
   }
 
   cargarNotificaciones() {
@@ -73,6 +109,8 @@ export class PanelNotificacionesComponent implements OnInit {
         console.log('Respuesta del servidor:', res);
         this.mensajeExito = '¡Notificación enviada correctamente!';
         this.nuevaNotificacion = { titulo: '', mensaje: '', es_global: true, destinatario: undefined };
+        this.searchTerm = '';
+        this.usuarioSeleccionado = null;
         this.cdr.detectChanges();
         setTimeout(() => {
           this.mensajeExito = '';

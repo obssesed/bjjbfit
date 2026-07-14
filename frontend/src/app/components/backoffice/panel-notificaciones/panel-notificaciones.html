@@ -28,14 +28,25 @@
       </div>
     </div>
 
-    <div class="form-group" *ngIf="!nuevaNotificacion.es_global">
-      <label>Seleccionar Usuario</label>
-      <select [(ngModel)]="nuevaNotificacion.destinatario" class="input-premium">
-        <option [ngValue]="undefined" disabled>-- Elige un alumno --</option>
-        <option *ngFor="let u of usuarios" [ngValue]="u.id">
-          {{ u.first_name }} {{ u.last_name }} (@{{ u.username }})
-        </option>
-      </select>
+    <div class="form-group autocomplete-container" *ngIf="!nuevaNotificacion.es_global">
+      <label>Buscar Usuario</label>
+      <input type="text" 
+             class="input-premium search-input" 
+             [(ngModel)]="searchTerm" 
+             (input)="filtrarUsuarios()" 
+             (focus)="filtrarUsuarios()"
+             (blur)="ocultarDropdown()"
+             placeholder="Escribe el nombre del alumno...">
+             
+      <ul class="autocomplete-list" *ngIf="mostrarDropdown && usuariosFiltrados.length > 0">
+        <li *ngFor="let u of usuariosFiltrados" (mousedown)="seleccionarUsuario(u)">
+          <div class="user-name">{{ u.first_name }} {{ u.last_name }}</div>
+          <div class="user-username">@{{ u.username }}</div>
+        </li>
+      </ul>
+      <div class="autocomplete-empty" *ngIf="mostrarDropdown && usuariosFiltrados.length === 0">
+        No se encontraron alumnos con ese nombre.
+      </div>
     </div>
 
     <div *ngIf="mensajeExito" class="alert-success">{{ mensajeExito }}</div>
