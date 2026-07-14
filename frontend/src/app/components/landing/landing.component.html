@@ -50,7 +50,12 @@
         <div class="about-badge">EST.2017</div>
         <h2 class="section-title">BJJBFIT Academy</h2>
         <p class="about-desc">
-          La Casa del Brasilian Jiujitsu de Badalona Club es la heredera y la evolución de nuestra primera academia BJJBFIT, con los mismos valores, con el mismo espíritu y las ganas renovadas. Nuestras enseñanza gira en torno al Brasilian Jiujitsu en sus formatos con Kimono y Nogi y todas aquellas disciplinas que nos ayudarán a mejorar nuestro desempeño y forma física, acondicionamiento físico (Fit4Fight), Defensa Personal (Self) y Striking (Fight4Fit), en un entorno profesional y familiar. Somos una Academia, un centro de aprendizaje que te acompañará desde los 4 años sin límite de edad
+          La Casa del Brasilian Jiujitsu de Badalona Club es la heredera y la evolución de nuestra primera academia
+          BJJBFIT, con los mismos valores, con el mismo espíritu y las ganas renovadas. Nuestras enseñanza gira en torno
+          al Brasilian Jiujitsu en sus formatos con Kimono y Nogi y todas aquellas disciplinas que nos ayudarán a
+          mejorar nuestro desempeño y forma física, acondicionamiento físico (Fit4Fight), Defensa Personal (Self) y
+          Striking (Fight4Fit), en un entorno profesional y familiar. Somos una Academia, un centro de aprendizaje que
+          te acompañará desde los 4 años sin límite de edad
         </p>
       </div>
       <div class="about-video">
@@ -194,7 +199,8 @@
 
     <div class="services-grid">
       <div *ngFor="let act of actividades" class="svc-card">
-        <div class="svc-visual" [style.backgroundImage]="act.imagen ? 'url(' + act.imagen + ')' : null" [ngClass]="{'no-img': !act.imagen}">
+        <div class="svc-visual" [style.backgroundImage]="act.imagen ? 'url(' + act.imagen + ')' : null"
+          [ngClass]="{'no-img': !act.imagen}">
           <div class="svc-overlay"></div>
         </div>
         <div class="svc-body">
@@ -204,7 +210,7 @@
           <div class="svc-footer" routerLink="/login">Explorar horarios y reservar →</div>
         </div>
       </div>
-      
+
       <!-- Placeholder si no hay actividades -->
       <div *ngIf="actividades.length === 0 && !cargandoActividades" class="empty-state">
         <p>No hay actividades configuradas actualmente.</p>
@@ -232,7 +238,7 @@
         <span class="extra-emoji">🚿</span>
         <div>
           <h4>Vestuarios</h4>
-          <p>Vestuarios amplios y completos</p>
+          <p>Vestuarios amplios y completos.</p>
         </div>
       </div>
     </div>
@@ -247,13 +253,15 @@
       <span class="store-banner-icon">🛒</span>
       <div>
         <strong>Compra presencial</strong>
-        <p>Para adquirir cualquier artículo, dirígete a la recepción de la academia. Aquí puedes consultar disponibilidad.</p>
+        <p>Para adquirir cualquier artículo, dirígete a la recepción de la academia. Aquí puedes consultar
+          disponibilidad.</p>
       </div>
     </div>
 
     <div class="products-grid">
       <div *ngFor="let prod of productos" class="product-card">
-        <div class="product-visual" [style.backgroundImage]="prod.imagen ? 'url(' + prod.imagen + ')' : null" [ngClass]="{'no-img': !prod.imagen}">
+        <div class="product-visual" [style.backgroundImage]="prod.imagen ? 'url(' + prod.imagen + ')' : null"
+          [ngClass]="{'no-img': !prod.imagen}">
           <div class="product-overlay"></div>
         </div>
         <div class="product-body">
@@ -262,7 +270,8 @@
             'low': prod.estado_stock === 'LOW_STOCK',
             'out': prod.estado_stock === 'OUT_OF_STOCK'
           }">
-            {{ prod.estado_stock_display || (prod.estado_stock === 'IN_STOCK' ? 'En Stock' : prod.estado_stock === 'LOW_STOCK' ? 'Últimas tallas' : 'Agotado') }}
+            {{ prod.estado_stock_display || (prod.estado_stock === 'IN_STOCK' ? 'En Stock' : prod.estado_stock ===
+            'LOW_STOCK' ? 'Últimas tallas' : 'Agotado') }}
           </span>
           <h3>{{ prod.nombre }}</h3>
           <p class="product-info">{{ prod.tallas }}</p>

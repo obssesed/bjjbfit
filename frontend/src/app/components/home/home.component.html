@@ -10,7 +10,8 @@
     <div class="admin-alert-banner" *ngIf="solicitudesPendientesCount > 0" routerLink="/backoffice/reseteos">
       <div class="alert-icon">⚠️</div>
       <div class="alert-text">
-        <strong>Atención Admin:</strong> Tienes {{ solicitudesPendientesCount }} solicitud(es) de reseteo de contraseña pendiente(s). Haz clic aquí para resolverlas.
+        <strong>Atención Admin:</strong> Tienes {{ solicitudesPendientesCount }} solicitud(es) de reseteo de contraseña
+        pendiente(s). Haz clic aquí para resolverlas.
       </div>
     </div>
 
@@ -83,7 +84,12 @@
         <div class="about-badge">EST.2017</div>
         <h2 class="section-title">BJJBFIT Academy</h2>
         <p class="about-desc">
-          La Casa del Brasilian Jiujitsu de Badalona Club es la heredera y la evolución de nuestra primera academia BJJBFIT, con los mismos valores, con el mismo espíritu y las ganas renovadas. Nuestras enseñanza gira en torno al Brasilian Jiujitsu en sus formatos con Kimono y Nogi y todas aquellas disciplinas que nos ayudarán a mejorar nuestro desempeño y forma física, acondicionamiento físico (Fit4Fight), Defensa Personal (Self) y Striking (Fight4Fit), en un entorno profesional y familiar. Somos una Academia, un centro de aprendizaje que te acompañará desde los 4 años sin límite de edad
+          La Casa del Brasilian Jiujitsu de Badalona Club es la heredera y la evolución de nuestra primera academia
+          BJJBFIT, con los mismos valores, con el mismo espíritu y las ganas renovadas. Nuestras enseñanza gira en torno
+          al Brasilian Jiujitsu en sus formatos con Kimono y Nogi y todas aquellas disciplinas que nos ayudarán a
+          mejorar nuestro desempeño y forma física, acondicionamiento físico (Fit4Fight), Defensa Personal (Self) y
+          Striking (Fight4Fit), en un entorno profesional y familiar. Somos una Academia, un centro de aprendizaje que
+          te acompañará desde los 4 años sin límite de edad
         </p>
       </div>
       <div class="about-video">
@@ -244,7 +250,8 @@
           </button>
         </div>
 
-        <div class="svc-visual" [style.backgroundImage]="act.imagen ? 'url(' + act.imagen + ')' : null" [ngClass]="{'no-img': !act.imagen}">
+        <div class="svc-visual" [style.backgroundImage]="act.imagen ? 'url(' + act.imagen + ')' : null"
+          [ngClass]="{'no-img': !act.imagen}">
           <div class="svc-overlay"></div>
         </div>
         <div class="svc-body">
@@ -254,7 +261,7 @@
           <div class="svc-footer">Explorar horarios →</div>
         </div>
       </div>
-      
+
       <!-- Placeholder si no hay actividades -->
       <div *ngIf="actividades.length === 0 && !cargandoActividades" class="empty-state">
         <p>No hay actividades configuradas actualmente.</p>
@@ -282,7 +289,7 @@
         <span class="extra-emoji">🚿</span>
         <div>
           <h4>Vestuarios</h4>
-          <p>Vestuarios completos con duchas, taquillas y secadores.</p>
+          <p>Vestuarios amplios y completos.</p>
         </div>
       </div>
     </div>
@@ -320,7 +327,8 @@
           </button>
         </div>
 
-        <div class="product-visual" [style.backgroundImage]="prod.imagen ? 'url(' + prod.imagen + ')' : null" [ngClass]="{'no-img': !prod.imagen}">
+        <div class="product-visual" [style.backgroundImage]="prod.imagen ? 'url(' + prod.imagen + ')' : null"
+          [ngClass]="{'no-img': !prod.imagen}">
           <div class="product-overlay"></div>
         </div>
         <div class="product-body">
@@ -329,7 +337,8 @@
             'low': prod.estado_stock === 'LOW_STOCK',
             'out': prod.estado_stock === 'OUT_OF_STOCK'
           }">
-            {{ prod.estado_stock_display || (prod.estado_stock === 'IN_STOCK' ? 'En Stock' : prod.estado_stock === 'LOW_STOCK' ? 'Últimas tallas' : 'Agotado') }}
+            {{ prod.estado_stock_display || (prod.estado_stock === 'IN_STOCK' ? 'En Stock' : prod.estado_stock ===
+            'LOW_STOCK' ? 'Últimas tallas' : 'Agotado') }}
           </span>
           <h3>{{ prod.nombre }}</h3>
           <p class="product-info">{{ prod.tallas }}</p>
@@ -358,9 +367,10 @@
     <div class="video-layout" *ngIf="videosRepaso.length > 0; else noVideos">
       <div class="video-main" *ngIf="videoActivo">
         <div class="video-player">
-          <video *ngIf="videoActivo.archivo_video" [src]="videoActivo.archivo_video" controls class="main-video-el" [poster]="videoActivo.miniatura || ''"></video>
+          <video *ngIf="videoActivo.archivo_video" [src]="videoActivo.archivo_video" controls class="main-video-el"
+            [poster]="videoActivo.miniatura || ''"></video>
           <div *ngIf="!videoActivo.archivo_video" class="video-placeholder">
-             <p>Cargando vídeo...</p>
+            <p>Cargando vídeo...</p>
           </div>
         </div>
         <div class="video-details">
@@ -379,10 +389,8 @@
       <aside class="video-sidebar">
         <h4 class="sidebar-title">Sesiones de Repaso</h4>
         <div class="sidebar-scroll">
-          <div *ngFor="let vid of videosRepaso" 
-               class="thumb-card" 
-               [ngClass]="{'active': videoActivo?.id === vid.id}"
-               (click)="seleccionarVideo(vid)">
+          <div *ngFor="let vid of videosRepaso" class="thumb-card" [ngClass]="{'active': videoActivo?.id === vid.id}"
+            (click)="seleccionarVideo(vid)">
             <div class="thumb-img" [style.backgroundImage]="vid.miniatura ? 'url(' + vid.miniatura + ')' : null">
               <div class="thumb-overlay" *ngIf="videoActivo?.id === vid.id">
                 <span>REPRODUCIENDO</span>
@@ -425,14 +433,16 @@
 
         <div class="form-group">
           <label>Descripción</label>
-          <textarea [(ngModel)]="actividadEdicion.descripcion" class="form-control" rows="3" placeholder="Describe brevemente el servicio..."></textarea>
+          <textarea [(ngModel)]="actividadEdicion.descripcion" class="form-control" rows="3"
+            placeholder="Describe brevemente el servicio..."></textarea>
         </div>
 
         <div class="form-group">
           <label>Imagen de fondo</label>
           <input type="file" (change)="onFileSelected($event)" class="form-control" accept="image/*">
           <p class="section-sub" style="margin-top: 5px; font-size: 0.8rem;">
-            {{ actividadEdicion.imagen ? 'Ya tiene imagen. Sube otra para cambiarla.' : 'Sube una imagen impactante para la tarjeta.' }}
+            {{ actividadEdicion.imagen ? 'Ya tiene imagen. Sube otra para cambiarla.' : 'Sube una imagen impactante para
+            la tarjeta.' }}
           </p>
         </div>
 
@@ -444,7 +454,8 @@
 
       <div class="modal-footer">
         <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
-        <button class="btn-save" (click)="guardarActividad()" [disabled]="guardandoActividad || !actividadEdicion.titulo || !actividadEdicion.descripcion">
+        <button class="btn-save" (click)="guardarActividad()"
+          [disabled]="guardandoActividad || !actividadEdicion.titulo || !actividadEdicion.descripcion">
           {{ guardandoActividad ? 'Guardando...' : 'Guardar Actividad' }}
         </button>
       </div>
@@ -481,7 +492,8 @@
 
         <div class="form-group">
           <label>Descripción</label>
-          <textarea [(ngModel)]="productoEdicion.descripcion" class="form-control" rows="3" placeholder="Breve descripción del producto..."></textarea>
+          <textarea [(ngModel)]="productoEdicion.descripcion" class="form-control" rows="3"
+            placeholder="Breve descripción del producto..."></textarea>
         </div>
 
         <div class="form-group">
@@ -515,12 +527,14 @@
       <div class="modal-body">
         <div class="form-group">
           <label>Título del Vídeo</label>
-          <input type="text" [(ngModel)]="videoEdicion.titulo" class="form-control" placeholder="Ej: Pasaje de guardia...">
+          <input type="text" [(ngModel)]="videoEdicion.titulo" class="form-control"
+            placeholder="Ej: Pasaje de guardia...">
         </div>
 
         <div class="form-group">
           <label>Descripción</label>
-          <textarea [(ngModel)]="videoEdicion.descripcion" class="form-control" rows="3" placeholder="Explica la técnica o el enfoque..."></textarea>
+          <textarea [(ngModel)]="videoEdicion.descripcion" class="form-control" rows="3"
+            placeholder="Explica la técnica o el enfoque..."></textarea>
         </div>
 
         <div class="form-group">
@@ -557,7 +571,7 @@
       <div class="confirm-icon">⚠️</div>
       <h2 class="confirm-title">{{ tituloConfirmar }}</h2>
       <p class="confirm-message">{{ mensajeConfirmar }}</p>
-      
+
       <div class="modal-footer confirm-footer">
         <button class="btn-cancel" (click)="cerrarModalConfirmar()">Cancelar</button>
         <button class="btn-save btn-danger" (click)="ejecutarConfirmacion()">
