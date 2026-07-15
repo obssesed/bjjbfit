@@ -1188,3 +1188,106 @@
   font-size: 0.8rem;
   opacity: 0.6;
 }
+
+/* === Botón Borrar Permanente === */
+.btn-delete {
+  background: transparent;
+  color: #ef4444; /* Rojo fosforito/alerta */
+  border: 1px solid #ef4444;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: #ef4444;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+.btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* === Modal Danger (Borrar Permanente) === */
+.danger-overlay {
+  background: rgba(0, 0, 0, 0.85); /* Más oscuro para alerta */
+  backdrop-filter: blur(8px);
+}
+
+.danger-card {
+  border: 2px solid #ef4444;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.2);
+  text-align: center;
+}
+
+.danger-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.danger-title {
+  color: #f87171 !important;
+  font-size: 1.5rem !important;
+}
+
+.danger-text {
+  color: #e2e8f0;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+}
+
+.danger-label {
+  color: #fca5a5 !important;
+  font-size: 1rem !important;
+}
+
+.danger-input {
+  background: rgba(0,0,0,0.3) !important;
+  border: 2px solid #ef4444 !important;
+  color: #fca5a5 !important;
+}
+
+.danger-input:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3) !important;
+}
+
+.danger-actions {
+  margin-top: 2rem;
+}
+
+.btn-confirm-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-danger:hover:not(:disabled) {
+  background: #dc2626;
+  box-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-confirm-danger:disabled {
+  background: #475569;
+  color: #94a3b8;
+  cursor: not-allowed;
+}

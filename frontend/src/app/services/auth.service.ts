@@ -321,4 +321,8 @@ export class AuthService {
   cambiarPasswordObligatorio(new_password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/deportistas/cambiar_password_obligatorio/`, { new_password });
   }
+
+  deleteUsuario(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/deportistas/${userId}/`);
+  }
 }

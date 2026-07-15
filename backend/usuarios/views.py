@@ -47,7 +47,7 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'solicitar_reseteo']:
             return [permissions.AllowAny()]
             
-        if self.action in ['list', 'activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan', 'crear_alta_manual']:
+        if self.action in ['list', 'activos_backoffice', 'inactivos_backoffice', 'pendientes_backoffice', 'activar_plan', 'crear_alta_manual', 'destroy']:
             return [permissions.IsAdminUser()]
             
         return [permissions.IsAuthenticated()]
@@ -183,8 +183,35 @@ class DeportistaViewSet(viewsets.ModelViewSet):
         
         # Generar un username si no se envía o si se quiere autogenerar
         import uuid
+        import unicodedata
         if not data.get('username'):
-            data['username'] = f"user_{uuid.uuid4().hex[:6]}"
+            first_name = data.get('first_name', '')
+            last_name = data.get('last_name', '')
+            
+            # Quitar acentos y poner en minúsculas
+            def normalize(s):
+                if not s: return ''
+                return ''.join(c for c in unicodedata.normalize('NFD', str(s)) if unicodedata.category(c) != 'Mn').lower()
+            
+            fn_norm = normalize(first_name).replace(' ', '')
+            # Coger solo el primer apellido
+            ln_norm = normalize(last_name).split()[0] if last_name else ''
+            
+            if fn_norm and ln_norm:
+                base_username = f"{fn_norm}.{ln_norm}"
+            elif fn_norm:
+                base_username = fn_norm
+            else:
+                base_username = f"user_{uuid.uuid4().hex[:6]}"
+                
+            # Verificar que no exista ya el username, si existe añadir número
+            username = base_username
+            counter = 1
+            while Deportista.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+                
+            data['username'] = username
             
         # Asignar contraseña por defecto si no se ha enviado una
         if 'password' not in data:

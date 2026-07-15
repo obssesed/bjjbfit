@@ -231,6 +231,9 @@
             <button class="btn-baja" (click)="abrirBaja(u)" [disabled]="activandoId === u.id">
               {{ activandoId === u.id ? '...' : 'Dar Baja' }}
             </button>
+            <button class="btn-delete" (click)="abrirDelete(u)" [disabled]="activandoId === u.id">
+              Borrar usuario
+            </button>
           </div>
         </td>
       </tr>
@@ -333,7 +336,12 @@
           </div>
         </td>
         <td>
-          <span class="pill pending-pill">⏳ Pendiente</span>
+          <div class="estado-col">
+            <span class="pill pending-pill">⏳ Pendiente</span>
+            <button class="btn-delete" (click)="abrirDelete(u)" [disabled]="activandoId === u.id" style="margin-top: 0.5rem;">
+              Borrar usuario
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -431,7 +439,12 @@
           </div>
         </td>
         <td>
-          <span class="pill error-pill">❌ Inactivo</span>
+          <div class="estado-col">
+            <span class="pill error-pill">❌ Inactivo</span>
+            <button class="btn-delete" (click)="abrirDelete(u)" [disabled]="activandoId === u.id" style="margin-top: 0.5rem;">
+              Borrar usuario
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -591,6 +604,35 @@
       <button class="btn-cancel" (click)="cerrarModalCuenta()">Cancelar</button>
       <button class="btn-confirm" [disabled]="activandoId === deportistaSeleccionado.id" (click)="confirmarCuenta()">
         {{ activandoId === deportistaSeleccionado.id ? 'Guardando...' : 'Guardar Cuenta' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== MODAL DANGER: Borrar Permanentemente ====== -->
+<div class="modal-overlay danger-overlay" *ngIf="showDeleteModal && usuarioABorrar">
+  <div class="modal-card danger-card">
+    <div class="danger-icon">⚠️</div>
+    <h3 class="modal-title danger-title">Borrar Usuario Permanentemente</h3>
+    <p class="modal-subtitle danger-text">
+      Estás a punto de borrar de forma definitiva a 
+      <strong>{{ usuarioABorrar.first_name }} {{ usuarioABorrar.last_name }}</strong>.<br><br>
+      Esta acción destruirá su perfil, su historial de reservas, grados, planes y no se podrá deshacer.
+    </p>
+
+    <div class="modal-plan-form">
+      <label class="modal-form-label danger-label">Escribe <strong>BORRAR</strong> para confirmar:</label>
+      <input type="text" [(ngModel)]="palabraConfirmacion" 
+             class="control-input danger-input" placeholder="BORRAR"
+             style="width: 100%; margin-top: 0.5rem; text-align: center; font-weight: bold; color: #f87171;">
+    </div>
+
+    <div class="modal-actions danger-actions">
+      <button class="btn-cancel" (click)="cerrarDeleteModal()">Cancelar</button>
+      <button class="btn-confirm-danger" 
+              [disabled]="palabraConfirmacion !== 'BORRAR' || activandoId === usuarioABorrar.id" 
+              (click)="ejecutarBorradoPermanente()">
+        {{ activandoId === usuarioABorrar.id ? 'Borrando...' : 'Sí, Borrar Permanentemente' }}
       </button>
     </div>
   </div>

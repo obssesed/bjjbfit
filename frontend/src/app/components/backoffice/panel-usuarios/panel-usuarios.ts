@@ -39,6 +39,11 @@ export class PanelUsuarios implements OnInit {
   editandoDni: number | null = null; // Para edición inline del DNI/NIF
   editandoNombre: number | null = null; // Para edición inline del nombre
 
+  // Modal de Borrado Permanente
+  showDeleteModal: boolean = false;
+  usuarioABorrar: PerfilDeportista | null = null;
+  palabraConfirmacion: string = '';
+
   // Filtros
   filtrosExpandidos: boolean = false;
   filtros = {
@@ -178,6 +183,48 @@ export class PanelUsuarios implements OnInit {
         this.showBajaModal = false;
         this.deportistaSeleccionado = null;
         this.mensajeExito = '❌ Error al dar de baja.';
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      }
+    });
+  }
+
+  // === Modal Borrar Usuario Permanentemente ===
+  abrirDelete(deportista: PerfilDeportista) {
+    this.usuarioABorrar = deportista;
+    this.palabraConfirmacion = '';
+    this.showDeleteModal = true;
+    this.cdr.detectChanges();
+  }
+
+  cerrarDeleteModal() {
+    this.showDeleteModal = false;
+    this.usuarioABorrar = null;
+    this.palabraConfirmacion = '';
+    this.cdr.detectChanges();
+  }
+
+  ejecutarBorradoPermanente() {
+    if (!this.usuarioABorrar || this.palabraConfirmacion !== 'BORRAR') return;
+    
+    this.activandoId = this.usuarioABorrar.id;
+    this.cdr.detectChanges();
+
+    this.authService.deleteUsuario(this.usuarioABorrar.id).subscribe({
+      next: (res) => {
+        this.activandoId = null;
+        this.showDeleteModal = false;
+        this.mensajeExito = 'Usuario borrado permanentemente de la base de datos.';
+        this.usuarioABorrar = null;
+        this.cargarUsuarios();
+        this.cdr.detectChanges();
+        setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
+      },
+      error: (err) => {
+        this.activandoId = null;
+        this.showDeleteModal = false;
+        this.usuarioABorrar = null;
+        this.mensajeExito = '❌ Error al borrar el usuario permanentemente.';
         this.cdr.detectChanges();
         setTimeout(() => { this.mensajeExito = null; this.cdr.detectChanges(); }, 4000);
       }
